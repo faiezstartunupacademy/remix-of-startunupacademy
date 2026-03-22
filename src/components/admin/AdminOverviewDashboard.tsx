@@ -21,7 +21,12 @@ interface PlatformStats {
   mvpValidator: { projects: number; hypotheses: number; features: number; tests: number; personas: number; teamMembers: number; metrics: number };
   knowledgeBase: { tests: number };
   dataroom: { deliverables: number; completed: number };
+  strategic: { projects: number; accessApproved: number; accessPending: number };
 }
+
+type Props = {
+  onNavigateTab?: (tab: string) => void;
+};
 
 const AdminOverviewDashboard = () => {
   const [stats, setStats] = useState<PlatformStats | null>(null);
