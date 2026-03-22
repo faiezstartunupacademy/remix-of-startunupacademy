@@ -1,0 +1,6 @@
+ALTER TABLE public.license_keys 
+ADD COLUMN IF NOT EXISTS formation_date DATE,
+ADD COLUMN IF NOT EXISTS duration_hours INTEGER DEFAULT 0,
+ADD COLUMN IF NOT EXISTS source_author TEXT,
+ADD COLUMN IF NOT EXISTS source_author_image TEXT,
+ADD COLUMN IF NOT EXISTS source_label TEXT;

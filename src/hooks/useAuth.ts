@@ -1,0 +1,103 @@
+import { useState, useEffect } from 'react';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+
+export type AppRole = 'admin' | 'user';
+
+interface AuthState {
+  user: User | null;
+  session: Session | null;
+  loading: boolean;
+  isAdmin: boolean;
+  role: AppRole | null;
+}
+
+export const useAuth = () => {
+  const [authState, setAuthState] = useState<AuthState>({
+    user: null,
+    session: null,
+    loading: true,
+    isAdmin: false,
+    role: null,
+  });
+
+  useEffect(() => {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setAuthState(prev => ({
+          ...prev,
+          session,
+          user: session?.user ?? null,
+          loading: false,
+        }));
+
+        // Defer role check with setTimeout to avoid deadlock
+        if (session?.user) {
+          setTimeout(() => {
+            fetchUserRole(session.user.id);
+          }, 0);
+        } else {
+          setAuthState(prev => ({
+            ...prev,
+            isAdmin: false,
+            role: null,
+          }));
+        }
+      }
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setAuthState(prev => ({
+        ...prev,
+        session,
+        user: session?.user ?? null,
+        loading: false,
+      }));
+      
+      if (session?.user) {
+        fetchUserRole(session.user.id);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchUserRole = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+
+      if (error) {
+        if (import.meta.env.DEV) {
+          console.error('Error fetching role:', error);
+        }
+        return;
+      }
+
+      const role = data?.role as AppRole;
+      setAuthState(prev => ({
+        ...prev,
+        role,
+        isAdmin: role === 'admin',
+      }));
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.error('Error fetching role:', error);
+      }
+    }
+  };
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
+
+  return {
+    ...authState,
+    signOut,
+  };
+};
