@@ -249,11 +249,9 @@ const MvpTestsLibraryV2 = ({ project }: Props) => {
       supabase.from("mvp_team_members" as any).select("*").eq("project_id", project.id),
     ]);
     if (testsData) {
-      const filtered = (testsData as any[]).filter(t =>
-        (t.applicable_sectors || []).includes(project.sector) &&
-        (t.applicable_scenarios || []).includes(project.scenario)
-      );
-      setTests(filtered);
+      // Include ALL tests, filtering logic is handled by the mentor scoring system
+      // Tests matching sector/scenario get higher scores; non-matching become "optionnel"
+      setTests(testsData as any[]);
     }
     if (resultsData) setResults(resultsData as any[]);
     if (teamData) setTeamMembers(teamData as any[]);
