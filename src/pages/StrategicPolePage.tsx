@@ -182,6 +182,26 @@ const StrategicPolePage = () => {
 
   const hasStrategicAccess = isAdmin || accessRequest?.status === "approved";
 
+  // Listen for real-time approval updates
+  useEffect(() => {
+    if (!user || !accessRequest || accessRequest.status !== "pending") return;
+    const channel = supabase
+      .channel("access-approval-listener")
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "strategic_access_requests", filter: `user_id=eq.${user.id}` },
+        (payload) => {
+          const newStatus = (payload.new as any).status;
+          if (newStatus === "approved") {
+            setAccessRequest({ ...accessRequest, status: "approved" });
+            toast({ title: "🎉 Accès débloqué !", description: "Votre accès au Pôle Stratégique a été approuvé. Les 4 espaces sont maintenant disponibles." });
+          } else if (newStatus === "rejected") {
+            setAccessRequest({ ...accessRequest, status: "rejected" });
+          }
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user, accessRequest?.id]);
+
   useEffect(() => { if (user && formationAccess?.hasAccess && hasStrategicAccess) loadProjects(); }, [user, formationAccess, hasStrategicAccess]);
   useEffect(() => {
     if (activeProject) {
