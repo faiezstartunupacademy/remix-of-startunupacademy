@@ -199,24 +199,26 @@ const AdminOverviewDashboard = ({ onNavigateTab }: Props) => {
     );
   }
 
-  const kpiCards = [
-    { label: "Utilisateurs", value: stats.users.total, icon: Users, color: "text-blue-600", bg: "from-blue-500/10 to-blue-600/5", sub: `${stats.users.recent7d} nouveaux (7j)` },
-    { label: "Administrateurs", value: stats.users.admins, icon: Award, color: "text-amber-600", bg: "from-amber-500/10 to-amber-600/5" },
-    { label: "Clés de Licence", value: stats.licenses.total, icon: Key, color: "text-emerald-600", bg: "from-emerald-500/10 to-emerald-600/5", sub: `${stats.licenses.active} actives · ${stats.licenses.totalUses} utilisations` },
+  const kpiCards: { label: string; value: number; icon: any; color: string; bg: string; sub?: string; tab?: string }[] = [
+    { label: "Utilisateurs", value: stats.users.total, icon: Users, color: "text-blue-600", bg: "from-blue-500/10 to-blue-600/5", sub: `${stats.users.recent7d} nouveaux (7j)`, tab: "users" },
+    { label: "Administrateurs", value: stats.users.admins, icon: Award, color: "text-amber-600", bg: "from-amber-500/10 to-amber-600/5", tab: "users" },
+    { label: "Clés de Licence", value: stats.licenses.total, icon: Key, color: "text-emerald-600", bg: "from-emerald-500/10 to-emerald-600/5", sub: `${stats.licenses.active} actives · ${stats.licenses.totalUses} utilisations`, tab: "licenses" },
     { label: "Formations", value: stats.formations.total, icon: BookOpen, color: "text-purple-600", bg: "from-purple-500/10 to-purple-600/5", sub: `${stats.formations.active} actives` },
     { label: "Participants", value: stats.formations.participants, icon: GraduationCap, color: "text-indigo-600", bg: "from-indigo-500/10 to-indigo-600/5", sub: `${stats.formations.completions} certifications` },
     { label: "Formateurs", value: stats.formations.trainers, icon: Briefcase, color: "text-teal-600", bg: "from-teal-500/10 to-teal-600/5", sub: `${stats.formations.evaluations} évaluations` },
-    { label: "Projets Incubation", value: stats.incubation.projects, icon: Rocket, color: "text-orange-600", bg: "from-orange-500/10 to-orange-600/5", sub: `${stats.incubation.activeProjects} actifs` },
+    { label: "Projets Stratégiques", value: stats.strategic.projects, icon: Rocket, color: "text-violet-600", bg: "from-violet-500/10 to-violet-600/5", sub: `${stats.strategic.accessApproved} accès autorisés · ${stats.strategic.accessPending} en attente`, tab: "projects" },
+    { label: "Projets Incubation", value: stats.incubation.projects, icon: Rocket, color: "text-orange-600", bg: "from-orange-500/10 to-orange-600/5", sub: `${stats.incubation.activeProjects} actifs`, tab: "projects" },
     { label: "Étapes Incubation", value: stats.incubation.steps, icon: Target, color: "text-cyan-600", bg: "from-cyan-500/10 to-cyan-600/5", sub: `${stats.incubation.completedSteps} complétées` },
     { label: "Rapports IA", value: stats.incubation.reports, icon: FileText, color: "text-violet-600", bg: "from-violet-500/10 to-violet-600/5", sub: `${stats.incubation.activities} activités` },
     { label: "Jalons", value: stats.incubation.milestones, icon: Layers, color: "text-rose-600", bg: "from-rose-500/10 to-rose-600/5", sub: `${stats.incubation.completedMilestones} atteints` },
+    { label: "Demandes d'accès", value: stats.strategic.accessApproved + stats.strategic.accessPending, icon: TrendingUp, color: "text-emerald-600", bg: "from-emerald-500/10 to-emerald-600/5", sub: `${stats.strategic.accessApproved} approuvées · ${stats.strategic.accessPending} en attente`, tab: "access" },
     { label: "Startups Marketplace", value: stats.marketplace.startups, icon: Building2, color: "text-sky-600", bg: "from-sky-500/10 to-sky-600/5", sub: `${stats.marketplace.approved} approuvées · ${stats.marketplace.pending} en attente` },
     { label: "Votes", value: stats.marketplace.votes, icon: Vote, color: "text-pink-600", bg: "from-pink-500/10 to-pink-600/5", sub: `${stats.marketplace.comments} commentaires` },
     { label: "Écosystèmes", value: stats.marketplace.ecosystems, icon: Globe, color: "text-lime-600", bg: "from-lime-500/10 to-lime-600/5", sub: `${stats.marketplace.programs} programmes` },
     { label: "Fondateurs", value: stats.marketplace.founders, icon: Users, color: "text-fuchsia-600", bg: "from-fuchsia-500/10 to-fuchsia-600/5", sub: `${stats.marketplace.fundingRounds} tours de table` },
     { label: "Forum Discussions", value: stats.forum.threads, icon: MessageSquare, color: "text-yellow-600", bg: "from-yellow-500/10 to-yellow-600/5", sub: `${stats.forum.posts} réponses · ${stats.forum.pinnedThreads} épinglées` },
     { label: "Chat Messages", value: stats.forum.chatMessages, icon: Activity, color: "text-red-600", bg: "from-red-500/10 to-red-600/5" },
-    { label: "Projets MVP", value: stats.mvpValidator.projects, icon: FlaskConical, color: "text-emerald-600", bg: "from-emerald-500/10 to-emerald-600/5", sub: `${stats.mvpValidator.hypotheses} hypothèses` },
+    { label: "Projets MVP", value: stats.mvpValidator.projects, icon: FlaskConical, color: "text-emerald-600", bg: "from-emerald-500/10 to-emerald-600/5", sub: `${stats.mvpValidator.hypotheses} hypothèses`, tab: "projects" },
     { label: "Features MVP", value: stats.mvpValidator.features, icon: Layers, color: "text-blue-600", bg: "from-blue-500/10 to-blue-600/5", sub: `${stats.mvpValidator.tests} tests exécutés` },
     { label: "Personas", value: stats.mvpValidator.personas, icon: Users, color: "text-orange-600", bg: "from-orange-500/10 to-orange-600/5", sub: `${stats.mvpValidator.teamMembers} membres d'équipe` },
     { label: "Base de Connaissances", value: stats.knowledgeBase.tests, icon: BookOpen, color: "text-purple-600", bg: "from-purple-500/10 to-purple-600/5" },
