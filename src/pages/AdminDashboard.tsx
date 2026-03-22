@@ -272,7 +272,7 @@ const AdminDashboard = () => {
             </TabsList>
 
             <TabsContent value="overview">
-              <AdminOverviewDashboard />
+              <AdminOverviewDashboard onNavigateTab={setActiveTab} />
             </TabsContent>
 
             <TabsContent value="access">
