@@ -247,13 +247,7 @@ const AdminDashboard = () => {
           </div>
 
           {/* Dashboard Tabs */}
-          <Tabs defaultValue="overview" className="space-y-6" onValueChange={() => {}}>
-            {/* Use ref-based tab switching */}
-            {(() => { 
-              const [activeTab, setActiveTab] = useState("overview");
-              return null; // handled below
-            })()}
-          </Tabs>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
              <TabsList className="grid w-full max-w-2xl grid-cols-5">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <LayoutDashboard className="h-4 w-4" />
