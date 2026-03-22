@@ -512,6 +512,12 @@ const StrategicPolePage = () => {
           }} />
           <div className="container relative z-10">
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-3xl mx-auto text-center">
+              {showAccessUnlockedBanner && (
+                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-emerald-500/20 backdrop-blur-sm border border-emerald-400/30 mb-4">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                  <span className="text-sm text-emerald-300 font-semibold">Accès débloqué — 4 espaces disponibles</span>
+                </motion.div>
+              )}
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 mb-6">
                 <Sparkles className="h-4 w-4 text-amber-400" />
                 <span className="text-sm text-white/80 font-medium">{t("strategic.badge")}</span>
