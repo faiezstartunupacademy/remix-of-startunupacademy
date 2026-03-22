@@ -174,6 +174,11 @@ const AdminOverviewDashboard = ({ onNavigateTab }: Props) => {
           deliverables: dataroomRes.count || dataroomRes.data?.length || 0,
           completed: completedDeliverables,
         },
+        strategic: {
+          projects: strategicProjectsRes.count || 0,
+          accessApproved: (accessRequestsRes.data as any[] || []).filter((r: any) => r.status === "approved").length,
+          accessPending: (accessRequestsRes.data as any[] || []).filter((r: any) => r.status === "pending").length,
+        },
       });
     } catch (error) {
       console.error("Error fetching stats:", error);
