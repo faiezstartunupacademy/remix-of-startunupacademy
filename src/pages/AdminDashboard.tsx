@@ -44,6 +44,7 @@ interface UserProfile {
 }
 
 const AdminDashboard = () => {
+  const [activeTab, setActiveTab] = useState("overview");
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [userEmail, setUserEmail] = useState("");
