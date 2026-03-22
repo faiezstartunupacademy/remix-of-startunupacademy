@@ -250,7 +250,10 @@ const AdminOverviewDashboard = ({ onNavigateTab }: Props) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.03 }}
           >
-            <Card className={`bg-gradient-to-br ${kpi.bg} hover:shadow-md transition-shadow`}>
+            <Card 
+              className={`bg-gradient-to-br ${kpi.bg} hover:shadow-md transition-all ${kpi.tab ? "cursor-pointer hover:scale-[1.02]" : ""}`}
+              onClick={() => kpi.tab && onNavigateTab?.(kpi.tab)}
+            >
               <CardContent className="p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
