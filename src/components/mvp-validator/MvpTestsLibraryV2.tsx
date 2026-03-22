@@ -91,6 +91,24 @@ function generateMentorRationale(test: Test, sector: string, scenario: string, t
   let score = 50;
   const reasons: string[] = [];
 
+  // 0. Sector & Scenario matching bonus/penalty
+  const sectorMatch = (test.applicable_sectors || []).length === 0 || (test.applicable_sectors || []).includes(sector);
+  const scenarioMatch = (test.applicable_scenarios || []).length === 0 || (test.applicable_scenarios || []).includes(scenario);
+  
+  if (sectorMatch && scenarioMatch) {
+    score += 15;
+    reasons.push("✅ Ce test correspond à votre secteur et scénario");
+  } else if (sectorMatch) {
+    score += 5;
+    reasons.push("📋 Ce test correspond à votre secteur mais pas au scénario actuel");
+  } else if (scenarioMatch) {
+    score += 5;
+    reasons.push("📋 Ce test correspond à votre scénario mais pas à votre secteur");
+  } else {
+    score -= 15;
+    reasons.push("ℹ️ Ce test est générique — moins prioritaire pour votre configuration");
+  }
+
   // 1. Sector alignment
   const sectorConfig = BM_TEST_KEYWORDS[sector];
   if (sectorConfig) {
@@ -249,11 +267,9 @@ const MvpTestsLibraryV2 = ({ project }: Props) => {
       supabase.from("mvp_team_members" as any).select("*").eq("project_id", project.id),
     ]);
     if (testsData) {
-      const filtered = (testsData as any[]).filter(t =>
-        (t.applicable_sectors || []).includes(project.sector) &&
-        (t.applicable_scenarios || []).includes(project.scenario)
-      );
-      setTests(filtered);
+      // Include ALL tests, filtering logic is handled by the mentor scoring system
+      // Tests matching sector/scenario get higher scores; non-matching become "optionnel"
+      setTests(testsData as any[]);
     }
     if (resultsData) setResults(resultsData as any[]);
     if (teamData) setTeamMembers(teamData as any[]);

@@ -44,6 +44,7 @@ interface UserProfile {
 }
 
 const AdminDashboard = () => {
+  const [activeTab, setActiveTab] = useState("overview");
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [userEmail, setUserEmail] = useState("");
@@ -246,7 +247,7 @@ const AdminDashboard = () => {
           </div>
 
           {/* Dashboard Tabs */}
-          <Tabs defaultValue="overview" className="space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
              <TabsList className="grid w-full max-w-2xl grid-cols-5">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <LayoutDashboard className="h-4 w-4" />
@@ -271,7 +272,7 @@ const AdminDashboard = () => {
             </TabsList>
 
             <TabsContent value="overview">
-              <AdminOverviewDashboard />
+              <AdminOverviewDashboard onNavigateTab={setActiveTab} />
             </TabsContent>
 
             <TabsContent value="access">
