@@ -28,7 +28,7 @@ type Props = {
   onNavigateTab?: (tab: string) => void;
 };
 
-const AdminOverviewDashboard = () => {
+const AdminOverviewDashboard = ({ onNavigateTab }: Props) => {
   const [stats, setStats] = useState<PlatformStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [recentActivity, setRecentActivity] = useState<{type: string; label: string; time: string}[]>([]);
