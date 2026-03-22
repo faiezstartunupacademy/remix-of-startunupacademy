@@ -335,6 +335,9 @@ const StrategicPolePage = () => {
     );
   }
 
+  // Show "Accès débloqué" banner when just approved
+  const showAccessUnlockedBanner = !isAdmin && accessRequest?.status === "approved";
+
   // Access request gate (after formation check)
   if (!isAdmin && !hasStrategicAccess) {
     return (
