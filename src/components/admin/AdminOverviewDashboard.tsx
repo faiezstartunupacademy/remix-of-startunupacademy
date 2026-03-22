@@ -48,6 +48,7 @@ const AdminOverviewDashboard = ({ onNavigateTab }: Props) => {
         mvpProjectsRes, mvpHypRes, mvpFeatRes, mvpTestsRes, mvpPersonasRes, mvpTeamRes, mvpMetricsRes,
         kbTestsRes,
         dataroomRes,
+        strategicProjectsRes, accessRequestsRes,
       ] = await Promise.all([
         supabase.from("profiles").select("created_at", { count: "exact", head: false }),
         supabase.from("user_roles").select("role", { count: "exact", head: false }),
@@ -84,6 +85,8 @@ const AdminOverviewDashboard = ({ onNavigateTab }: Props) => {
         supabase.from("mvp_metrics").select("id", { count: "exact", head: true }),
         supabase.from("knowledge_base_tests").select("id", { count: "exact", head: true }),
         supabase.from("dataroom_deliverables").select("completed", { count: "exact", head: false }),
+        supabase.from("strategic_projects").select("id", { count: "exact", head: true }),
+        supabase.from("strategic_access_requests" as any).select("status", { count: "exact", head: false }),
       ]);
 
       const now = new Date();
