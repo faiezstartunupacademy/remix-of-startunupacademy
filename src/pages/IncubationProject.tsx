@@ -515,7 +515,7 @@ const IncubationProject = () => {
                 const stepTests = testsByStep[s.id] || [];
                 const completed = stepTests.filter(t => t.status === "completed").length;
                 const total = stepTests.length;
-                const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+                const pct = total > 0 ? Math.round((completed / total) * 100) : (s.status === "completed" ? 100 : 0);
                 const isCompleted = s.status === "completed";
                 const isActive = s.status === "active" || s.status === "in_progress";
                 const isLocked = s.status === "locked";
