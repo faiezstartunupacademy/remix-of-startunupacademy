@@ -738,15 +738,25 @@ const IncubationProject = () => {
                           <Progress value={progress} className="h-2" />
                         </div>
                         {stepData.status !== "completed" && (
-                          <Button
-                            onClick={() => handlePassGate(stepData)}
-                            disabled={progress < 60}
-                            className="w-full gap-2"
-                            size="sm"
-                          >
-                            <Check className="h-4 w-4" />
-                            {progress < 60 ? `${60 - progress}% restants` : "Valider et passer à la suite"}
-                          </Button>
+                          <>
+                            {!hasReport && (
+                              <p className="text-xs text-amber-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Générez le rapport IA avant de valider la gate</p>
+                            )}
+                            {hasReport && hasTests && progress < 60 && (
+                              <p className="text-xs text-amber-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Complétez au moins 60% des tests</p>
+                            )}
+                            <Button
+                              onClick={() => handlePassGate(stepData)}
+                              disabled={!canPassGate}
+                              className="w-full gap-2"
+                              size="sm"
+                            >
+                              <Check className="h-4 w-4" />
+                              {!hasReport ? "Rapport IA requis" : 
+                               hasTests && progress < 60 ? `${60 - progress}% restants` : 
+                               "Valider et passer à la suite"}
+                            </Button>
+                          </>
                         )}
                         {stepData.status === "completed" && (
                           <Badge className="w-full justify-center bg-emerald-500/10 text-emerald-600">✅ Étape validée</Badge>
