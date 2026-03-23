@@ -614,6 +614,7 @@ export type Database = {
       }
       incubation_projects: {
         Row: {
+          blocked_reason: string | null
           business_model: string | null
           competitors: string[] | null
           created_at: string | null
@@ -623,6 +624,7 @@ export type Database = {
           has_revenue: boolean | null
           has_users: boolean | null
           id: string
+          is_blocked: boolean
           name: string
           overall_progress: number | null
           problem_description: string | null
@@ -638,6 +640,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          blocked_reason?: string | null
           business_model?: string | null
           competitors?: string[] | null
           created_at?: string | null
@@ -647,6 +650,7 @@ export type Database = {
           has_revenue?: boolean | null
           has_users?: boolean | null
           id?: string
+          is_blocked?: boolean
           name: string
           overall_progress?: number | null
           problem_description?: string | null
@@ -662,6 +666,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          blocked_reason?: string | null
           business_model?: string | null
           competitors?: string[] | null
           created_at?: string | null
@@ -671,6 +676,7 @@ export type Database = {
           has_revenue?: boolean | null
           has_users?: boolean | null
           id?: string
+          is_blocked?: boolean
           name?: string
           overall_progress?: number | null
           problem_description?: string | null
@@ -2351,6 +2357,7 @@ export type Database = {
       }
       strategic_projects: {
         Row: {
+          blocked_reason: string | null
           completed_at: string | null
           created_at: string
           current_phase: number
@@ -2358,6 +2365,7 @@ export type Database = {
           has_idea: boolean | null
           id: string
           incubation_active: boolean | null
+          is_blocked: boolean
           name: string
           sector: string | null
           startup_stage: string | null
@@ -2365,6 +2373,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          blocked_reason?: string | null
           completed_at?: string | null
           created_at?: string
           current_phase?: number
@@ -2372,6 +2381,7 @@ export type Database = {
           has_idea?: boolean | null
           id?: string
           incubation_active?: boolean | null
+          is_blocked?: boolean
           name: string
           sector?: string | null
           startup_stage?: string | null
@@ -2379,6 +2389,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          blocked_reason?: string | null
           completed_at?: string | null
           created_at?: string
           current_phase?: number
@@ -2386,6 +2397,7 @@ export type Database = {
           has_idea?: boolean | null
           id?: string
           incubation_active?: boolean | null
+          is_blocked?: boolean
           name?: string
           sector?: string | null
           startup_stage?: string | null
