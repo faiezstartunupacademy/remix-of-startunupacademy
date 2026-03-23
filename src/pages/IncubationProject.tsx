@@ -515,7 +515,7 @@ const IncubationProject = () => {
                 const stepTests = testsByStep[s.id] || [];
                 const completed = stepTests.filter(t => t.status === "completed").length;
                 const total = stepTests.length;
-                const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+                const pct = total > 0 ? Math.round((completed / total) * 100) : (s.status === "completed" ? 100 : 0);
                 const isCompleted = s.status === "completed";
                 const isActive = s.status === "active" || s.status === "in_progress";
                 const isLocked = s.status === "locked";
@@ -598,9 +598,11 @@ const IncubationProject = () => {
           {steps.filter(s => s.status !== "locked").map((stepData) => {
             const stepTests = testsByStep[stepData.id] || [];
             const completedTests = stepTests.filter(t => t.status === "completed").length;
-            const progress = stepTests.length > 0 ? Math.round((completedTests / stepTests.length) * 100) : 0;
+            const hasTests = stepTests.length > 0;
+            const progress = hasTests ? Math.round((completedTests / stepTests.length) * 100) : 100;
             const isGenerating = generatingStep === stepData.step_number;
             const hasReport = stepData.ai_report_content && Object.keys(stepData.ai_report_content).length > 0;
+            const canPassGate = hasReport && (hasTests ? progress >= 60 : true);
 
             return (
               <AccordionItem key={stepData.id} value={stepData.id} className="border rounded-xl overflow-hidden">
@@ -736,15 +738,25 @@ const IncubationProject = () => {
                           <Progress value={progress} className="h-2" />
                         </div>
                         {stepData.status !== "completed" && (
-                          <Button
-                            onClick={() => handlePassGate(stepData)}
-                            disabled={progress < 60}
-                            className="w-full gap-2"
-                            size="sm"
-                          >
-                            <Check className="h-4 w-4" />
-                            {progress < 60 ? `${60 - progress}% restants` : "Valider et passer à la suite"}
-                          </Button>
+                          <>
+                            {!hasReport && (
+                              <p className="text-xs text-amber-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Générez le rapport IA avant de valider la gate</p>
+                            )}
+                            {hasReport && hasTests && progress < 60 && (
+                              <p className="text-xs text-amber-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Complétez au moins 60% des tests</p>
+                            )}
+                            <Button
+                              onClick={() => handlePassGate(stepData)}
+                              disabled={!canPassGate}
+                              className="w-full gap-2"
+                              size="sm"
+                            >
+                              <Check className="h-4 w-4" />
+                              {!hasReport ? "Rapport IA requis" : 
+                               hasTests && progress < 60 ? `${60 - progress}% restants` : 
+                               "Valider et passer à la suite"}
+                            </Button>
+                          </>
                         )}
                         {stepData.status === "completed" && (
                           <Badge className="w-full justify-center bg-emerald-500/10 text-emerald-600">✅ Étape validée</Badge>
