@@ -598,9 +598,11 @@ const IncubationProject = () => {
           {steps.filter(s => s.status !== "locked").map((stepData) => {
             const stepTests = testsByStep[stepData.id] || [];
             const completedTests = stepTests.filter(t => t.status === "completed").length;
-            const progress = stepTests.length > 0 ? Math.round((completedTests / stepTests.length) * 100) : 0;
+            const hasTests = stepTests.length > 0;
+            const progress = hasTests ? Math.round((completedTests / stepTests.length) * 100) : 100;
             const isGenerating = generatingStep === stepData.step_number;
             const hasReport = stepData.ai_report_content && Object.keys(stepData.ai_report_content).length > 0;
+            const canPassGate = hasReport && (hasTests ? progress >= 60 : true);
 
             return (
               <AccordionItem key={stepData.id} value={stepData.id} className="border rounded-xl overflow-hidden">
