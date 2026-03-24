@@ -367,20 +367,21 @@ const AdminProjectsList = () => {
                             <div className="flex items-center gap-3 pt-2">
                               {!p.is_blocked && (
                                 <div className="flex-1 flex gap-2 items-center">
-                                  <Input
-                                    placeholder="Motif du blocage..."
-                                    value={blocking === p.id ? blockReason : ""}
-                                    onChange={e => { setBlocking(p.id); setBlockReason(e.target.value); }}
-                                    className="h-9 text-sm max-w-xs"
-                                    onFocus={() => setBlocking(p.id)}
+                                  <Textarea
+                                    placeholder="Motif du blocage (obligatoire)..."
+                                    value={blockReasons[p.id] || ""}
+                                    onChange={e => setBlockReasonForProject(p.id, e.target.value)}
+                                    className="text-sm max-w-sm min-h-[60px]"
+                                    rows={2}
                                   />
                                   <Button
                                     variant="destructive" size="sm"
-                                    onClick={() => toggleBlockStrategic(p)}
-                                    disabled={blocking === p.id && !blockReason.trim()}
-                                    className="gap-1"
+                                    onClick={(e) => { e.stopPropagation(); toggleBlockStrategic(p); }}
+                                    disabled={blockingId === p.id || !(blockReasons[p.id] || "").trim()}
+                                    className="gap-1 self-end"
                                   >
-                                    <ShieldBan className="h-3.5 w-3.5" /> Bloquer
+                                    {blockingId === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldBan className="h-3.5 w-3.5" />}
+                                    Bloquer
                                   </Button>
                                 </div>
                               )}
