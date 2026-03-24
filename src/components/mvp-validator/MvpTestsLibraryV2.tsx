@@ -255,6 +255,8 @@ const MvpTestsLibraryV2 = ({ project }: Props) => {
   const [expandedRationale, setExpandedRationale] = useState<string | null>(null);
   const [resultForm, setResultForm] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [analyzingVerdict, setAnalyzingVerdict] = useState(false);
+  const [aiVerdict, setAiVerdict] = useState<any>(null);
   const [filterPriority, setFilterPriority] = useState<string>("all");
   const { toast } = useToast();
 
@@ -380,6 +382,7 @@ const MvpTestsLibraryV2 = ({ project }: Props) => {
       qualitative_result: existing?.qualitative_result || "",
       quantitative_result: existing?.quantitative_result?.toString() || "",
     });
+    setAiVerdict(null);
     setSelectedTest(test);
   };
 
@@ -647,12 +650,83 @@ const MvpTestsLibraryV2 = ({ project }: Props) => {
 
             <div className="space-y-2">
               <Label>Résultat qualitatif</Label>
-              <Textarea value={resultForm.qualitative_result || ""} onChange={e => setResultForm(p => ({ ...p, qualitative_result: e.target.value }))} placeholder="Observations..." />
+              <p className="text-[11px] text-muted-foreground leading-tight">
+                Décrivez vos observations terrain : retours clients, comportements observés, verbatims recueillis, 
+                points de friction identifiés, insights qualitatifs. Ex: « 8 utilisateurs sur 10 ont mentionné la 
+                difficulté de l'onboarding. Les early adopters veulent une intégration Slack. »
+              </p>
+              <Textarea value={resultForm.qualitative_result || ""} onChange={e => setResultForm(p => ({ ...p, qualitative_result: e.target.value }))} placeholder="Ex: Les utilisateurs interrogés ont exprimé un besoin fort pour..." />
             </div>
             <div className="space-y-2">
               <Label>Résultat quantitatif</Label>
-              <Input type="number" value={resultForm.quantitative_result || ""} onChange={e => setResultForm(p => ({ ...p, quantitative_result: e.target.value }))} placeholder="Ex: 85" />
+              <p className="text-[11px] text-muted-foreground leading-tight">
+                Entrez la métrique chiffrée mesurée : taux de conversion (%), NPS score, nombre d'inscriptions, 
+                taux de rétention, CAC en €, etc. Ce chiffre sera comparé à la métrique cible du test pour 
+                déterminer le verdict IA (succès/échec/partiel).
+              </p>
+              <Input type="number" value={resultForm.quantitative_result || ""} onChange={e => setResultForm(p => ({ ...p, quantitative_result: e.target.value }))} placeholder="Ex: 85 (taux de conversion %)" />
             </div>
+
+            {/* AI Verdict */}
+            {(resultForm.qualitative_result || resultForm.quantitative_result) && (
+              <div className="border-t pt-4 space-y-3">
+                <Button
+                  onClick={async () => {
+                    if (!selectedTest) return;
+                    setAnalyzingVerdict(true);
+                    setAiVerdict(null);
+                    try {
+                      const { data, error } = await supabase.functions.invoke("analyze-test-result", {
+                        body: {
+                          test_name: selectedTest.name,
+                          test_objective: selectedTest.description,
+                          target_metrics: null,
+                          qualitative_result: resultForm.qualitative_result,
+                          quantitative_result: resultForm.quantitative_result,
+                          estimated_duration: selectedTest.estimated_duration,
+                          sector: project.sector,
+                          phase: selectedTest.phase,
+                        },
+                      });
+                      if (error) throw error;
+                      setAiVerdict(data?.verdict || null);
+                    } catch (e: any) {
+                      toast({ title: "Erreur d'analyse IA", description: e.message, variant: "destructive" });
+                    } finally {
+                      setAnalyzingVerdict(false);
+                    }
+                  }}
+                  disabled={analyzingVerdict}
+                  variant="outline"
+                  className="w-full gap-2 border-primary/30 text-primary"
+                  size="sm"
+                >
+                  {analyzingVerdict ? <><Loader2 className="h-4 w-4 animate-spin" /> Analyse IA en cours...</> : <><Brain className="h-4 w-4" /> Obtenir le verdict IA</>}
+                </Button>
+
+                {aiVerdict && (
+                  <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="p-4 rounded-lg bg-primary/5 border border-primary/20 space-y-3 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Badge className={aiVerdict.verdict === "Succès" ? "bg-emerald-500" : aiVerdict.verdict === "Échec" ? "bg-red-500" : "bg-amber-500"}>
+                        {aiVerdict.verdict}
+                      </Badge>
+                      <Badge variant="outline">{aiVerdict.recommendation}</Badge>
+                    </div>
+                    {aiVerdict.interpretation && <p className="text-muted-foreground text-xs">{aiVerdict.interpretation}</p>}
+                    {aiVerdict.duration_analysis && <p className="text-muted-foreground text-xs"><strong>⏱ Durée :</strong> {aiVerdict.duration_analysis}</p>}
+                    {aiVerdict.next_actions?.length > 0 && (
+                      <div>
+                        <p className="font-medium text-xs mb-1">Prochaines actions :</p>
+                        <ul className="list-disc list-inside text-xs text-muted-foreground space-y-0.5">
+                          {aiVerdict.next_actions.map((a: string, i: number) => <li key={i}>{a}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </div>
+            )}
+
             <Button onClick={saveResult} disabled={saving} className="w-full">
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sauvegarder"}
             </Button>

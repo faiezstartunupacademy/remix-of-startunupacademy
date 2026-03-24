@@ -725,7 +725,7 @@ const IncubationProject = () => {
                           {stepData.gate_status === "passed" ? "🟢" : progress >= 60 ? "🟡" : "🔴"} Gate GO/NO-GO
                         </CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-3">
+                       <CardContent className="space-y-3">
                         <div className="p-3 rounded-xl bg-muted/30 text-xs">
                           <p className="font-semibold mb-1">Critères de passage :</p>
                           <p className="text-muted-foreground">{stepData.gate_criteria}</p>
@@ -740,10 +740,41 @@ const IncubationProject = () => {
                         {stepData.status !== "completed" && (
                           <>
                             {!hasReport && (
-                              <p className="text-xs text-amber-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Générez le rapport IA avant de valider la gate</p>
+                              <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 text-xs space-y-1">
+                                <p className="font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1">
+                                  <AlertTriangle className="h-3 w-3" /> Rapport IA requis
+                                </p>
+                                <p className="text-amber-600 dark:text-amber-500">
+                                  Vous devez d'abord générer le rapport IA pour cette étape. 
+                                  Le rapport analyse votre projet et produit des recommandations spécifiques 
+                                  à l'étape « {STEP_NAMES[stepData.step_number - 1]} ». 
+                                  Cliquez sur « Générer le rapport IA » dans la carte de gauche.
+                                </p>
+                              </div>
                             )}
                             {hasReport && hasTests && progress < 60 && (
-                              <p className="text-xs text-amber-600 flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Complétez au moins 60% des tests</p>
+                              <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 text-xs space-y-1">
+                                <p className="font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1">
+                                  <AlertTriangle className="h-3 w-3" /> Tests insuffisants ({progress}% / 60% minimum)
+                                </p>
+                                <p className="text-amber-600 dark:text-amber-500">
+                                  Vous devez compléter au moins 60% des tests MVP associés à cette étape 
+                                  avant de pouvoir valider la gate. Il vous reste {stepTests.length - completedTests} test(s) 
+                                  à compléter. Marquez vos tests comme « complétés » dans la carte centrale 
+                                  ou accédez aux détails via l'icône ↗.
+                                </p>
+                              </div>
+                            )}
+                            {hasReport && !hasTests && (
+                              <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 text-xs space-y-1">
+                                <p className="font-semibold text-blue-700 dark:text-blue-400 flex items-center gap-1">
+                                  ℹ️ Aucun test requis pour cette étape
+                                </p>
+                                <p className="text-blue-600 dark:text-blue-500">
+                                  L'étape « {STEP_NAMES[stepData.step_number - 1]} » ne comporte pas de tests MVP. 
+                                  Le rapport IA est suffisant pour valider la gate.
+                                </p>
+                              </div>
                             )}
                             <Button
                               onClick={() => handlePassGate(stepData)}
@@ -752,9 +783,9 @@ const IncubationProject = () => {
                               size="sm"
                             >
                               <Check className="h-4 w-4" />
-                              {!hasReport ? "Rapport IA requis" : 
-                               hasTests && progress < 60 ? `${60 - progress}% restants` : 
-                               "Valider et passer à la suite"}
+                              {!hasReport ? "Rapport IA requis — Générez-le d'abord" : 
+                               hasTests && progress < 60 ? `Encore ${stepTests.length - completedTests} test(s) à compléter` : 
+                               `✅ Valider l'étape ${stepData.step_number} et passer à la suite`}
                             </Button>
                           </>
                         )}
