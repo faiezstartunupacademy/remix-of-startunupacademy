@@ -93,47 +93,53 @@ const AdminProjectsList = () => {
     }
   };
 
+  const setBlockReasonForProject = (projectId: string, reason: string) => {
+    setBlockReasons(prev => ({ ...prev, [projectId]: reason }));
+  };
+
   const toggleBlockStrategic = async (project: StrategicProject) => {
     const newBlocked = !project.is_blocked;
-    if (newBlocked && !blockReason.trim()) {
+    const reason = blockReasons[project.id] || "";
+    if (newBlocked && !reason.trim()) {
       toast({ title: "Motif requis", description: "Veuillez indiquer la raison du blocage", variant: "destructive" });
       return;
     }
-    setBlocking(project.id);
+    setBlockingId(project.id);
     try {
       await supabase.from("strategic_projects").update({
         is_blocked: newBlocked,
-        blocked_reason: newBlocked ? blockReason : null,
+        blocked_reason: newBlocked ? reason : null,
       } as any).eq("id", project.id);
       toast({ title: newBlocked ? "🚫 Projet bloqué" : "✅ Projet débloqué" });
-      setBlockReason("");
+      setBlockReasonForProject(project.id, "");
       fetchAll();
     } catch {
       toast({ title: "Erreur", variant: "destructive" });
     } finally {
-      setBlocking(null);
+      setBlockingId(null);
     }
   };
 
   const toggleBlockIncubation = async (project: IncubationProjectRow) => {
     const newBlocked = !project.is_blocked;
-    if (newBlocked && !blockReason.trim()) {
+    const reason = blockReasons[project.id] || "";
+    if (newBlocked && !reason.trim()) {
       toast({ title: "Motif requis", description: "Veuillez indiquer la raison du blocage", variant: "destructive" });
       return;
     }
-    setBlocking(project.id);
+    setBlockingId(project.id);
     try {
       await supabase.from("incubation_projects").update({
         is_blocked: newBlocked,
-        blocked_reason: newBlocked ? blockReason : null,
+        blocked_reason: newBlocked ? reason : null,
       } as any).eq("id", project.id);
       toast({ title: newBlocked ? "🚫 Projet bloqué" : "✅ Projet débloqué" });
-      setBlockReason("");
+      setBlockReasonForProject(project.id, "");
       fetchAll();
     } catch {
       toast({ title: "Erreur", variant: "destructive" });
     } finally {
-      setBlocking(null);
+      setBlockingId(null);
     }
   };
 
