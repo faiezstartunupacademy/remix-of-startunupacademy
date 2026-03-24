@@ -255,6 +255,8 @@ const MvpTestsLibraryV2 = ({ project }: Props) => {
   const [expandedRationale, setExpandedRationale] = useState<string | null>(null);
   const [resultForm, setResultForm] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [analyzingVerdict, setAnalyzingVerdict] = useState(false);
+  const [aiVerdict, setAiVerdict] = useState<any>(null);
   const [filterPriority, setFilterPriority] = useState<string>("all");
   const { toast } = useToast();
 
