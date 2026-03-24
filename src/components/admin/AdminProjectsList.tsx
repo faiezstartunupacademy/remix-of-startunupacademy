@@ -388,9 +388,11 @@ const AdminProjectsList = () => {
                               {p.is_blocked && (
                                 <Button
                                   size="sm" className="gap-1 bg-emerald-600 hover:bg-emerald-700"
-                                  onClick={() => toggleBlockStrategic(p)}
+                                  onClick={(e) => { e.stopPropagation(); toggleBlockStrategic(p); }}
+                                  disabled={blockingId === p.id}
                                 >
-                                  <ShieldCheck className="h-3.5 w-3.5" /> Débloquer
+                                  {blockingId === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldCheck className="h-3.5 w-3.5" />}
+                                  Débloquer
                                 </Button>
                               )}
                               <Button asChild variant="outline" size="sm" className="gap-1 text-xs">
