@@ -382,6 +382,7 @@ const MvpTestsLibraryV2 = ({ project }: Props) => {
       qualitative_result: existing?.qualitative_result || "",
       quantitative_result: existing?.quantitative_result?.toString() || "",
     });
+    setAiVerdict(null);
     setSelectedTest(test);
   };
 
