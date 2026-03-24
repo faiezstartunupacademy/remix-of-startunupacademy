@@ -49,8 +49,8 @@ const AdminProjectsList = () => {
   const [accessRequests, setAccessRequests] = useState<AccessRequest[]>([]);
   const [expandedStrategic, setExpandedStrategic] = useState<string | null>(null);
   const [expandedIncubation, setExpandedIncubation] = useState<string | null>(null);
-  const [blockReason, setBlockReason] = useState("");
-  const [blocking, setBlocking] = useState<string | null>(null);
+  const [blockReasons, setBlockReasons] = useState<Record<string, string>>({});
+  const [blockingId, setBlockingId] = useState<string | null>(null);
 
   useEffect(() => { fetchAll(); }, []);
 
