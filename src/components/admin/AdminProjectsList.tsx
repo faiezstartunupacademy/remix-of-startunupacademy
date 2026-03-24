@@ -49,8 +49,8 @@ const AdminProjectsList = () => {
   const [accessRequests, setAccessRequests] = useState<AccessRequest[]>([]);
   const [expandedStrategic, setExpandedStrategic] = useState<string | null>(null);
   const [expandedIncubation, setExpandedIncubation] = useState<string | null>(null);
-  const [blockReason, setBlockReason] = useState("");
-  const [blocking, setBlocking] = useState<string | null>(null);
+  const [blockReasons, setBlockReasons] = useState<Record<string, string>>({});
+  const [blockingId, setBlockingId] = useState<string | null>(null);
 
   useEffect(() => { fetchAll(); }, []);
 
@@ -93,47 +93,53 @@ const AdminProjectsList = () => {
     }
   };
 
+  const setBlockReasonForProject = (projectId: string, reason: string) => {
+    setBlockReasons(prev => ({ ...prev, [projectId]: reason }));
+  };
+
   const toggleBlockStrategic = async (project: StrategicProject) => {
     const newBlocked = !project.is_blocked;
-    if (newBlocked && !blockReason.trim()) {
+    const reason = blockReasons[project.id] || "";
+    if (newBlocked && !reason.trim()) {
       toast({ title: "Motif requis", description: "Veuillez indiquer la raison du blocage", variant: "destructive" });
       return;
     }
-    setBlocking(project.id);
+    setBlockingId(project.id);
     try {
       await supabase.from("strategic_projects").update({
         is_blocked: newBlocked,
-        blocked_reason: newBlocked ? blockReason : null,
+        blocked_reason: newBlocked ? reason : null,
       } as any).eq("id", project.id);
       toast({ title: newBlocked ? "🚫 Projet bloqué" : "✅ Projet débloqué" });
-      setBlockReason("");
+      setBlockReasonForProject(project.id, "");
       fetchAll();
     } catch {
       toast({ title: "Erreur", variant: "destructive" });
     } finally {
-      setBlocking(null);
+      setBlockingId(null);
     }
   };
 
   const toggleBlockIncubation = async (project: IncubationProjectRow) => {
     const newBlocked = !project.is_blocked;
-    if (newBlocked && !blockReason.trim()) {
+    const reason = blockReasons[project.id] || "";
+    if (newBlocked && !reason.trim()) {
       toast({ title: "Motif requis", description: "Veuillez indiquer la raison du blocage", variant: "destructive" });
       return;
     }
-    setBlocking(project.id);
+    setBlockingId(project.id);
     try {
       await supabase.from("incubation_projects").update({
         is_blocked: newBlocked,
-        blocked_reason: newBlocked ? blockReason : null,
+        blocked_reason: newBlocked ? reason : null,
       } as any).eq("id", project.id);
       toast({ title: newBlocked ? "🚫 Projet bloqué" : "✅ Projet débloqué" });
-      setBlockReason("");
+      setBlockReasonForProject(project.id, "");
       fetchAll();
     } catch {
       toast({ title: "Erreur", variant: "destructive" });
     } finally {
-      setBlocking(null);
+      setBlockingId(null);
     }
   };
 
@@ -361,29 +367,32 @@ const AdminProjectsList = () => {
                             <div className="flex items-center gap-3 pt-2">
                               {!p.is_blocked && (
                                 <div className="flex-1 flex gap-2 items-center">
-                                  <Input
-                                    placeholder="Motif du blocage..."
-                                    value={blocking === p.id ? blockReason : ""}
-                                    onChange={e => { setBlocking(p.id); setBlockReason(e.target.value); }}
-                                    className="h-9 text-sm max-w-xs"
-                                    onFocus={() => setBlocking(p.id)}
+                                  <Textarea
+                                    placeholder="Motif du blocage (obligatoire)..."
+                                    value={blockReasons[p.id] || ""}
+                                    onChange={e => setBlockReasonForProject(p.id, e.target.value)}
+                                    className="text-sm max-w-sm min-h-[60px]"
+                                    rows={2}
                                   />
                                   <Button
                                     variant="destructive" size="sm"
-                                    onClick={() => toggleBlockStrategic(p)}
-                                    disabled={blocking === p.id && !blockReason.trim()}
-                                    className="gap-1"
+                                    onClick={(e) => { e.stopPropagation(); toggleBlockStrategic(p); }}
+                                    disabled={blockingId === p.id || !(blockReasons[p.id] || "").trim()}
+                                    className="gap-1 self-end"
                                   >
-                                    <ShieldBan className="h-3.5 w-3.5" /> Bloquer
+                                    {blockingId === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldBan className="h-3.5 w-3.5" />}
+                                    Bloquer
                                   </Button>
                                 </div>
                               )}
                               {p.is_blocked && (
                                 <Button
                                   size="sm" className="gap-1 bg-emerald-600 hover:bg-emerald-700"
-                                  onClick={() => toggleBlockStrategic(p)}
+                                  onClick={(e) => { e.stopPropagation(); toggleBlockStrategic(p); }}
+                                  disabled={blockingId === p.id}
                                 >
-                                  <ShieldCheck className="h-3.5 w-3.5" /> Débloquer
+                                  {blockingId === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldCheck className="h-3.5 w-3.5" />}
+                                  Débloquer
                                 </Button>
                               )}
                               <Button asChild variant="outline" size="sm" className="gap-1 text-xs">
@@ -506,29 +515,32 @@ const AdminProjectsList = () => {
                             <div className="flex items-center gap-3 pt-2">
                               {!p.is_blocked && (
                                 <div className="flex-1 flex gap-2 items-center">
-                                  <Input
-                                    placeholder="Motif du blocage..."
-                                    value={blocking === p.id ? blockReason : ""}
-                                    onChange={e => { setBlocking(p.id); setBlockReason(e.target.value); }}
-                                    className="h-9 text-sm max-w-xs"
-                                    onFocus={() => setBlocking(p.id)}
+                                  <Textarea
+                                    placeholder="Motif du blocage (obligatoire)..."
+                                    value={blockReasons[p.id] || ""}
+                                    onChange={e => setBlockReasonForProject(p.id, e.target.value)}
+                                    className="text-sm max-w-sm min-h-[60px]"
+                                    rows={2}
                                   />
                                   <Button
                                     variant="destructive" size="sm"
-                                    onClick={() => toggleBlockIncubation(p)}
-                                    disabled={blocking === p.id && !blockReason.trim()}
-                                    className="gap-1"
+                                    onClick={(e) => { e.stopPropagation(); toggleBlockIncubation(p); }}
+                                    disabled={blockingId === p.id || !(blockReasons[p.id] || "").trim()}
+                                    className="gap-1 self-end"
                                   >
-                                    <ShieldBan className="h-3.5 w-3.5" /> Bloquer
+                                    {blockingId === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldBan className="h-3.5 w-3.5" />}
+                                    Bloquer
                                   </Button>
                                 </div>
                               )}
                               {p.is_blocked && (
                                 <Button
                                   size="sm" className="gap-1 bg-emerald-600 hover:bg-emerald-700"
-                                  onClick={() => toggleBlockIncubation(p)}
+                                  onClick={(e) => { e.stopPropagation(); toggleBlockIncubation(p); }}
+                                  disabled={blockingId === p.id}
                                 >
-                                  <ShieldCheck className="h-3.5 w-3.5" /> Débloquer
+                                  {blockingId === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ShieldCheck className="h-3.5 w-3.5" />}
+                                  Débloquer
                                 </Button>
                               )}
                               <Button asChild variant="outline" size="sm" className="gap-1 text-xs">
