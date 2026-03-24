@@ -544,7 +544,7 @@ const AdminProjectsList = () => {
                                 </Button>
                               )}
                               <Button asChild variant="outline" size="sm" className="gap-1 text-xs">
-                                <Link to={`/incubation/${p.id}`}>
+                                <Link to={`/pole-strategique/${p.id}`}>
                                   <Eye className="h-3 w-3" /> Voir le projet
                                 </Link>
                               </Button>
