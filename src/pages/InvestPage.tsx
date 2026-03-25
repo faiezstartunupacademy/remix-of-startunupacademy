@@ -252,11 +252,25 @@ const InvestPage = () => {
           </div>
         )}
       </div>
-      <div className="flex gap-2">
-        <Input value={input} onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && !e.shiftKey && onSend(input)}
+      <div className="flex gap-2 items-end">
+        <Textarea value={input} onChange={e => setInput(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              onSend(input);
+            }
+          }}
           placeholder={placeholder} disabled={isStreaming}
-          className="rounded-full h-11 shadow-sm text-sm" />
+          rows={1}
+          className="rounded-2xl min-h-[44px] max-h-[160px] resize-none shadow-sm text-sm py-3 px-4"
+          style={{ height: 'auto', overflow: 'hidden' }}
+          ref={(el) => {
+            if (el) {
+              el.style.height = 'auto';
+              el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+            }
+          }}
+        />
         <Button onClick={() => onSend(input)} disabled={isStreaming || !input.trim()} size="icon"
           className="rounded-full h-11 w-11 shrink-0 shadow-lg">
           <Send className="h-4 w-4" />
