@@ -108,6 +108,10 @@ const StrategicPolePage = () => {
         .limit(1);
       if (reqData && (reqData as any[]).length > 0) {
         setAccessRequest(reqData[0] as any);
+        // Show welcome modal for approved users who haven't accepted terms
+        if ((reqData[0] as any).status === "approved" && !localStorage.getItem("strategic_terms_accepted_" + user.id)) {
+          setShowWelcomeModal(true);
+        }
       }
       setCheckingAccess(false);
     };
