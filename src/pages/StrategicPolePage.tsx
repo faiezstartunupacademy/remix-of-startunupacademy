@@ -196,7 +196,11 @@ const StrategicPolePage = () => {
           const newStatus = (payload.new as any).status;
           if (newStatus === "approved") {
             setAccessRequest({ ...accessRequest, status: "approved" });
-            toast({ title: "🎉 Accès débloqué !", description: "Votre accès au Pôle Stratégique a été approuvé. Les 4 espaces sont maintenant disponibles." });
+            // Show welcome modal if user hasn't accepted terms yet
+            if (!localStorage.getItem("strategic_terms_accepted_" + user.id)) {
+              setShowWelcomeModal(true);
+            }
+            toast({ title: "🎉 Accès débloqué !", description: "Votre accès au Pôle Stratégique a été approuvé." });
           } else if (newStatus === "rejected") {
             setAccessRequest({ ...accessRequest, status: "rejected" });
           }
