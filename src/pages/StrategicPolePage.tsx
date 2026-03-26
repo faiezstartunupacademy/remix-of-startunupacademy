@@ -18,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -77,6 +79,8 @@ const StrategicPolePage = () => {
   const [submittingRequest, setSubmittingRequest] = useState(false);
   const [accessDiscussions, setAccessDiscussions] = useState<any[]>([]);
   const [discussionInput, setDiscussionInput] = useState("");
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => { if (!authLoading && !user) navigate("/auth"); }, [user, authLoading, navigate]);
 
@@ -104,6 +108,10 @@ const StrategicPolePage = () => {
         .limit(1);
       if (reqData && (reqData as any[]).length > 0) {
         setAccessRequest(reqData[0] as any);
+        // Show welcome modal for approved users who haven't accepted terms
+        if ((reqData[0] as any).status === "approved" && !localStorage.getItem("strategic_terms_accepted_" + user.id)) {
+          setShowWelcomeModal(true);
+        }
       }
       setCheckingAccess(false);
     };
@@ -192,7 +200,11 @@ const StrategicPolePage = () => {
           const newStatus = (payload.new as any).status;
           if (newStatus === "approved") {
             setAccessRequest({ ...accessRequest, status: "approved" });
-            toast({ title: "🎉 Accès débloqué !", description: "Votre accès au Pôle Stratégique a été approuvé. Les 4 espaces sont maintenant disponibles." });
+            // Show welcome modal if user hasn't accepted terms yet
+            if (!localStorage.getItem("strategic_terms_accepted_" + user.id)) {
+              setShowWelcomeModal(true);
+            }
+            toast({ title: "🎉 Accès débloqué !", description: "Votre accès au Pôle Stratégique a été approuvé." });
           } else if (newStatus === "rejected") {
             setAccessRequest({ ...accessRequest, status: "rejected" });
           }
@@ -898,6 +910,74 @@ const StrategicPolePage = () => {
         </div>
       </main>
       <Footer />
+
+      {/* Welcome / Terms Acceptance Modal */}
+      <Dialog open={showWelcomeModal} onOpenChange={(open) => { if (!open && termsAccepted) setShowWelcomeModal(false); }}>
+        <DialogContent className="sm:max-w-lg" onPointerDownOutside={(e) => e.preventDefault()}>
+          <DialogHeader>
+            <div className="flex items-center justify-center mb-3">
+              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+                <ShieldCheck className="h-7 w-7 text-primary" />
+              </div>
+            </div>
+            <DialogTitle className="text-center text-xl">Bienvenue au Pôle Stratégique 🎉</DialogTitle>
+            <DialogDescription className="text-center">
+              Votre accès a été approuvé par l'administrateur.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="rounded-xl border bg-muted/30 p-4 space-y-3 text-sm">
+              <p className="font-semibold text-foreground">Le Pôle Stratégique vous donne accès à :</p>
+              <ul className="space-y-1.5 text-muted-foreground">
+                <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" /> <span><strong>IA Stratégique</strong> — Accompagnement intelligent en 7 phases</span></li>
+                <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" /> <span><strong>Incubation IA</strong> — Processus structuré avec tests MVP</span></li>
+                <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" /> <span><strong>Business Plan Generator</strong> — Génération automatisée</span></li>
+                <li className="flex items-start gap-2"><CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" /> <span><strong>Invest Advisor</strong> — Conseil en financement</span></li>
+              </ul>
+            </div>
+
+            <div className="rounded-xl border border-amber-200 bg-amber-50/50 dark:bg-amber-500/5 dark:border-amber-500/20 p-4 space-y-2 text-sm">
+              <p className="font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-2">
+                <Shield className="h-4 w-4" /> Conditions d'utilisation
+              </p>
+              <ul className="space-y-1 text-amber-600/80 dark:text-amber-300/70 text-xs leading-relaxed">
+                <li>• Vous accédez à cet espace de votre propre volonté et initiative.</li>
+                <li>• Les données et informations que vous partagez (projet, secteur, stratégie) sont communiquées volontairement au Pôle Stratégique.</li>
+                <li>• Ces données seront traitées de manière confidentielle et utilisées uniquement dans le cadre de votre accompagnement stratégique.</li>
+                <li>• L'IA fournit des recommandations à titre indicatif et ne constitue pas un conseil juridique ou financier.</li>
+                <li>• L'administrateur peut consulter l'avancement de vos projets à des fins de suivi et d'encadrement.</li>
+              </ul>
+            </div>
+
+            <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/20">
+              <Checkbox
+                id="terms-accept"
+                checked={termsAccepted}
+                onCheckedChange={(checked) => setTermsAccepted(checked === true)}
+                className="mt-0.5"
+              />
+              <label htmlFor="terms-accept" className="text-sm cursor-pointer leading-relaxed">
+                J'ai lu et j'accepte les conditions ci-dessus. Je confirme que j'entre dans le Pôle Stratégique de ma propre volonté et que les données partagées le sont volontairement.
+              </label>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              className="w-full gap-2"
+              disabled={!termsAccepted}
+              onClick={() => {
+                localStorage.setItem("strategic_terms_accepted_" + user?.id, new Date().toISOString());
+                setShowWelcomeModal(false);
+                toast({ title: "✅ Conditions acceptées", description: "Bienvenue ! Vous pouvez maintenant créer vos projets." });
+              }}
+            >
+              <Rocket className="h-4 w-4" /> Accéder au Pôle Stratégique
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
