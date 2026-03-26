@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Check, AlertTriangle, Play, FileText, Download, RefreshCw, Loader2, ChevronDown, ChevronUp, ExternalLink, Trophy, PartyPopper, Rocket, TestTube2 } from "lucide-react";
+import { ArrowLeft, Lock, Check, AlertTriangle, Play, FileText, Download, RefreshCw, Loader2, ChevronDown, ChevronUp, ExternalLink, Trophy, PartyPopper, Rocket, TestTube2, ChevronLeft, ChevronRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,13 @@ import jsPDF from "jspdf";
 
 const STEP_EMOJIS = ["🔥", "⚖️", "📐", "👥", "⚠️", "📈", "🎯"];
 const STEP_NAMES = ["Disruption", "Réglementaire", "Running Lean", "MVP-Personas", "Risques", "Métriques", "Plan Tactique"];
+const STEP_ICONS: Record<string, string> = {
+  completed: "✅",
+  active: "🔵",
+  in_progress: "🔵",
+  locked: "🔒",
+  not_started: "⬜",
+};
 
 const statusColors: Record<string, string> = {
   not_started: "bg-muted text-muted-foreground",
@@ -469,11 +476,17 @@ const IncubationProject = () => {
             <span className="text-sm text-muted-foreground">Progression globale</span>
             <Progress value={project.overall_progress || 0} className="flex-1 max-w-xs h-2" />
             <span className="text-sm font-medium">{Math.round(project.overall_progress || 0)}%</span>
-            <Button asChild variant="outline" size="sm" className="gap-2 ml-auto">
+            <Button asChild variant="outline" size="sm" className="gap-2">
               <Link to={`/strategic-console/${project.id}`}>
-                <TestTube2 className="h-4 w-4" /> MVP Validator & Console Stratégique
+                <Rocket className="h-4 w-4" /> Console Stratégique
               </Link>
             </Button>
+            {project.overall_progress === 100 && (
+              <Button size="sm" variant="default" className="gap-2" onClick={() => generateFinalPDF()} disabled={generatingFinalPDF}>
+                {generatingFinalPDF ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                📄 Rapport Final PDF
+              </Button>
+            )}
           </div>
         </div>
 
@@ -565,10 +578,15 @@ const IncubationProject = () => {
             return (
               <div key={s.id} className="flex items-center gap-0">
                 <motion.div
-                  className={`relative flex flex-col items-center cursor-pointer transition-all duration-300 ${
-                    isLocked ? "opacity-40" : "hover:scale-105"
+                  className={`relative flex flex-col items-center transition-all duration-300 ${
+                    isLocked ? "opacity-40" : "cursor-pointer hover:scale-105"
                   }`}
                   whileHover={!isLocked ? { scale: 1.05 } : {}}
+                  onClick={() => {
+                    if (!isLocked && stepRefs.current[s.id]) {
+                      stepRefs.current[s.id]?.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }
+                  }}
                 >
                   <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-lg font-bold border-2 transition-all duration-500 ${
                     isCompleted ? "bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-500/30" :
@@ -579,9 +597,40 @@ const IncubationProject = () => {
                      isLocked ? <Lock className="h-5 w-5" /> :
                      <span>{STEP_EMOJIS[i]}</span>}
                   </div>
-                  <span className={`text-xs mt-1 text-center max-w-[80px] ${isActive ? "font-bold text-primary" : "text-muted-foreground"}`}>
+                  <span className={`text-xs mt-1 text-center max-w-[80px] font-semibold ${
+                    isActive ? "text-primary" : isCompleted ? "text-emerald-600" : "text-muted-foreground"
+                  }`}>
                     {STEP_NAMES[i]}
                   </span>
+                  {/* Prev/Next step bubble */}
+                  {isActive && i > 0 && (
+                    <button
+                      className="absolute -left-3 top-3 w-6 h-6 rounded-full bg-muted border border-border flex items-center justify-center hover:bg-accent transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const prevStep = steps[i - 1];
+                        if (prevStep && stepRefs.current[prevStep.id]) {
+                          stepRefs.current[prevStep.id]?.scrollIntoView({ behavior: "smooth", block: "center" });
+                        }
+                      }}
+                    >
+                      <ChevronLeft className="h-3 w-3" />
+                    </button>
+                  )}
+                  {isActive && i < steps.length - 1 && (
+                    <button
+                      className="absolute -right-3 top-3 w-6 h-6 rounded-full bg-muted border border-border flex items-center justify-center hover:bg-accent transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const nextStep = steps[i + 1];
+                        if (nextStep && stepRefs.current[nextStep.id]) {
+                          stepRefs.current[nextStep.id]?.scrollIntoView({ behavior: "smooth", block: "center" });
+                        }
+                      }}
+                    >
+                      <ChevronRight className="h-3 w-3" />
+                    </button>
+                  )}
                 </motion.div>
                 {i < steps.length - 1 && (
                   <div className={`hidden md:block w-8 lg:w-12 h-0.5 mx-1 transition-all duration-500 ${
@@ -690,13 +739,13 @@ const IncubationProject = () => {
                         <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
                           {stepTests.map(test => (
                             <div key={test.id} className="p-2 rounded-lg bg-muted/30 flex items-start justify-between gap-2">
-                              <div className="flex-1 min-w-0">
+                              <Link to={`/pole-strategique/${project.id}/test/${test.id}`} className="flex-1 min-w-0 hover:bg-accent/50 rounded-md p-1 -m-1 transition-colors cursor-pointer">
                                 <div className="flex items-center gap-2">
                                   <span className="text-xs font-mono text-muted-foreground">#{test.test_number}</span>
-                                  <p className="text-xs font-medium truncate">{test.name}</p>
+                                  <p className="text-xs font-medium truncate text-primary hover:underline">{test.name}</p>
                                 </div>
                                 <p className="text-[10px] text-muted-foreground line-clamp-1">{test.objective}</p>
-                              </div>
+                              </Link>
                               <div className="flex items-center gap-1 shrink-0">
                                 <Badge variant="outline" className={`text-[10px] ${statusColors[test.status] || ""}`}>
                                   {test.status === "completed" ? "✅" : test.status === "in_progress" ? "🔄" : "⬜"}
@@ -707,9 +756,6 @@ const IncubationProject = () => {
                                 {test.status === "in_progress" && (
                                   <Button size="sm" variant="ghost" className="h-6 px-1 text-[10px]" onClick={() => handleTestStatusChange(test.id, "completed")}>✓</Button>
                                 )}
-                                <Link to={`/pole-strategique/${project.id}/test/${test.id}`}>
-                                  <Button size="sm" variant="ghost" className="h-6 px-1"><ExternalLink className="h-3 w-3" /></Button>
-                                </Link>
                               </div>
                             </div>
                           ))}
@@ -719,16 +765,28 @@ const IncubationProject = () => {
                     </Card>
 
                     {/* Card C — Gate */}
-                    <Card className="border-border/50">
+                    <Card className={`border-2 ${
+                      stepData.gate_status === "passed" ? "border-emerald-500/50 bg-emerald-500/5" :
+                      progress >= 60 && hasReport ? "border-yellow-500/50 bg-yellow-500/5" :
+                      "border-destructive/30 bg-destructive/5"
+                    }`}>
                       <CardHeader className="pb-3">
                         <CardTitle className="text-base flex items-center gap-2">
                           {stepData.gate_status === "passed" ? "🟢" : progress >= 60 ? "🟡" : "🔴"} Gate GO/NO-GO
                         </CardTitle>
                       </CardHeader>
                        <CardContent className="space-y-3">
-                        <div className="p-3 rounded-xl bg-muted/30 text-xs">
-                          <p className="font-semibold mb-1">Critères de passage :</p>
-                          <p className="text-muted-foreground">{stepData.gate_criteria}</p>
+                        <div className="p-4 rounded-xl border-2 border-primary/20 bg-primary/5">
+                          <p className="font-bold text-sm mb-2 flex items-center gap-2 text-primary">📋 Critères de passage</p>
+                          <p className="text-sm leading-relaxed">{stepData.gate_criteria}</p>
+                          <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                            <div className={`p-2 rounded-lg text-center ${hasReport ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30" : "bg-muted text-muted-foreground border border-border"}`}>
+                              {hasReport ? "✅" : "❌"} Rapport IA
+                            </div>
+                            <div className={`p-2 rounded-lg text-center ${!hasTests || progress >= 60 ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30" : "bg-muted text-muted-foreground border border-border"}`}>
+                              {!hasTests || progress >= 60 ? "✅" : "❌"} Tests ≥60%
+                            </div>
+                          </div>
                         </div>
                         <div>
                           <div className="flex justify-between text-xs mb-1">

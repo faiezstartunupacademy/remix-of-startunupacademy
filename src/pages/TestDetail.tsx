@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Save, Loader2, Brain, HelpCircle, BarChart3 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Save, Loader2, Brain, HelpCircle, BarChart3, ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,24 @@ const difficultyColors: Record<string, string> = {
   hard: "bg-destructive/10 text-destructive",
 };
 
+const UNIT_OPTIONS = [
+  { value: "%", label: "% (Pourcentage)" },
+  { value: "€", label: "€ (Euro)" },
+  { value: "$", label: "$ (Dollar)" },
+  { value: "TND", label: "TND (Dinar)" },
+  { value: "users", label: "Utilisateurs" },
+  { value: "jours", label: "Jours" },
+  { value: "heures", label: "Heures" },
+  { value: "/5", label: "/5 (Note sur 5)" },
+  { value: "/10", label: "/10 (Note sur 10)" },
+  { value: "NPS", label: "NPS" },
+  { value: "conversions", label: "Conversions" },
+  { value: "clics", label: "Clics" },
+  { value: "inscriptions", label: "Inscriptions" },
+  { value: "ventes", label: "Ventes" },
+  { value: "réponses", label: "Réponses" },
+];
+
 const TestDetail = () => {
   const { projectId, testId } = useParams();
   const navigate = useNavigate();
@@ -33,6 +51,8 @@ const TestDetail = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [globalProgress, setGlobalProgress] = useState({ completed: 0, total: 0, stepName: "" });
   const [projectSector, setProjectSector] = useState<string>("");
+  const [siblingTests, setSiblingTests] = useState<any[]>([]);
+  const [showSaveSuccess, setShowSaveSuccess] = useState(false);
   const [form, setForm] = useState({
     qualitative_result: "", quantitative_result: "", quantitative_unit: "",
     status: "not_started", executed_at: "",
@@ -41,6 +61,7 @@ const TestDetail = () => {
   useEffect(() => { fetchTest(); }, [testId]);
 
   const fetchTest = async () => {
+    setLoading(true);
     try {
       const { data, error } = await supabase.from("mvp_tests").select("*").eq("id", testId!).single();
       if (error) throw error;
@@ -53,7 +74,6 @@ const TestDetail = () => {
         executed_at: data.executed_at ? data.executed_at.split("T")[0] : "",
       });
 
-      // Fetch knowledge base test for protocol
       const { data: kb } = await supabase
         .from("knowledge_base_tests")
         .select("*")
@@ -61,7 +81,15 @@ const TestDetail = () => {
         .maybeSingle();
       setKbTest(kb);
 
-      // Fetch global progress for this project
+      // Fetch all sibling tests in same step
+      const { data: siblings } = await supabase
+        .from("mvp_tests")
+        .select("id, name, test_number, status, step_id")
+        .eq("step_id", data.step_id)
+        .eq("project_id", data.project_id)
+        .order("test_number");
+      setSiblingTests(siblings || []);
+
       const { data: allTests } = await supabase
         .from("mvp_tests")
         .select("status, step_id")
@@ -71,8 +99,7 @@ const TestDetail = () => {
         .select("name")
         .eq("id", data.step_id)
         .maybeSingle();
-      
-      // Fetch project sector for duration adjustment
+
       const { data: projectData } = await supabase
         .from("incubation_projects")
         .select("sector")
@@ -103,7 +130,8 @@ const TestDetail = () => {
       };
       const { error } = await supabase.from("mvp_tests").update(updates).eq("id", testId!);
       if (error) throw error;
-      toast.success("Test sauvegardé !");
+      setShowSaveSuccess(true);
+      setTimeout(() => setShowSaveSuccess(false), 3000);
     } catch { toast.error("Erreur de sauvegarde"); }
     finally { setSaving(false); }
   };
@@ -134,7 +162,6 @@ const TestDetail = () => {
       toast.success("Analyse IA terminée !");
     } catch (err) {
       console.error(err);
-      // Fallback mock
       const mockVerdict = {
         interpretation: "Résultat analysé par rapport à la métrique cible. Les données indiquent une tendance positive.",
         verdict: "Partiel",
@@ -147,6 +174,10 @@ const TestDetail = () => {
       toast.info("Rapport de démonstration généré");
     } finally { setAnalyzing(false); }
   };
+
+  const currentIndex = siblingTests.findIndex(t => t.id === testId);
+  const prevTest = currentIndex > 0 ? siblingTests[currentIndex - 1] : null;
+  const nextTest = currentIndex < siblingTests.length - 1 ? siblingTests[currentIndex + 1] : null;
 
   if (loading) {
     return <div className="min-h-screen flex flex-col"><Header /><main className="flex-1 container py-12"><Skeleton className="h-8 w-1/3 mb-4" /><Skeleton className="h-4 w-2/3 mb-8" /><Skeleton className="h-40 w-full" /></main><Footer /></div>;
@@ -166,6 +197,14 @@ const TestDetail = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 container py-8 max-w-4xl">
+        {/* Save success banner */}
+        {showSaveSuccess && (
+          <div className="mb-4 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-2 animate-in slide-in-from-top-2">
+            <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+            <span className="font-medium text-emerald-700 dark:text-emerald-400">✅ Test sauvegardé avec succès !</span>
+          </div>
+        )}
+
         <Button variant="ghost" onClick={() => navigate(`/pole-strategique/${projectId}`)} className="mb-4 gap-2">
           <ArrowLeft className="h-4 w-4" /> Retour au projet
         </Button>
@@ -197,17 +236,59 @@ const TestDetail = () => {
           </CardContent>
         </Card>
 
-        <div className="flex flex-wrap items-center gap-3 mb-6">
-          <Badge variant="outline" className="font-mono">#{test.test_number}</Badge>
-          <h1 className="text-2xl font-bold">{test.name}</h1>
-          {kbTest?.difficulty_level && <Badge className={difficultyColors[kbTest.difficulty_level]}>{kbTest.difficulty_level}</Badge>}
-          {kbTest?.estimated_duration && (
-            <Badge variant="secondary">
-              ⏱ {projectSector ? getAdjustedDuration(kbTest.estimated_duration, projectSector, kbTest.phase) : kbTest.estimated_duration}
-              {projectSector && <span className="ml-1 opacity-70">({projectSector})</span>}
-            </Badge>
-          )}
-        </div>
+        {/* Test header - displayed at top */}
+        <Card className="mb-6 border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
+          <CardContent className="pt-4 pb-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <Badge variant="outline" className="font-mono text-base px-3 py-1">#{test.test_number}</Badge>
+              <h1 className="text-2xl font-bold">{test.name}</h1>
+              {kbTest?.difficulty_level && <Badge className={difficultyColors[kbTest.difficulty_level]}>{kbTest.difficulty_level}</Badge>}
+              {kbTest?.estimated_duration && (
+                <Badge variant="secondary">
+                  ⏱ {projectSector ? getAdjustedDuration(kbTest.estimated_duration, projectSector, kbTest.phase) : kbTest.estimated_duration}
+                  {projectSector && <span className="ml-1 opacity-70">({projectSector})</span>}
+                </Badge>
+              )}
+            </div>
+            {/* Sibling test list - clickable names */}
+            {siblingTests.length > 1 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {siblingTests.map((s) => (
+                  <Link key={s.id} to={`/pole-strategique/${projectId}/test/${s.id}`}>
+                    <Badge
+                      variant={s.id === testId ? "default" : "outline"}
+                      className={`cursor-pointer transition-all hover:scale-105 ${
+                        s.id === testId ? "ring-2 ring-primary/30" : 
+                        s.status === "completed" ? "border-emerald-500/50 text-emerald-600" : ""
+                      }`}
+                    >
+                      {s.status === "completed" && "✅ "}#{s.test_number} {s.name}
+                    </Badge>
+                  </Link>
+                ))}
+              </div>
+            )}
+            {/* Prev/Next step nav */}
+            <div className="mt-3 flex items-center justify-between">
+              {prevTest ? (
+                <Link to={`/pole-strategique/${projectId}/test/${prevTest.id}`}>
+                  <Button variant="ghost" size="sm" className="gap-1 text-xs">
+                    <ChevronLeft className="h-3.5 w-3.5" /> 
+                    <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground">← Test précédent: #{prevTest.test_number}</span>
+                  </Button>
+                </Link>
+              ) : <span />}
+              {nextTest ? (
+                <Link to={`/pole-strategique/${projectId}/test/${nextTest.id}`}>
+                  <Button variant="ghost" size="sm" className="gap-1 text-xs">
+                    <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground">Test suivant: #{nextTest.test_number} →</span>
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  </Button>
+                </Link>
+              ) : <span />}
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="grid md:grid-cols-2 gap-6">
           {/* Left column */}
@@ -261,7 +342,8 @@ const TestDetail = () => {
           <div className="space-y-4">
             <Card><CardHeader className="pb-2"><CardTitle className="text-base">📝 Résultats</CardTitle></CardHeader>
               <CardContent className="space-y-4">
-                <div><Label>Statut</Label>
+                <div>
+                  <Label>Statut <span className="text-destructive">*</span></Label>
                   <Select value={form.status} onValueChange={v => setForm(p => ({ ...p, status: v }))}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -273,49 +355,73 @@ const TestDetail = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div><Label>Date d'exécution</Label><Input type="date" value={form.executed_at} onChange={e => setForm(p => ({ ...p, executed_at: e.target.value }))} /></div>
+                <div>
+                  <Label>Date d'exécution <span className="text-destructive">*</span></Label>
+                  <Input type="date" value={form.executed_at} onChange={e => setForm(p => ({ ...p, executed_at: e.target.value }))} />
+                </div>
                 <div>
                   <div className="flex items-center gap-1.5 mb-1">
-                    <Label>Résultat qualitatif</Label>
+                    <Label>Résultat qualitatif <span className="text-destructive">*</span></Label>
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild><HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" /></TooltipTrigger>
-                        <TooltipContent className="max-w-xs"><p>Décrivez vos observations terrain : retours utilisateurs, comportements observés, citations, points de friction. C'est le contexte qui permet à l'IA de nuancer son verdict.</p></TooltipContent>
+                        <TooltipContent className="max-w-xs"><p>Décrivez vos observations terrain : retours utilisateurs, comportements observés, citations, points de friction.</p></TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                   </div>
-                  <Textarea value={form.qualitative_result} onChange={e => setForm(p => ({ ...p, qualitative_result: e.target.value }))} placeholder="Ex: Sur 10 utilisateurs interviewés, 7 ont mentionné que le processus d'inscription est trop long. 3 ont abandonné à l'étape 3. Les retours positifs portent sur la clarté de la proposition de valeur." rows={4} />
+                  <Textarea value={form.qualitative_result} onChange={e => setForm(p => ({ ...p, qualitative_result: e.target.value }))} placeholder="Ex: Sur 10 utilisateurs interviewés, 7 ont mentionné que le processus d'inscription est trop long..." rows={4} />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <div className="flex items-center gap-1.5 mb-1">
-                      <Label>Résultat quantitatif</Label>
+                      <Label>Résultat quantitatif <span className="text-destructive">*</span></Label>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild><HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" /></TooltipTrigger>
-                          <TooltipContent className="max-w-xs"><p>Le chiffre mesurable lié à la métrique cible de ce test. Il sera comparé aux seuils de succès/échec définis dans les métriques cibles.</p></TooltipContent>
+                          <TooltipContent className="max-w-xs"><p>Le chiffre mesurable lié à la métrique cible de ce test.</p></TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     </div>
-                    <Input type="number" value={form.quantitative_result} onChange={e => setForm(p => ({ ...p, quantitative_result: e.target.value }))} placeholder="Ex: 35 (taux de conversion), 120 (inscrits), 4.2 (note)" />
+                    <Input type="number" value={form.quantitative_result} onChange={e => setForm(p => ({ ...p, quantitative_result: e.target.value }))} placeholder="Ex: 35, 120, 4.2" />
                   </div>
                   <div>
                     <div className="flex items-center gap-1.5 mb-1">
-                      <Label>Unité de mesure</Label>
+                      <Label>Unité de mesure <span className="text-destructive">*</span></Label>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild><HelpCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" /></TooltipTrigger>
-                          <TooltipContent className="max-w-xs"><p>L'unité associée à votre chiffre : %, €, utilisateurs, jours, /5 (note sur 5), NPS, etc.</p></TooltipContent>
+                          <TooltipContent className="max-w-xs"><p>L'unité associée à votre chiffre : %, €, utilisateurs, jours, etc.</p></TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
                     </div>
-                    <Input value={form.quantitative_unit} onChange={e => setForm(p => ({ ...p, quantitative_unit: e.target.value }))} placeholder="Ex: %, €, users, jours, /5, NPS" />
+                    <Select value={form.quantitative_unit} onValueChange={v => setForm(p => ({ ...p, quantitative_unit: v }))}>
+                      <SelectTrigger><SelectValue placeholder="Sélectionner l'unité" /></SelectTrigger>
+                      <SelectContent>
+                        {UNIT_OPTIONS.map(u => (
+                          <SelectItem key={u.value} value={u.value}>{u.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
                 <Button onClick={handleSave} disabled={saving} className="w-full gap-2">
                   {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                   Sauvegarder
                 </Button>
+
+                {/* Next / Previous test buttons */}
+                <div className="flex gap-2">
+                  {prevTest && (
+                    <Button variant="outline" size="sm" className="flex-1 gap-1" onClick={() => navigate(`/pole-strategique/${projectId}/test/${prevTest.id}`)}>
+                      <ChevronLeft className="h-4 w-4" /> Test précédent
+                    </Button>
+                  )}
+                  {nextTest && (
+                    <Button variant="outline" size="sm" className="flex-1 gap-1" onClick={() => navigate(`/pole-strategique/${projectId}/test/${nextTest.id}`)}>
+                      Test suivant <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
