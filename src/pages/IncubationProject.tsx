@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Check, AlertTriangle, Play, FileText, Download, RefreshCw, Loader2, ChevronDown, ChevronUp, ExternalLink, Trophy, PartyPopper, Rocket, TestTube2 } from "lucide-react";
+import { ArrowLeft, Lock, Check, AlertTriangle, Play, FileText, Download, RefreshCw, Loader2, ChevronDown, ChevronUp, ExternalLink, Trophy, PartyPopper, Rocket, TestTube2, ChevronLeft, ChevronRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
