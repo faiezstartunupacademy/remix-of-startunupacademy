@@ -476,11 +476,17 @@ const IncubationProject = () => {
             <span className="text-sm text-muted-foreground">Progression globale</span>
             <Progress value={project.overall_progress || 0} className="flex-1 max-w-xs h-2" />
             <span className="text-sm font-medium">{Math.round(project.overall_progress || 0)}%</span>
-            <Button asChild variant="outline" size="sm" className="gap-2 ml-auto">
+            <Button asChild variant="outline" size="sm" className="gap-2">
               <Link to={`/strategic-console/${project.id}`}>
-                <TestTube2 className="h-4 w-4" /> MVP Validator & Console Stratégique
+                <Rocket className="h-4 w-4" /> Console Stratégique
               </Link>
             </Button>
+            {project.overall_progress === 100 && (
+              <Button size="sm" variant="default" className="gap-2" onClick={() => generateFinalPDF()} disabled={generatingFinalPDF}>
+                {generatingFinalPDF ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+                📄 Rapport Final PDF
+              </Button>
+            )}
           </div>
         </div>
 
