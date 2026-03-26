@@ -17,6 +17,13 @@ import jsPDF from "jspdf";
 
 const STEP_EMOJIS = ["🔥", "⚖️", "📐", "👥", "⚠️", "📈", "🎯"];
 const STEP_NAMES = ["Disruption", "Réglementaire", "Running Lean", "MVP-Personas", "Risques", "Métriques", "Plan Tactique"];
+const STEP_ICONS: Record<string, string> = {
+  completed: "✅",
+  active: "🔵",
+  in_progress: "🔵",
+  locked: "🔒",
+  not_started: "⬜",
+};
 
 const statusColors: Record<string, string> = {
   not_started: "bg-muted text-muted-foreground",
