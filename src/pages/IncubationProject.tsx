@@ -733,13 +733,13 @@ const IncubationProject = () => {
                         <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
                           {stepTests.map(test => (
                             <div key={test.id} className="p-2 rounded-lg bg-muted/30 flex items-start justify-between gap-2">
-                              <div className="flex-1 min-w-0">
+                              <Link to={`/pole-strategique/${project.id}/test/${test.id}`} className="flex-1 min-w-0 hover:bg-accent/50 rounded-md p-1 -m-1 transition-colors cursor-pointer">
                                 <div className="flex items-center gap-2">
                                   <span className="text-xs font-mono text-muted-foreground">#{test.test_number}</span>
-                                  <p className="text-xs font-medium truncate">{test.name}</p>
+                                  <p className="text-xs font-medium truncate text-primary hover:underline">{test.name}</p>
                                 </div>
                                 <p className="text-[10px] text-muted-foreground line-clamp-1">{test.objective}</p>
-                              </div>
+                              </Link>
                               <div className="flex items-center gap-1 shrink-0">
                                 <Badge variant="outline" className={`text-[10px] ${statusColors[test.status] || ""}`}>
                                   {test.status === "completed" ? "✅" : test.status === "in_progress" ? "🔄" : "⬜"}
@@ -750,9 +750,6 @@ const IncubationProject = () => {
                                 {test.status === "in_progress" && (
                                   <Button size="sm" variant="ghost" className="h-6 px-1 text-[10px]" onClick={() => handleTestStatusChange(test.id, "completed")}>✓</Button>
                                 )}
-                                <Link to={`/pole-strategique/${project.id}/test/${test.id}`}>
-                                  <Button size="sm" variant="ghost" className="h-6 px-1"><ExternalLink className="h-3 w-3" /></Button>
-                                </Link>
                               </div>
                             </div>
                           ))}
