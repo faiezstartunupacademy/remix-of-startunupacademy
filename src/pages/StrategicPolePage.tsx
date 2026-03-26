@@ -79,6 +79,8 @@ const StrategicPolePage = () => {
   const [submittingRequest, setSubmittingRequest] = useState(false);
   const [accessDiscussions, setAccessDiscussions] = useState<any[]>([]);
   const [discussionInput, setDiscussionInput] = useState("");
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => { if (!authLoading && !user) navigate("/auth"); }, [user, authLoading, navigate]);
 
