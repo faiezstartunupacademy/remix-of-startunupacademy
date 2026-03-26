@@ -759,16 +759,28 @@ const IncubationProject = () => {
                     </Card>
 
                     {/* Card C — Gate */}
-                    <Card className="border-border/50">
+                    <Card className={`border-2 ${
+                      stepData.gate_status === "passed" ? "border-emerald-500/50 bg-emerald-500/5" :
+                      progress >= 60 && hasReport ? "border-yellow-500/50 bg-yellow-500/5" :
+                      "border-destructive/30 bg-destructive/5"
+                    }`}>
                       <CardHeader className="pb-3">
                         <CardTitle className="text-base flex items-center gap-2">
                           {stepData.gate_status === "passed" ? "🟢" : progress >= 60 ? "🟡" : "🔴"} Gate GO/NO-GO
                         </CardTitle>
                       </CardHeader>
                        <CardContent className="space-y-3">
-                        <div className="p-3 rounded-xl bg-muted/30 text-xs">
-                          <p className="font-semibold mb-1">Critères de passage :</p>
-                          <p className="text-muted-foreground">{stepData.gate_criteria}</p>
+                        <div className="p-4 rounded-xl border-2 border-primary/20 bg-primary/5">
+                          <p className="font-bold text-sm mb-2 flex items-center gap-2 text-primary">📋 Critères de passage</p>
+                          <p className="text-sm leading-relaxed">{stepData.gate_criteria}</p>
+                          <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                            <div className={`p-2 rounded-lg text-center ${hasReport ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30" : "bg-muted text-muted-foreground border border-border"}`}>
+                              {hasReport ? "✅" : "❌"} Rapport IA
+                            </div>
+                            <div className={`p-2 rounded-lg text-center ${!hasTests || progress >= 60 ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30" : "bg-muted text-muted-foreground border border-border"}`}>
+                              {!hasTests || progress >= 60 ? "✅" : "❌"} Tests ≥60%
+                            </div>
+                          </div>
                         </div>
                         <div>
                           <div className="flex justify-between text-xs mb-1">
