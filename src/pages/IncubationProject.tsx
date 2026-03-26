@@ -572,10 +572,15 @@ const IncubationProject = () => {
             return (
               <div key={s.id} className="flex items-center gap-0">
                 <motion.div
-                  className={`relative flex flex-col items-center cursor-pointer transition-all duration-300 ${
-                    isLocked ? "opacity-40" : "hover:scale-105"
+                  className={`relative flex flex-col items-center transition-all duration-300 ${
+                    isLocked ? "opacity-40" : "cursor-pointer hover:scale-105"
                   }`}
                   whileHover={!isLocked ? { scale: 1.05 } : {}}
+                  onClick={() => {
+                    if (!isLocked && stepRefs.current[s.id]) {
+                      stepRefs.current[s.id]?.scrollIntoView({ behavior: "smooth", block: "center" });
+                    }
+                  }}
                 >
                   <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-lg font-bold border-2 transition-all duration-500 ${
                     isCompleted ? "bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-500/30" :
@@ -586,9 +591,40 @@ const IncubationProject = () => {
                      isLocked ? <Lock className="h-5 w-5" /> :
                      <span>{STEP_EMOJIS[i]}</span>}
                   </div>
-                  <span className={`text-xs mt-1 text-center max-w-[80px] ${isActive ? "font-bold text-primary" : "text-muted-foreground"}`}>
+                  <span className={`text-xs mt-1 text-center max-w-[80px] font-semibold ${
+                    isActive ? "text-primary" : isCompleted ? "text-emerald-600" : "text-muted-foreground"
+                  }`}>
                     {STEP_NAMES[i]}
                   </span>
+                  {/* Prev/Next step bubble */}
+                  {isActive && i > 0 && (
+                    <button
+                      className="absolute -left-3 top-3 w-6 h-6 rounded-full bg-muted border border-border flex items-center justify-center hover:bg-accent transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const prevStep = steps[i - 1];
+                        if (prevStep && stepRefs.current[prevStep.id]) {
+                          stepRefs.current[prevStep.id]?.scrollIntoView({ behavior: "smooth", block: "center" });
+                        }
+                      }}
+                    >
+                      <ChevronLeft className="h-3 w-3" />
+                    </button>
+                  )}
+                  {isActive && i < steps.length - 1 && (
+                    <button
+                      className="absolute -right-3 top-3 w-6 h-6 rounded-full bg-muted border border-border flex items-center justify-center hover:bg-accent transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const nextStep = steps[i + 1];
+                        if (nextStep && stepRefs.current[nextStep.id]) {
+                          stepRefs.current[nextStep.id]?.scrollIntoView({ behavior: "smooth", block: "center" });
+                        }
+                      }}
+                    >
+                      <ChevronRight className="h-3 w-3" />
+                    </button>
+                  )}
                 </motion.div>
                 {i < steps.length - 1 && (
                   <div className={`hidden md:block w-8 lg:w-12 h-0.5 mx-1 transition-all duration-500 ${
