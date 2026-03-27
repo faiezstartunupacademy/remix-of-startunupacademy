@@ -511,10 +511,10 @@ const IncubationProject = () => {
                 <Rocket className="h-4 w-4" /> Console Stratégique
               </Link>
             </Button>
-            {project.overall_progress === 100 && (
+            {steps.some(s => s.status === "completed") && (
               <Button size="sm" variant="default" className="gap-2" onClick={() => generateFinalPDF()} disabled={generatingFinalPDF}>
                 {generatingFinalPDF ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-                📄 Rapport Final PDF
+                📄 Rapport PDF ({steps.filter(s => s.status === "completed").length}/7 étapes)
               </Button>
             )}
           </div>
