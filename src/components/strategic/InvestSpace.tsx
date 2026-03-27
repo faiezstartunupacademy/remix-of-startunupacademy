@@ -736,7 +736,7 @@ Utilise TOUTES les données des phases stratégiques disponibles.`;
                 </div>
                 <Button
                   onClick={() => generateDocument("business-plan")}
-                  disabled={generatingDoc !== null || phaseMessages.length === 0}
+                  disabled={generatingDoc !== null}
                   className="w-full gap-2"
                 >
                   {generatingDoc === "business-plan" ? (
