@@ -223,10 +223,27 @@ export const BMClassifierChatbot = () => {
                               key={pattern.number} 
                               variant="secondary"
                               className="text-xs cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                              onClick={() => setSelectedPattern(selectedPattern?.number === pattern.number ? null : pattern)}
                             >
-                              {pattern.symbol}
+                              {pattern.symbol} {pattern.name}
                             </Badge>
                           ))}
+                        </div>
+                      )}
+                      {/* Pattern detail inline */}
+                      {message.patterns && selectedPattern && message.patterns.some(p => p.number === selectedPattern.number) && (
+                        <div className="mt-2 p-3 rounded-lg bg-primary/5 border border-primary/20 text-xs space-y-2">
+                          <div className="flex items-center justify-between">
+                            <p className="font-bold text-primary">{selectedPattern.symbol} {selectedPattern.name}</p>
+                            <button onClick={() => setSelectedPattern(null)} className="text-muted-foreground hover:text-foreground">✕</button>
+                          </div>
+                          <p>💡 {selectedPattern.idea}</p>
+                          <p>📊 <strong>KPI :</strong> {selectedPattern.kpi}</p>
+                          <p>🎯 <strong>BI :</strong> {selectedPattern.bi}</p>
+                          <p>📈 <strong>Maturité :</strong> {selectedPattern.maturity}</p>
+                          <p>✅ <strong>Compatible avec :</strong> {selectedPattern.compatible}</p>
+                          <p>❌ <strong>Anti-patterns :</strong> {selectedPattern.antiPatterns}</p>
+                          <p>📉 <strong>YC Metrics :</strong> {selectedPattern.ycMetrics}</p>
                         </div>
                       )}
                     </div>
