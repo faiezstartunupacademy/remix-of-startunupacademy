@@ -696,7 +696,7 @@ Utilise TOUTES les données des phases stratégiques disponibles.`;
                 </div>
                 <Button
                   onClick={() => generateDocument("pitch-deck")}
-                  disabled={generatingDoc !== null || phaseMessages.length === 0}
+                  disabled={generatingDoc !== null}
                   className="w-full gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
                 >
                   {generatingDoc === "pitch-deck" ? (
