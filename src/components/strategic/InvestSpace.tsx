@@ -757,8 +757,28 @@ Utilise TOUTES les données des phases stratégiques disponibles.`;
           </div>
 
           {phaseMessages.length === 0 && (
-            <Card className="border-dashed text-center py-6">
-              <CardContent><p className="text-sm text-muted-foreground">Complétez les phases stratégiques pour activer la génération automatique.</p></CardContent>
+            <Card className="border-dashed text-center py-8">
+              <CardContent className="space-y-4">
+                <div className="flex justify-center">
+                  <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+                    <AlertTriangle className="h-7 w-7 text-primary" />
+                  </div>
+                </div>
+                <div>
+                  <p className="font-semibold text-base mb-2">Phases stratégiques non complétées</p>
+                  <p className="text-sm text-muted-foreground max-w-lg mx-auto leading-relaxed">
+                    Les <strong>phases stratégiques</strong> sont les 7 étapes du parcours d'incubation IA de votre projet 
+                    (Disruption, Réglementaire, Running Lean, MVP-Personas, Risques, Métriques et Plan Tactique). 
+                    Chaque phase génère un rapport d'analyse IA qui alimente automatiquement les documents stratégiques 
+                    (Pitch Deck, Business Plan). 
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-2 max-w-lg mx-auto">
+                    👉 Rendez-vous dans votre <strong>espace d'incubation</strong> pour compléter les étapes, 
+                    exécuter les tests MVP et valider les gates GO/NO-GO. Une fois toutes les phases validées, 
+                    la génération automatique de vos documents sera activée.
+                  </p>
+                </div>
+              </CardContent>
             </Card>
           )}
 

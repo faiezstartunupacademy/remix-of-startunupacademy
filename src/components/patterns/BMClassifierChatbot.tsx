@@ -88,6 +88,8 @@ export const BMClassifierChatbot = () => {
     return BM_PATTERNS.filter(p => relevantPatternNumbers.has(p.number)).slice(0, 6);
   };
 
+  const [selectedPattern, setSelectedPattern] = useState<typeof BM_PATTERNS[0] | null>(null);
+
   const generateResponse = (userMessage: string): { content: string; patterns: typeof BM_PATTERNS } => {
     const patterns = analyzeInput(userMessage);
     
@@ -101,7 +103,7 @@ export const BMClassifierChatbot = () => {
         content += `   💡 ${pattern.idea}\n\n`;
       });
       
-      content += `\n📌 Voulez-vous en savoir plus sur un pattern spécifique ? Ou décrivez-moi d'autres aspects de votre business model !`;
+      content += `\n📌 Cliquez sur un pattern pour voir ses détails, combinaisons possibles et KPIs.\n\n💡 **Combiner des patterns ?** Les patterns compatibles sont indiqués dans les détails de chaque pattern. Une combinaison stratégique de 2-3 patterns complémentaires renforce souvent le business model.`;
     } else {
       content = "Je comprends ! Pour vous aider à identifier les meilleurs patterns, pouvez-vous me préciser :\n\n• Votre modèle de revenus (abonnement, commission, vente directe...)\n• Votre cible (B2B, B2C)\n• Votre différenciation principale";
     }
@@ -221,10 +223,27 @@ export const BMClassifierChatbot = () => {
                               key={pattern.number} 
                               variant="secondary"
                               className="text-xs cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                              onClick={() => setSelectedPattern(selectedPattern?.number === pattern.number ? null : pattern)}
                             >
-                              {pattern.symbol}
+                              {pattern.symbol} {pattern.name}
                             </Badge>
                           ))}
+                        </div>
+                      )}
+                      {/* Pattern detail inline */}
+                      {message.patterns && selectedPattern && message.patterns.some(p => p.number === selectedPattern.number) && (
+                        <div className="mt-2 p-3 rounded-lg bg-primary/5 border border-primary/20 text-xs space-y-2">
+                          <div className="flex items-center justify-between">
+                            <p className="font-bold text-primary">{selectedPattern.symbol} {selectedPattern.name}</p>
+                            <button onClick={() => setSelectedPattern(null)} className="text-muted-foreground hover:text-foreground">✕</button>
+                          </div>
+                          <p>💡 {selectedPattern.idea}</p>
+                          <p>📊 <strong>KPI :</strong> {selectedPattern.kpi}</p>
+                          <p>🎯 <strong>BI :</strong> {selectedPattern.bi}</p>
+                          <p>📈 <strong>Maturité :</strong> {selectedPattern.maturity}</p>
+                          <p>✅ <strong>Compatible avec :</strong> {selectedPattern.compatible}</p>
+                          <p>❌ <strong>Anti-patterns :</strong> {selectedPattern.antiPatterns}</p>
+                          <p>📉 <strong>YC Metrics :</strong> {selectedPattern.ycMetrics}</p>
                         </div>
                       )}
                     </div>

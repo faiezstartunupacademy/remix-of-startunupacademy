@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, Check, AlertTriangle, Play, FileText, Download, RefreshCw, Loader2, ChevronDown, ChevronUp, ExternalLink, Trophy, PartyPopper, Rocket, TestTube2, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, Lock, Check, AlertTriangle, Play, FileText, Download, RefreshCw, Loader2, ChevronDown, ChevronUp, ExternalLink, Trophy, PartyPopper, Rocket, TestTube2, ChevronLeft, ChevronRight, Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -250,6 +251,35 @@ const IncubationProject = () => {
           overall_progress: 100,
           status: "completed"
         }).eq("id", project.id);
+
+        // Auto-add startup to marketplace
+        try {
+          const slug = project.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            const { data: existing } = await supabase
+              .from("marketplace_startups")
+              .select("id")
+              .eq("slug", slug)
+              .maybeSingle();
+            
+            if (!existing) {
+              await supabase.from("marketplace_startups").insert({
+                name: project.name,
+                slug,
+                sector: project.sector || "Technologie",
+                stage: project.stage || "MVP",
+                tagline: project.description?.substring(0, 120) || "",
+                description: project.description || "",
+                created_by: user.id,
+                is_approved: false,
+              });
+              toast.info("🚀 Votre startup a été soumise au marketplace pour approbation !");
+            }
+          }
+        } catch (e) {
+          console.error("Auto marketplace submission error:", e);
+        }
 
         await fetchData();
 
@@ -520,7 +550,12 @@ const IncubationProject = () => {
         {/* Visual progress per step */}
         <Card className="mb-8 border-border/50">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">📊 Progression par étape</CardTitle>
+            <CardTitle className="text-base flex items-center justify-between">
+              <span>📊 Progression par étape</span>
+              <span className="text-xs font-normal text-muted-foreground">
+                Total : {Object.values(testsByStep).flat().filter((t: any) => t.status === "completed").length}/{Object.values(testsByStep).flat().length} tests complétés
+              </span>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-7 gap-3">
@@ -736,16 +771,27 @@ const IncubationProject = () => {
                       </CardHeader>
                       <CardContent className="space-y-3">
                         <Progress value={progress} className="h-2" />
+                        <p className="text-[10px] text-muted-foreground text-right">{completedTests}/{stepTests.length} tests • {stepTests.filter(t => t.status === "in_progress").length} en cours • {stepTests.filter(t => t.status === "not_started").length} restants</p>
                         <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
                           {stepTests.map(test => (
                             <div key={test.id} className="p-2 rounded-lg bg-muted/30 flex items-start justify-between gap-2">
-                              <Link to={`/pole-strategique/${project.id}/test/${test.id}`} className="flex-1 min-w-0 hover:bg-accent/50 rounded-md p-1 -m-1 transition-colors cursor-pointer">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-xs font-mono text-muted-foreground">#{test.test_number}</span>
-                                  <p className="text-xs font-medium truncate text-primary hover:underline">{test.name}</p>
-                                </div>
-                                <p className="text-[10px] text-muted-foreground line-clamp-1">{test.objective}</p>
-                              </Link>
+                              <TooltipProvider delayDuration={200}>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Link to={`/pole-strategique/${project.id}/test/${test.id}`} className="flex-1 min-w-0 hover:bg-accent/50 rounded-md p-1 -m-1 transition-colors cursor-pointer">
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-xs font-mono text-muted-foreground">#{test.test_number}</span>
+                                        <p className="text-xs font-medium truncate text-primary hover:underline">{test.name}</p>
+                                      </div>
+                                      <p className="text-[10px] text-muted-foreground line-clamp-1">{test.objective}</p>
+                                    </Link>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top" className="max-w-xs">
+                                    <p className="font-semibold text-xs mb-1">🧪 {test.name}</p>
+                                    <p className="text-xs text-muted-foreground">{test.objective || "Test de validation MVP pour cette étape d'incubation."}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                               <div className="flex items-center gap-1 shrink-0">
                                 <Badge variant="outline" className={`text-[10px] ${statusColors[test.status] || ""}`}>
                                   {test.status === "completed" ? "✅" : test.status === "in_progress" ? "🔄" : "⬜"}
