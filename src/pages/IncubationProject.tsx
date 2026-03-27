@@ -336,8 +336,9 @@ const IncubationProject = () => {
       doc.setFontSize(12);
       doc.text(`Projet : ${project.name}`, margin, y); y += 8;
       doc.text(`Description : ${project.description || "N/A"}`, margin, y); y += 8;
-      doc.text(`Progression : 100%`, margin, y); y += 8;
-      doc.text(`Étapes complétées : 7/7`, margin, y); y += 15;
+      const completedSteps = steps.filter(s => s.status === "completed").length;
+      doc.text(`Progression : ${project.overall_progress || 0}%`, margin, y); y += 8;
+      doc.text(`Étapes complétées : ${completedSteps}/7`, margin, y); y += 15;
 
       // Scores summary
       doc.setFontSize(16);
@@ -511,10 +512,10 @@ const IncubationProject = () => {
                 <Rocket className="h-4 w-4" /> Console Stratégique
               </Link>
             </Button>
-            {project.overall_progress === 100 && (
+            {steps.some(s => s.status === "completed") && (
               <Button size="sm" variant="default" className="gap-2" onClick={() => generateFinalPDF()} disabled={generatingFinalPDF}>
                 {generatingFinalPDF ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-                📄 Rapport Final PDF
+                📄 Rapport PDF ({steps.filter(s => s.status === "completed").length}/7 étapes)
               </Button>
             )}
           </div>
