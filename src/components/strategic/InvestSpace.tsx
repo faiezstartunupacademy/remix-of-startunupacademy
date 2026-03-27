@@ -432,7 +432,7 @@ Utilise TOUTES les données des phases stratégiques disponibles.`;
     }
   };
 
-  const downloadGeneratedPDF = (content: string, type: string) => {
+  const downloadGeneratedPDF = async (content: string, type: string) => {
     const doc = new jsPDF();
     const pw = doc.internal.pageSize.getWidth();
     const margin = 15;
@@ -458,8 +458,30 @@ Utilise TOUTES les données des phases stratégiques disponibles.`;
         doc.text(s, margin, y); y += s.length * 5;
       } else { y += 3; }
     }
-    doc.save(`${type}-${projectName.replace(/\s+/g, "-")}.pdf`);
-    toast({ title: "✅ PDF téléchargé" });
+
+    const fileName = `${type}-${projectName.replace(/\s+/g, "-")}.pdf`;
+    doc.save(fileName);
+
+    // Auto-upload to storage
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const normalizedName = fileName
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-zA-Z0-9._-]/g, "-")
+          .toLowerCase();
+        const filePath = `${user.id}/${projectId}/generated/${normalizedName}`;
+        const blob = doc.output("blob");
+        await supabase.storage
+          .from("incubation-reports")
+          .upload(filePath, blob, { contentType: "application/pdf", upsert: true });
+        toast({ title: "✅ PDF téléchargé et archivé", description: `${type === "pitch-deck" ? "Pitch Deck" : "Business Plan"} sauvegardé dans vos documents.` });
+      }
+    } catch (e) {
+      console.error("Auto-upload error:", e);
+      toast({ title: "✅ PDF téléchargé" });
+    }
   };
 
   const coreDeliverables = DELIVERABLES.filter(d => d.category === "core");
