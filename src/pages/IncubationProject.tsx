@@ -550,7 +550,12 @@ const IncubationProject = () => {
         {/* Visual progress per step */}
         <Card className="mb-8 border-border/50">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">📊 Progression par étape</CardTitle>
+            <CardTitle className="text-base flex items-center justify-between">
+              <span>📊 Progression par étape</span>
+              <span className="text-xs font-normal text-muted-foreground">
+                Total : {Object.values(testsByStep).flat().filter((t: any) => t.status === "completed").length}/{Object.values(testsByStep).flat().length} tests complétés
+              </span>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-7 gap-3">
