@@ -737,16 +737,27 @@ const IncubationProject = () => {
                       </CardHeader>
                       <CardContent className="space-y-3">
                         <Progress value={progress} className="h-2" />
+                        <p className="text-[10px] text-muted-foreground text-right">{completedTests}/{stepTests.length} tests • {stepTests.filter(t => t.status === "in_progress").length} en cours • {stepTests.filter(t => t.status === "not_started").length} restants</p>
                         <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
                           {stepTests.map(test => (
                             <div key={test.id} className="p-2 rounded-lg bg-muted/30 flex items-start justify-between gap-2">
-                              <Link to={`/pole-strategique/${project.id}/test/${test.id}`} className="flex-1 min-w-0 hover:bg-accent/50 rounded-md p-1 -m-1 transition-colors cursor-pointer">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-xs font-mono text-muted-foreground">#{test.test_number}</span>
-                                  <p className="text-xs font-medium truncate text-primary hover:underline">{test.name}</p>
-                                </div>
-                                <p className="text-[10px] text-muted-foreground line-clamp-1">{test.objective}</p>
-                              </Link>
+                              <TooltipProvider delayDuration={200}>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Link to={`/pole-strategique/${project.id}/test/${test.id}`} className="flex-1 min-w-0 hover:bg-accent/50 rounded-md p-1 -m-1 transition-colors cursor-pointer">
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-xs font-mono text-muted-foreground">#{test.test_number}</span>
+                                        <p className="text-xs font-medium truncate text-primary hover:underline">{test.name}</p>
+                                      </div>
+                                      <p className="text-[10px] text-muted-foreground line-clamp-1">{test.objective}</p>
+                                    </Link>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top" className="max-w-xs">
+                                    <p className="font-semibold text-xs mb-1">🧪 {test.name}</p>
+                                    <p className="text-xs text-muted-foreground">{test.objective || "Test de validation MVP pour cette étape d'incubation."}</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                               <div className="flex items-center gap-1 shrink-0">
                                 <Badge variant="outline" className={`text-[10px] ${statusColors[test.status] || ""}`}>
                                   {test.status === "completed" ? "✅" : test.status === "in_progress" ? "🔄" : "⬜"}
