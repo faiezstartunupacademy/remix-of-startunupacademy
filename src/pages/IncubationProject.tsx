@@ -246,53 +246,53 @@ const IncubationProject = () => {
         }, 800);
       } else {
         // All 7 steps completed!
-248:         await supabase.from("incubation_projects").update({
-249:           current_step: 8,
-250:           overall_progress: 100,
-251:           status: "completed"
-252:         }).eq("id", project.id);
-253: 
-254:         // Auto-add startup to marketplace
-255:         try {
-256:           const slug = project.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-257:           const { data: { user } } = await supabase.auth.getUser();
-258:           if (user) {
-259:             const { data: existing } = await supabase
-260:               .from("marketplace_startups")
-261:               .select("id")
-262:               .eq("slug", slug)
-263:               .maybeSingle();
-264:             
-265:             if (!existing) {
-266:               await supabase.from("marketplace_startups").insert({
-267:                 name: project.name,
-268:                 slug,
-269:                 sector: project.sector || "Technologie",
-270:                 stage: project.stage || "MVP",
-271:                 tagline: project.description?.substring(0, 120) || "",
-272:                 description: project.description || "",
-273:                 created_by: user.id,
-274:                 is_approved: false,
-275:               });
-276:               toast.info("🚀 Votre startup a été soumise au marketplace pour approbation !");
-277:             }
-278:           }
-279:         } catch (e) {
-280:           console.error("Auto marketplace submission error:", e);
-281:         }
-282: 
-283:         await fetchData();
-284: 
-285:         // Final PDF is generated and archived before celebration + redirect
-286:         await generateFinalPDF({ download: false });
-287:         setShowFinalCelebration(true);
-288:         toast.success("🏆 Félicitations ! Incubation terminée ! Rapport final généré et archivé. Redirection vers la Console Stratégique...", { duration: 6000 });
-289: 
-290:         setTimeout(() => {
-291:           navigate(`/pole-strategique/${id}`);
-292:         }, 5000);
-293: 
-294:         setTransitionStep(null);
+        await supabase.from("incubation_projects").update({
+          current_step: 8,
+          overall_progress: 100,
+          status: "completed"
+        }).eq("id", project.id);
+
+        // Auto-add startup to marketplace
+        try {
+          const slug = project.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            const { data: existing } = await supabase
+              .from("marketplace_startups")
+              .select("id")
+              .eq("slug", slug)
+              .maybeSingle();
+            
+            if (!existing) {
+              await supabase.from("marketplace_startups").insert({
+                name: project.name,
+                slug,
+                sector: project.sector || "Technologie",
+                stage: project.stage || "MVP",
+                tagline: project.description?.substring(0, 120) || "",
+                description: project.description || "",
+                created_by: user.id,
+                is_approved: false,
+              });
+              toast.info("🚀 Votre startup a été soumise au marketplace pour approbation !");
+            }
+          }
+        } catch (e) {
+          console.error("Auto marketplace submission error:", e);
+        }
+
+        await fetchData();
+
+        // Final PDF is generated and archived before celebration + redirect
+        await generateFinalPDF({ download: false });
+        setShowFinalCelebration(true);
+        toast.success("🏆 Félicitations ! Incubation terminée ! Rapport final généré et archivé. Redirection vers la Console Stratégique...", { duration: 6000 });
+
+        setTimeout(() => {
+          navigate(`/pole-strategique/${id}`);
+        }, 5000);
+
+        setTransitionStep(null);
       }
     } catch { 
       toast.error("Erreur lors de la validation"); 
