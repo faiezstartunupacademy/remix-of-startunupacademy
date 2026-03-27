@@ -756,31 +756,57 @@ Utilise TOUTES les données des phases stratégiques disponibles.`;
             </Card>
           </div>
 
-          {phaseMessages.length === 0 && (
-            <Card className="border-dashed text-center py-8">
-              <CardContent className="space-y-4">
-                <div className="flex justify-center">
-                  <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-                    <AlertTriangle className="h-7 w-7 text-primary" />
+          <Card className={`text-center py-6 ${phaseMessages.length === 0 ? "border-dashed border-amber-300 dark:border-amber-700 bg-amber-50/30 dark:bg-amber-950/10" : "border-emerald-300 dark:border-emerald-700 bg-emerald-50/30 dark:bg-emerald-950/10"}`}>
+            <CardContent className="space-y-4">
+              <div className="flex justify-center">
+                <div className={`w-14 h-14 rounded-full flex items-center justify-center ${phaseMessages.length === 0 ? "bg-amber-500/10" : "bg-emerald-500/10"}`}>
+                  {phaseMessages.length === 0 ? <AlertTriangle className="h-7 w-7 text-amber-500" /> : <CheckCircle2 className="h-7 w-7 text-emerald-500" />}
+                </div>
+              </div>
+              <div>
+                <p className="font-semibold text-base mb-3">
+                  {phaseMessages.length === 0 ? "💡 Comment ça marche ?" : "✅ Données disponibles pour la génération"}
+                </p>
+                <div className="text-sm text-muted-foreground max-w-2xl mx-auto text-left space-y-3">
+                  <p className="leading-relaxed">
+                    Les <strong>7 phases stratégiques</strong> constituent le parcours complet d'incubation IA de votre projet. 
+                    Chaque phase analyse un aspect critique de votre startup :
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                      <span>🔥</span> <strong>Phase 1</strong> — Identification de la disruption (type, marché, proposition de valeur)
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                      <span>⚖️</span> <strong>Phase 2</strong> — Analyse réglementaire (certifications, brevets, normes)
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                      <span>📐</span> <strong>Phase 3</strong> — Running Lean (Lean Canvas, hypothèses, roadmap MVP)
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                      <span>👥</span> <strong>Phase 4</strong> — MVP ↔ Personas (mapping besoins, score d'adéquation)
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                      <span>⚠️</span> <strong>Phase 5</strong> — Risques systémiques (matrice impact × probabilité)
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                      <span>📈</span> <strong>Phase 6</strong> — Métriques combinées (scores globaux, KPIs)
+                    </div>
+                    <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                      <span>🎯</span> <strong>Phase 7</strong> — Plan tactique (roadmap 12 mois, budget, stack, équipe)
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 text-xs">
+                    <p className="font-semibold text-primary mb-1">📋 Processus de génération</p>
+                    <p>
+                      {phaseMessages.length === 0 
+                        ? "Pour enrichir vos documents, complétez les étapes d'incubation dans votre espace projet. Chaque rapport IA généré alimente le contenu du Pitch Deck et du Business Plan. Vous pouvez toutefois générer une version préliminaire dès maintenant basée sur les informations de votre projet."
+                        : `${phaseMessages.length} message(s) de phases disponibles. Les documents seront générés à partir de ces données et des informations de votre projet. Plus vous complétez de phases, plus les documents seront riches et détaillés.`}
+                    </p>
                   </div>
                 </div>
-                <div>
-                  <p className="font-semibold text-base mb-2">Phases stratégiques non complétées</p>
-                  <p className="text-sm text-muted-foreground max-w-lg mx-auto leading-relaxed">
-                    Les <strong>phases stratégiques</strong> sont les 7 étapes du parcours d'incubation IA de votre projet 
-                    (Disruption, Réglementaire, Running Lean, MVP-Personas, Risques, Métriques et Plan Tactique). 
-                    Chaque phase génère un rapport d'analyse IA qui alimente automatiquement les documents stratégiques 
-                    (Pitch Deck, Business Plan). 
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-2 max-w-lg mx-auto">
-                    👉 Rendez-vous dans votre <strong>espace d'incubation</strong> pour compléter les étapes, 
-                    exécuter les tests MVP et valider les gates GO/NO-GO. Une fois toutes les phases validées, 
-                    la génération automatique de vos documents sera activée.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Generated content preview */}
           {(generatedDocs["pitch-deck"] || generatedDocs["business-plan"]) && (

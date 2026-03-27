@@ -336,8 +336,9 @@ const IncubationProject = () => {
       doc.setFontSize(12);
       doc.text(`Projet : ${project.name}`, margin, y); y += 8;
       doc.text(`Description : ${project.description || "N/A"}`, margin, y); y += 8;
-      doc.text(`Progression : 100%`, margin, y); y += 8;
-      doc.text(`Étapes complétées : 7/7`, margin, y); y += 15;
+      const completedSteps = steps.filter(s => s.status === "completed").length;
+      doc.text(`Progression : ${project.overall_progress || 0}%`, margin, y); y += 8;
+      doc.text(`Étapes complétées : ${completedSteps}/7`, margin, y); y += 15;
 
       // Scores summary
       doc.setFontSize(16);
