@@ -18,6 +18,15 @@ import jsPDF from "jspdf";
 
 const STEP_EMOJIS = ["🔥", "⚖️", "📐", "👥", "⚠️", "📈", "🎯"];
 const STEP_NAMES = ["Disruption", "Réglementaire", "Running Lean", "MVP-Personas", "Risques", "Métriques", "Plan Tactique"];
+const STEP_TOOLTIPS = [
+  { objective: "Identifier le type de disruption et la proposition de valeur unique de votre startup.", finalite: "Valider le potentiel disruptif du projet.", relation: "Alimente l'analyse réglementaire (étape 2) en identifiant le périmètre d'innovation." },
+  { objective: "Analyser les certifications, brevets, normes et exigences réglementaires.", finalite: "Sécuriser le cadre juridique et technique du projet.", relation: "Dépend de la disruption identifiée (étape 1). Alimente le Running Lean (étape 3) avec les contraintes légales." },
+  { objective: "Construire le Lean Canvas, définir les hypothèses critiques et la roadmap MVP.", finalite: "Structurer le modèle économique et le plan de validation.", relation: "S'appuie sur les étapes 1-2. Alimente le mapping MVP-Personas (étape 4)." },
+  { objective: "Mapper les personas cibles avec les fonctionnalités MVP et valider l'adéquation.", finalite: "Confirmer le Product-Market Fit préliminaire.", relation: "Utilise le Lean Canvas (étape 3). Alimente l'analyse des risques (étape 5)." },
+  { objective: "Évaluer les risques systémiques (marché, technique, financier, équipe, réglementaire).", finalite: "Construire une matrice de risques avec plans de mitigation.", relation: "S'appuie sur toutes les étapes précédentes. Alimente les métriques (étape 6)." },
+  { objective: "Définir les KPIs, métriques combinées et scores de maturité.", finalite: "Quantifier la performance et le potentiel du projet.", relation: "Synthétise les étapes 1-5. Alimente le plan tactique final (étape 7)." },
+  { objective: "Élaborer la roadmap 12 mois, le budget, le stack technique et la composition d'équipe.", finalite: "Produire un plan d'exécution actionnable et chiffré.", relation: "Étape finale qui synthétise tout le parcours d'incubation." },
+];
 const STEP_ICONS: Record<string, string> = {
   completed: "✅",
   active: "🔵",
