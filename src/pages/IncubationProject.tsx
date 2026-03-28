@@ -773,6 +773,9 @@ const IncubationProject = () => {
 
             return (
               <div key={s.id} className="flex items-center gap-0">
+                <TooltipProvider delayDuration={300}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
                 <motion.div
                   className={`relative flex flex-col items-center transition-all duration-300 ${
                     isLocked ? "opacity-40" : "cursor-pointer hover:scale-105"
