@@ -435,23 +435,39 @@ Utilise TOUTES les données des phases stratégiques disponibles.`;
   const downloadGeneratedPDF = async (content: string, type: string) => {
     const doc = new jsPDF();
     const pw = doc.internal.pageSize.getWidth();
-    const margin = 15;
+    const margin = 20;
     const cw = pw - margin * 2;
-    let y = 25;
-    doc.setFontSize(20); doc.setFont("helvetica", "bold");
-    doc.text(type === "pitch-deck" ? "PITCH DECK" : "BUSINESS PLAN", margin, y); y += 8;
-    doc.setFontSize(14); doc.text(projectName, margin, y); y += 6;
-    doc.setFontSize(10); doc.setFont("helvetica", "normal");
-    doc.text(`${sector || "N/A"} | ${startupStage} | ${new Date().toLocaleDateString("fr-FR")}`, margin, y); y += 12;
+
+    // Cover header
+    doc.setFillColor(88, 28, 135);
+    doc.rect(0, 0, pw, 38, "F");
+    doc.setFillColor(168, 85, 247);
+    doc.rect(0, 0, 6, 38, "F");
+    doc.setTextColor(255, 255, 255);
+    let y = 18;
+    doc.setFontSize(18); doc.setFont("helvetica", "bold");
+    doc.text(type === "pitch-deck" ? "PITCH DECK" : "BUSINESS PLAN", margin + 2, y); y += 8;
+    doc.setFontSize(12); doc.setFont("helvetica", "normal");
+    doc.text(`${projectName} — ${sector || "N/A"} | ${startupStage}`, margin + 2, y);
+
+    y = 50;
+    doc.setTextColor(40, 40, 40);
+    doc.setFontSize(10);
+    doc.text(`Généré le ${new Date().toLocaleDateString("fr-FR")} — ${PITCH_TYPES.find(p => p.value === pitchType)?.label || ""}`, margin, y);
+    y += 12;
 
     for (const line of content.split("\n")) {
-      if (y > 270) { doc.addPage(); y = 20; }
+      if (y > 270) { doc.addPage(); y = 25; }
       if (line.startsWith("## ")) {
-        doc.setFontSize(14); doc.setFont("helvetica", "bold"); y += 4;
-        doc.text(line.replace("## ", ""), margin, y); y += 8;
+        doc.setFillColor(245, 245, 250);
+        doc.rect(margin, y - 4, cw, 9, "F");
+        doc.setFontSize(14); doc.setFont("helvetica", "bold");
+        doc.setTextColor(88, 28, 135);
+        doc.text(line.replace("## ", ""), margin + 2, y + 1); y += 12;
+        doc.setTextColor(40, 40, 40);
       } else if (line.startsWith("### ")) {
         doc.setFontSize(11); doc.setFont("helvetica", "bold");
-        doc.text(line.replace("### ", ""), margin, y); y += 6;
+        doc.text(line.replace("### ", ""), margin, y); y += 7;
       } else if (line.trim()) {
         doc.setFontSize(10); doc.setFont("helvetica", "normal");
         const s = doc.splitTextToSize(line.replace(/\*\*/g, ""), cw);
@@ -459,10 +475,22 @@ Utilise TOUTES les données des phases stratégiques disponibles.`;
       } else { y += 3; }
     }
 
-    const fileName = `${type}-${projectName.replace(/\s+/g, "-")}.pdf`;
+    // Footer
+    const totalPages = doc.getNumberOfPages();
+    for (let p = 1; p <= totalPages; p++) {
+      doc.setPage(p);
+      doc.setFontSize(8); doc.setFont("helvetica", "italic");
+      doc.setTextColor(150);
+      doc.text(`StartUnUp — ${type === "pitch-deck" ? "Pitch Deck" : "Business Plan"} — Page ${p}/${totalPages}`, margin, 288);
+      doc.setDrawColor(200); doc.line(margin, 285, pw - margin, 285);
+      doc.setTextColor(0);
+    }
+
+    const timestamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-");
+    const fileName = `${type}-${projectName.replace(/\s+/g, "-")}-${timestamp}.pdf`;
     doc.save(fileName);
 
-    // Auto-upload to storage
+    // Auto-upload to storage with versioned name
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -476,7 +504,7 @@ Utilise TOUTES les données des phases stratégiques disponibles.`;
         await supabase.storage
           .from("incubation-reports")
           .upload(filePath, blob, { contentType: "application/pdf", upsert: true });
-        toast({ title: "✅ PDF téléchargé et archivé", description: `${type === "pitch-deck" ? "Pitch Deck" : "Business Plan"} sauvegardé dans vos documents.` });
+        toast({ title: "✅ PDF téléchargé et archivé", description: `Version sauvegardée : ${timestamp}` });
       }
     } catch (e) {
       console.error("Auto-upload error:", e);
