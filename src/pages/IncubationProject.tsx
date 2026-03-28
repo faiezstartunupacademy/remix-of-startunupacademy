@@ -831,6 +831,15 @@ const IncubationProject = () => {
                     </button>
                   )}
                 </motion.div>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs p-3">
+                      <p className="font-bold text-xs mb-1">{STEP_EMOJIS[i]} {STEP_NAMES[i]}</p>
+                      <p className="text-xs text-muted-foreground">{STEP_TOOLTIPS[i].objective}</p>
+                      <p className="text-[10px] mt-1"><strong>Finalité :</strong> {STEP_TOOLTIPS[i].finalite}</p>
+                      <p className="text-[10px]"><strong>Relation :</strong> {STEP_TOOLTIPS[i].relation}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
                 {i < steps.length - 1 && (
                   <div className={`hidden md:block w-8 lg:w-12 h-0.5 mx-1 transition-all duration-500 ${
                     isCompleted ? "bg-emerald-500" : "bg-border"
