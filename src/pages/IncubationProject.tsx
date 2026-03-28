@@ -517,38 +517,66 @@ const IncubationProject = () => {
 
   const exportPDF = async (stepData: any, options?: { download?: boolean }) => {
     const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text(`Rapport — ${stepData.name}`, 20, 25);
-    doc.setFontSize(12);
-    doc.text(`Projet : ${project?.name}`, 20, 35);
-    doc.text(`Date : ${new Date().toLocaleDateString("fr-FR")}`, 20, 42);
+    const pw = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    const cw = pw - margin * 2;
 
-    let y = 55;
+    // Header bar
+    doc.setFillColor(88, 28, 135);
+    doc.rect(0, 0, pw, 35, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text(`${STEP_EMOJIS[stepData.step_number - 1]}  Rapport — ${stepData.name}`, margin, 22);
+
+    let y = 45;
+    doc.setTextColor(40, 40, 40);
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Projet : ${project?.name}`, margin, y); y += 7;
+    doc.text(`Date : ${new Date().toLocaleDateString("fr-FR")}`, margin, y); y += 7;
+    if (stepData.ai_report_score) {
+      doc.text(`Score IA : ${stepData.ai_report_score}/100`, margin, y); y += 7;
+    }
+    y += 5;
+
     const report = stepData.ai_report_content;
     if (report && typeof report === "object") {
       Object.entries(report).forEach(([key, value]) => {
-        if (y > 270) { doc.addPage(); y = 20; }
+        if (y > 265) { doc.addPage(); y = 25; }
+        doc.setFillColor(245, 245, 250);
+        doc.rect(margin, y - 4, cw, 8, "F");
         doc.setFontSize(11);
         doc.setFont("helvetica", "bold");
-        doc.text(key.replace(/_/g, " ").toUpperCase(), 20, y);
-        y += 7;
+        doc.setTextColor(88, 28, 135);
+        doc.text(key.replace(/_/g, " ").toUpperCase(), margin + 2, y + 1);
+        y += 10;
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
+        doc.setFontSize(9);
+        doc.setTextColor(40, 40, 40);
         const text = typeof value === "string" ? value : JSON.stringify(value, null, 2);
-        const lines = doc.splitTextToSize(text, 170);
+        const lines = doc.splitTextToSize(text, cw);
         lines.forEach((line: string) => {
-          if (y > 280) { doc.addPage(); y = 20; }
-          doc.text(line, 20, y);
-          y += 5;
+          if (y > 278) { doc.addPage(); y = 25; }
+          doc.text(line, margin, y);
+          y += 4.5;
         });
-        y += 5;
+        y += 6;
       });
     } else {
-      doc.text("Aucun rapport disponible.", 20, y);
+      doc.text("Aucun rapport disponible.", margin, y);
     }
 
-    doc.setFontSize(8);
-    doc.text("Généré par StartunupAcademy — Plateforme d'Incubation IA", 20, 290);
+    // Footer
+    const totalPages = doc.getNumberOfPages();
+    for (let p = 1; p <= totalPages; p++) {
+      doc.setPage(p);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "italic");
+      doc.setTextColor(150, 150, 150);
+      doc.text(`StartUnUp Academy — ${stepData.name} — Page ${p}/${totalPages}`, margin, 288);
+      doc.setDrawColor(200); doc.line(margin, 285, pw - margin, 285);
+    }
 
     const fileName = `rapport-${stepData.name.toLowerCase().replace(/\s+/g, "-")}-${project?.name?.toLowerCase().replace(/\s+/g, "-") || "projet"}.pdf`;
     await uploadGeneratedPdf(doc, fileName);
