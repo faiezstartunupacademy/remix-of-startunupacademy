@@ -190,6 +190,9 @@ const MarketplaceAdmin = () => {
           <TabsTrigger value="ecosystems">Écosystèmes ({ecosystems?.length || 0})</TabsTrigger>
           <TabsTrigger value="add-ecosystem">{t("marketplace.addEcosystem")}</TabsTrigger>
           <TabsTrigger value="programs" className="gap-1"><Award className="h-3 w-3" /> Programmes ({programs.length})</TabsTrigger>
+          <TabsTrigger value="incubation" className="gap-1" onClick={() => { if (incubatedStartups.length === 0) fetchIncubatedStartups(); }}>
+            <Download className="h-3 w-3" /> Import Incubation
+          </TabsTrigger>
         </TabsList>
 
         {/* Startups Tab */}
