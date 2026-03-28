@@ -420,6 +420,57 @@ const MarketplaceAdmin = () => {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* Incubation Import Tab */}
+        <TabsContent value="incubation" className="space-y-4 mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Download className="h-5 w-5 text-primary" /> Importer depuis l'Incubation IA
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-xs text-muted-foreground">
+                Les startups ayant complété les 7 étapes d'incubation IA apparaissent ici. Importez-les dans le marketplace pour les rendre visibles.
+              </p>
+              {loadingIncubated ? (
+                <div className="flex justify-center py-6"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+              ) : incubatedStartups.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Rocket className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                  <p className="text-sm">Aucune startup n'a encore achevé les 7 étapes d'incubation.</p>
+                  <Button variant="outline" size="sm" className="mt-3 gap-1" onClick={fetchIncubatedStartups}>
+                    <Loader2 className="h-3 w-3" /> Rafraîchir
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {incubatedStartups.map(proj => (
+                    <div key={proj.id} className="flex items-center justify-between p-3 rounded-lg border bg-muted/20">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-sm">{proj.name}</p>
+                        <div className="flex gap-2 mt-1">
+                          {proj.sector && <Badge variant="outline" className="text-[10px]">{proj.sector}</Badge>}
+                          {proj.stage && <Badge variant="secondary" className="text-[10px]">{proj.stage}</Badge>}
+                          <Badge className="bg-emerald-500/10 text-emerald-600 text-[10px]">✅ Incubation complétée</Badge>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="gap-1.5 shrink-0"
+                        disabled={importingId === proj.id}
+                        onClick={() => importToMarketplace(proj)}
+                      >
+                        {importingId === proj.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
+                        Importer
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   );
