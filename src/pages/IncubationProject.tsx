@@ -18,6 +18,15 @@ import jsPDF from "jspdf";
 
 const STEP_EMOJIS = ["🔥", "⚖️", "📐", "👥", "⚠️", "📈", "🎯"];
 const STEP_NAMES = ["Disruption", "Réglementaire", "Running Lean", "MVP-Personas", "Risques", "Métriques", "Plan Tactique"];
+const STEP_TOOLTIPS = [
+  { objective: "Identifier le type de disruption et la proposition de valeur unique de votre startup.", finalite: "Valider le potentiel disruptif du projet.", relation: "Alimente l'analyse réglementaire (étape 2) en identifiant le périmètre d'innovation." },
+  { objective: "Analyser les certifications, brevets, normes et exigences réglementaires.", finalite: "Sécuriser le cadre juridique et technique du projet.", relation: "Dépend de la disruption identifiée (étape 1). Alimente le Running Lean (étape 3) avec les contraintes légales." },
+  { objective: "Construire le Lean Canvas, définir les hypothèses critiques et la roadmap MVP.", finalite: "Structurer le modèle économique et le plan de validation.", relation: "S'appuie sur les étapes 1-2. Alimente le mapping MVP-Personas (étape 4)." },
+  { objective: "Mapper les personas cibles avec les fonctionnalités MVP et valider l'adéquation.", finalite: "Confirmer le Product-Market Fit préliminaire.", relation: "Utilise le Lean Canvas (étape 3). Alimente l'analyse des risques (étape 5)." },
+  { objective: "Évaluer les risques systémiques (marché, technique, financier, équipe, réglementaire).", finalite: "Construire une matrice de risques avec plans de mitigation.", relation: "S'appuie sur toutes les étapes précédentes. Alimente les métriques (étape 6)." },
+  { objective: "Définir les KPIs, métriques combinées et scores de maturité.", finalite: "Quantifier la performance et le potentiel du projet.", relation: "Synthétise les étapes 1-5. Alimente le plan tactique final (étape 7)." },
+  { objective: "Élaborer la roadmap 12 mois, le budget, le stack technique et la composition d'équipe.", finalite: "Produire un plan d'exécution actionnable et chiffré.", relation: "Étape finale qui synthétise tout le parcours d'incubation." },
+];
 const STEP_ICONS: Record<string, string> = {
   completed: "✅",
   active: "🔵",
@@ -307,88 +316,173 @@ const IncubationProject = () => {
     try {
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
-      const margin = 15;
+      const margin = 20;
       const contentWidth = pageWidth - margin * 2;
 
-      // Cover page
+      // ── Cover page ──
       doc.setFillColor(88, 28, 135);
       doc.rect(0, 0, pageWidth, 297, "F");
+      // Decorative bar
+      doc.setFillColor(168, 85, 247);
+      doc.rect(0, 0, 8, 297, "F");
       doc.setTextColor(255, 255, 255);
-      doc.setFontSize(32);
-      doc.text("RAPPORT FINAL", margin, 60);
-      doc.text("D'INCUBATION", margin, 75);
-      doc.setFontSize(20);
-      doc.text(project.name, margin, 100);
-      doc.setFontSize(14);
-      if (project.sector) doc.text(`Secteur : ${project.sector}`, margin, 115);
-      if (project.stage) doc.text(`Stade : ${project.stage}`, margin, 128);
-      doc.setFontSize(12);
-      doc.text(`Généré le ${new Date().toLocaleDateString("fr-FR")}`, margin, 150);
-      doc.text("StartUnUp Academy — Plateforme d'Incubation IA", margin, 165);
-
-      // Summary page
-      doc.addPage();
-      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(36);
+      doc.setFont("helvetica", "bold");
+      doc.text("RAPPORT FINAL", margin + 5, 70);
+      doc.setFontSize(28);
+      doc.text("D'INCUBATION IA", margin + 5, 85);
+      doc.setDrawColor(168, 85, 247);
+      doc.setLineWidth(1);
+      doc.line(margin + 5, 92, pageWidth - margin, 92);
       doc.setFontSize(22);
-      doc.text("📊 Résumé Exécutif", margin, 25);
-
-      let y = 40;
-      doc.setFontSize(12);
-      doc.text(`Projet : ${project.name}`, margin, y); y += 8;
-      doc.text(`Description : ${project.description || "N/A"}`, margin, y); y += 8;
-      const completedSteps = steps.filter(s => s.status === "completed").length;
-      doc.text(`Progression : ${project.overall_progress || 0}%`, margin, y); y += 8;
-      doc.text(`Étapes complétées : ${completedSteps}/7`, margin, y); y += 15;
-
-      // Scores summary
-      doc.setFontSize(16);
-      doc.text("🎯 Scores par étape", margin, y); y += 10;
+      doc.text(project.name, margin + 5, 110);
+      doc.setFontSize(13);
+      doc.setFont("helvetica", "normal");
+      if (project.sector) doc.text(`Secteur : ${project.sector}`, margin + 5, 125);
+      if (project.stage) doc.text(`Stade : ${project.stage}`, margin + 5, 137);
       doc.setFontSize(11);
+      doc.text(`Généré le ${new Date().toLocaleDateString("fr-FR")}`, margin + 5, 160);
+      doc.text("StartUnUp Academy — Plateforme d'Incubation IA", margin + 5, 172);
 
-      steps.forEach((s, i) => {
-        if (y > 270) { doc.addPage(); y = 20; }
-        const score = s.ai_report_score || "N/A";
-        doc.setFont("helvetica", "bold");
-        doc.text(`${STEP_EMOJIS[i]} Étape ${s.step_number} — ${STEP_NAMES[i]}`, margin, y);
-        doc.setFont("helvetica", "normal");
-        doc.text(`Score : ${score}/100`, margin + 120, y);
-        y += 7;
-
-        const stepTests = testsByStep[s.id] || [];
-        const completed = stepTests.filter(t => t.status === "completed").length;
-        doc.text(`   Tests complétés : ${completed}/${stepTests.length}`, margin, y);
-        y += 10;
+      // ── Table of contents ──
+      doc.addPage();
+      doc.setTextColor(88, 28, 135);
+      doc.setFontSize(24);
+      doc.setFont("helvetica", "bold");
+      doc.text("TABLE DES MATIÈRES", margin, 30);
+      doc.setDrawColor(88, 28, 135);
+      doc.line(margin, 34, margin + 80, 34);
+      let tocY = 48;
+      doc.setTextColor(40, 40, 40);
+      doc.setFontSize(12);
+      const tocItems = ["Résumé Exécutif", "Scores par étape", ...steps.map((s, i) => `Étape ${s.step_number} — ${STEP_NAMES[i]}`)];
+      tocItems.forEach((item, idx) => {
+        doc.setFont("helvetica", idx < 2 ? "bold" : "normal");
+        doc.text(`${idx + 1}.  ${item}`, margin, tocY);
+        tocY += 9;
       });
 
-      // Detailed reports per step
-      steps.forEach((s, i) => {
-        doc.addPage();
-        doc.setFontSize(18);
-        doc.setFont("helvetica", "bold");
-        doc.text(`${STEP_EMOJIS[i]} Étape ${s.step_number} — ${s.name}`, margin, 25);
+      // ── Summary page ──
+      doc.addPage();
+      doc.setTextColor(88, 28, 135);
+      doc.setFontSize(22);
+      doc.setFont("helvetica", "bold");
+      doc.text("1. RÉSUMÉ EXÉCUTIF", margin, 28);
+      doc.setDrawColor(88, 28, 135);
+      doc.line(margin, 32, margin + 70, 32);
 
-        let sy = 40;
+      let y = 44;
+      doc.setTextColor(40, 40, 40);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "normal");
+      const summaryItems = [
+        ["Projet", project.name],
+        ["Description", project.description || "N/A"],
+        ["Secteur", project.sector || "N/A"],
+        ["Stade", project.stage || "N/A"],
+        ["Progression", `${project.overall_progress || 0}%`],
+        ["Étapes complétées", `${steps.filter(s => s.status === "completed").length}/7`],
+      ];
+      summaryItems.forEach(([label, value]) => {
+        doc.setFont("helvetica", "bold");
+        doc.text(`${label} :`, margin, y);
+        doc.setFont("helvetica", "normal");
+        const lines = doc.splitTextToSize(String(value), contentWidth - 50);
+        doc.text(lines, margin + 50, y);
+        y += lines.length * 6 + 4;
+      });
+
+      // ── Scores summary ──
+      y += 8;
+      doc.setTextColor(88, 28, 135);
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "bold");
+      doc.text("2. SCORES PAR ÉTAPE", margin, y); y += 5;
+      doc.setDrawColor(88, 28, 135);
+      doc.line(margin, y, margin + 60, y); y += 10;
+
+      doc.setTextColor(40, 40, 40);
+      steps.forEach((s, i) => {
+        if (y > 260) { doc.addPage(); y = 25; }
+        const score = s.ai_report_score || "—";
+        const stepTests = testsByStep[s.id] || [];
+        const completed = stepTests.filter((t: any) => t.status === "completed").length;
+        const failed = stepTests.filter((t: any) => t.status === "failed").length;
+        const ignored = stepTests.filter((t: any) => t.status === "skipped").length;
+
+        // Step row with colored bar
+        doc.setFillColor(s.status === "completed" ? 16 : 200, s.status === "completed" ? 185 : 200, s.status === "completed" ? 129 : 200);
+        doc.rect(margin, y - 4, 3, 18, "F");
+
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.text(`${STEP_EMOJIS[i]} Étape ${s.step_number} — ${STEP_NAMES[i]}`, margin + 6, y);
         doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
+        doc.text(`Score : ${score}/100`, margin + 130, y);
+        y += 6;
+        doc.setFontSize(9);
+        doc.text(`Tests : ${completed}/${stepTests.length} validés | ${failed} échoués | ${ignored} ignorés`, margin + 6, y);
+        y += 12;
+      });
+
+      // ── Detailed reports per step ──
+      steps.forEach((s, i) => {
+        doc.addPage();
+        // Step header
+        doc.setFillColor(88, 28, 135);
+        doc.rect(0, 0, pageWidth, 40, "F");
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(18);
+        doc.setFont("helvetica", "bold");
+        doc.text(`${STEP_EMOJIS[i]}  Étape ${s.step_number} — ${s.name}`, margin, 26);
+
+        let sy = 52;
+        doc.setTextColor(40, 40, 40);
+
+        // Test stats for this step
+        const stepTests = testsByStep[s.id] || [];
+        if (stepTests.length > 0) {
+          const completed = stepTests.filter((t: any) => t.status === "completed").length;
+          const failed = stepTests.filter((t: any) => t.status === "failed").length;
+          doc.setFontSize(10);
+          doc.setFont("helvetica", "bold");
+          doc.text(`Tests MVP : ${completed}/${stepTests.length} validés, ${failed} échoués`, margin, sy);
+          sy += 8;
+          doc.setFont("helvetica", "normal");
+          stepTests.forEach((t: any) => {
+            if (sy > 275) { doc.addPage(); sy = 25; }
+            const icon = t.status === "completed" ? "✓" : t.status === "failed" ? "✗" : "○";
+            doc.setFontSize(9);
+            doc.text(`  ${icon}  ${t.name}`, margin, sy);
+            sy += 5;
+          });
+          sy += 6;
+        }
 
         const report = s.ai_report_content;
         if (report && typeof report === "object") {
           Object.entries(report).forEach(([key, value]) => {
-            if (sy > 270) { doc.addPage(); sy = 20; }
+            if (sy > 265) { doc.addPage(); sy = 25; }
+            // Section header
+            doc.setFillColor(245, 245, 250);
+            doc.rect(margin, sy - 4, contentWidth, 8, "F");
             doc.setFont("helvetica", "bold");
             doc.setFontSize(11);
-            doc.text(key.replace(/_/g, " ").toUpperCase(), margin, sy);
-            sy += 6;
+            doc.setTextColor(88, 28, 135);
+            doc.text(key.replace(/_/g, " ").toUpperCase(), margin + 2, sy + 1);
+            sy += 10;
             doc.setFont("helvetica", "normal");
             doc.setFontSize(9);
+            doc.setTextColor(40, 40, 40);
             const text = typeof value === "string" ? value : JSON.stringify(value, null, 2);
             const lines = doc.splitTextToSize(text, contentWidth);
             lines.forEach((line: string) => {
-              if (sy > 280) { doc.addPage(); sy = 20; }
+              if (sy > 278) { doc.addPage(); sy = 25; }
               doc.text(line, margin, sy);
               sy += 4.5;
             });
-            sy += 5;
+            sy += 6;
           });
         }
       });
@@ -399,7 +493,10 @@ const IncubationProject = () => {
         doc.setPage(p);
         doc.setFontSize(8);
         doc.setTextColor(150, 150, 150);
-        doc.text(`StartUnUp Academy — Rapport Final d'Incubation — Page ${p}/${totalPages}`, margin, 290);
+        doc.setFont("helvetica", "italic");
+        doc.text(`StartUnUp Academy — Rapport Final d'Incubation — Page ${p}/${totalPages}`, margin, 288);
+        doc.setDrawColor(200, 200, 200);
+        doc.line(margin, 285, pageWidth - margin, 285);
       }
 
       const fileName = `rapport-final-incubation-${project.name.toLowerCase().replace(/\s+/g, "-")}.pdf`;
@@ -420,38 +517,66 @@ const IncubationProject = () => {
 
   const exportPDF = async (stepData: any, options?: { download?: boolean }) => {
     const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text(`Rapport — ${stepData.name}`, 20, 25);
-    doc.setFontSize(12);
-    doc.text(`Projet : ${project?.name}`, 20, 35);
-    doc.text(`Date : ${new Date().toLocaleDateString("fr-FR")}`, 20, 42);
+    const pw = doc.internal.pageSize.getWidth();
+    const margin = 20;
+    const cw = pw - margin * 2;
 
-    let y = 55;
+    // Header bar
+    doc.setFillColor(88, 28, 135);
+    doc.rect(0, 0, pw, 35, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text(`${STEP_EMOJIS[stepData.step_number - 1]}  Rapport — ${stepData.name}`, margin, 22);
+
+    let y = 45;
+    doc.setTextColor(40, 40, 40);
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Projet : ${project?.name}`, margin, y); y += 7;
+    doc.text(`Date : ${new Date().toLocaleDateString("fr-FR")}`, margin, y); y += 7;
+    if (stepData.ai_report_score) {
+      doc.text(`Score IA : ${stepData.ai_report_score}/100`, margin, y); y += 7;
+    }
+    y += 5;
+
     const report = stepData.ai_report_content;
     if (report && typeof report === "object") {
       Object.entries(report).forEach(([key, value]) => {
-        if (y > 270) { doc.addPage(); y = 20; }
+        if (y > 265) { doc.addPage(); y = 25; }
+        doc.setFillColor(245, 245, 250);
+        doc.rect(margin, y - 4, cw, 8, "F");
         doc.setFontSize(11);
         doc.setFont("helvetica", "bold");
-        doc.text(key.replace(/_/g, " ").toUpperCase(), 20, y);
-        y += 7;
+        doc.setTextColor(88, 28, 135);
+        doc.text(key.replace(/_/g, " ").toUpperCase(), margin + 2, y + 1);
+        y += 10;
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
+        doc.setFontSize(9);
+        doc.setTextColor(40, 40, 40);
         const text = typeof value === "string" ? value : JSON.stringify(value, null, 2);
-        const lines = doc.splitTextToSize(text, 170);
+        const lines = doc.splitTextToSize(text, cw);
         lines.forEach((line: string) => {
-          if (y > 280) { doc.addPage(); y = 20; }
-          doc.text(line, 20, y);
-          y += 5;
+          if (y > 278) { doc.addPage(); y = 25; }
+          doc.text(line, margin, y);
+          y += 4.5;
         });
-        y += 5;
+        y += 6;
       });
     } else {
-      doc.text("Aucun rapport disponible.", 20, y);
+      doc.text("Aucun rapport disponible.", margin, y);
     }
 
-    doc.setFontSize(8);
-    doc.text("Généré par StartunupAcademy — Plateforme d'Incubation IA", 20, 290);
+    // Footer
+    const totalPages = doc.getNumberOfPages();
+    for (let p = 1; p <= totalPages; p++) {
+      doc.setPage(p);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "italic");
+      doc.setTextColor(150, 150, 150);
+      doc.text(`StartUnUp Academy — ${stepData.name} — Page ${p}/${totalPages}`, margin, 288);
+      doc.setDrawColor(200); doc.line(margin, 285, pw - margin, 285);
+    }
 
     const fileName = `rapport-${stepData.name.toLowerCase().replace(/\s+/g, "-")}-${project?.name?.toLowerCase().replace(/\s+/g, "-") || "projet"}.pdf`;
     await uploadGeneratedPdf(doc, fileName);
@@ -548,7 +673,7 @@ const IncubationProject = () => {
           </CardContent>
         </Card>
 
-        {/* Visual progress per step */}
+        {/* Visual progress per step — Interactive */}
         <Card className="mb-8 border-border/50">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center justify-between">
@@ -562,7 +687,10 @@ const IncubationProject = () => {
             <div className="grid grid-cols-1 sm:grid-cols-7 gap-3">
               {steps.map((s, i) => {
                 const stepTests = testsByStep[s.id] || [];
-                const completed = stepTests.filter(t => t.status === "completed").length;
+                const completed = stepTests.filter((t: any) => t.status === "completed").length;
+                const failed = stepTests.filter((t: any) => t.status === "failed").length;
+                const skipped = stepTests.filter((t: any) => t.status === "skipped").length;
+                const inProgress = stepTests.filter((t: any) => t.status === "in_progress").length;
                 const total = stepTests.length;
                 const pct = total > 0 ? Math.round((completed / total) * 100) : (s.status === "completed" ? 100 : 0);
                 const isCompleted = s.status === "completed";
@@ -570,34 +698,66 @@ const IncubationProject = () => {
                 const isLocked = s.status === "locked";
 
                 return (
-                  <motion.div
-                    key={s.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    className={`flex flex-col items-center p-2 rounded-lg transition-all ${
-                      isLocked ? "opacity-40" : ""
-                    }`}
-                  >
-                    <span className="text-lg mb-1">{STEP_EMOJIS[i]}</span>
-                    <div className="w-full h-24 sm:h-28 bg-muted rounded-md relative overflow-hidden flex items-end">
-                      <motion.div
-                        className={`w-full rounded-md ${
-                          isCompleted ? "bg-emerald-500" :
-                          isActive ? "bg-primary" :
-                          "bg-muted-foreground/30"
-                        }`}
-                        initial={{ height: 0 }}
-                        animate={{ height: `${Math.max(pct, 4)}%` }}
-                        transition={{ duration: 0.6, delay: i * 0.08 }}
-                      />
-                      <span className="absolute inset-0 flex items-center justify-center text-xs font-bold">
-                        {pct}%
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-center text-muted-foreground mt-1 leading-tight">{STEP_NAMES[i]}</p>
-                    <p className="text-[10px] font-medium">{completed}/{total}</p>
-                  </motion.div>
+                  <TooltipProvider key={s.id} delayDuration={200}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.05 }}
+                          className={`flex flex-col items-center p-2 rounded-lg transition-all cursor-pointer hover:ring-2 hover:ring-primary/30 ${
+                            isLocked ? "opacity-40" : ""
+                          }`}
+                          onClick={() => {
+                            if (!isLocked && stepRefs.current[s.id]) {
+                              stepRefs.current[s.id]?.scrollIntoView({ behavior: "smooth", block: "center" });
+                            }
+                          }}
+                        >
+                          <span className="text-lg mb-1">{STEP_EMOJIS[i]}</span>
+                          <div className={`w-full h-24 sm:h-28 rounded-md relative overflow-hidden flex items-end border-2 transition-all ${
+                            isCompleted ? "border-emerald-500/50" : isActive ? "border-primary/50" : "border-border"
+                          }`}>
+                            <motion.div
+                              className={`w-full rounded-b-md ${
+                                isCompleted ? "bg-emerald-500" :
+                                isActive ? "bg-primary" :
+                                "bg-muted-foreground/30"
+                              }`}
+                              initial={{ height: 0 }}
+                              animate={{ height: `${Math.max(pct, 4)}%` }}
+                              transition={{ duration: 0.6, delay: i * 0.08 }}
+                            />
+                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5 px-1">
+                              <span className="text-sm font-bold">{pct}%</span>
+                              {total > 0 && (
+                                <div className="text-[8px] leading-tight text-center space-y-0">
+                                  <p>✅{completed} ❌{failed} ⏭{skipped}</p>
+                                  <p className="text-muted-foreground">{inProgress} en cours</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <p className="text-[10px] text-center text-muted-foreground mt-1 leading-tight font-medium">{STEP_NAMES[i]}</p>
+                          <p className="text-[10px] font-bold">{completed}/{total}</p>
+                        </motion.div>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs p-3">
+                        <p className="font-bold text-xs mb-1">{STEP_EMOJIS[i]} {STEP_NAMES[i]}</p>
+                        <p className="text-xs text-muted-foreground mb-2">{STEP_TOOLTIPS[i].objective}</p>
+                        <p className="text-[10px] font-semibold">🎯 Finalité : <span className="font-normal">{STEP_TOOLTIPS[i].finalite}</span></p>
+                        <p className="text-[10px] font-semibold mt-1">🔗 Relation : <span className="font-normal">{STEP_TOOLTIPS[i].relation}</span></p>
+                        {total > 0 && (
+                          <div className="mt-2 pt-2 border-t text-[10px] space-y-0.5">
+                            <p>✅ Validés : {completed}/{total} ({total > 0 ? Math.round((completed/total)*100) : 0}%)</p>
+                            <p>❌ Échoués : {failed}/{total}</p>
+                            <p>⏭ Ignorés : {skipped}/{total}</p>
+                            <p>🔄 En cours : {inProgress}/{total}</p>
+                          </div>
+                        )}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 );
               })}
             </div>
@@ -613,6 +773,9 @@ const IncubationProject = () => {
 
             return (
               <div key={s.id} className="flex items-center gap-0">
+                <TooltipProvider delayDuration={300}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
                 <motion.div
                   className={`relative flex flex-col items-center transition-all duration-300 ${
                     isLocked ? "opacity-40" : "cursor-pointer hover:scale-105"
@@ -668,6 +831,15 @@ const IncubationProject = () => {
                     </button>
                   )}
                 </motion.div>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs p-3">
+                      <p className="font-bold text-xs mb-1">{STEP_EMOJIS[i]} {STEP_NAMES[i]}</p>
+                      <p className="text-xs text-muted-foreground">{STEP_TOOLTIPS[i].objective}</p>
+                      <p className="text-[10px] mt-1"><strong>Finalité :</strong> {STEP_TOOLTIPS[i].finalite}</p>
+                      <p className="text-[10px]"><strong>Relation :</strong> {STEP_TOOLTIPS[i].relation}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
                 {i < steps.length - 1 && (
                   <div className={`hidden md:block w-8 lg:w-12 h-0.5 mx-1 transition-all duration-500 ${
                     isCompleted ? "bg-emerald-500" : "bg-border"

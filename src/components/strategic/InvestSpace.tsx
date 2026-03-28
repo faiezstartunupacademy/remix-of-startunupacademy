@@ -435,23 +435,39 @@ Utilise TOUTES les données des phases stratégiques disponibles.`;
   const downloadGeneratedPDF = async (content: string, type: string) => {
     const doc = new jsPDF();
     const pw = doc.internal.pageSize.getWidth();
-    const margin = 15;
+    const margin = 20;
     const cw = pw - margin * 2;
-    let y = 25;
-    doc.setFontSize(20); doc.setFont("helvetica", "bold");
-    doc.text(type === "pitch-deck" ? "PITCH DECK" : "BUSINESS PLAN", margin, y); y += 8;
-    doc.setFontSize(14); doc.text(projectName, margin, y); y += 6;
-    doc.setFontSize(10); doc.setFont("helvetica", "normal");
-    doc.text(`${sector || "N/A"} | ${startupStage} | ${new Date().toLocaleDateString("fr-FR")}`, margin, y); y += 12;
+
+    // Cover header
+    doc.setFillColor(88, 28, 135);
+    doc.rect(0, 0, pw, 38, "F");
+    doc.setFillColor(168, 85, 247);
+    doc.rect(0, 0, 6, 38, "F");
+    doc.setTextColor(255, 255, 255);
+    let y = 18;
+    doc.setFontSize(18); doc.setFont("helvetica", "bold");
+    doc.text(type === "pitch-deck" ? "PITCH DECK" : "BUSINESS PLAN", margin + 2, y); y += 8;
+    doc.setFontSize(12); doc.setFont("helvetica", "normal");
+    doc.text(`${projectName} — ${sector || "N/A"} | ${startupStage}`, margin + 2, y);
+
+    y = 50;
+    doc.setTextColor(40, 40, 40);
+    doc.setFontSize(10);
+    doc.text(`Généré le ${new Date().toLocaleDateString("fr-FR")} — ${PITCH_TYPES.find(p => p.value === pitchType)?.label || ""}`, margin, y);
+    y += 12;
 
     for (const line of content.split("\n")) {
-      if (y > 270) { doc.addPage(); y = 20; }
+      if (y > 270) { doc.addPage(); y = 25; }
       if (line.startsWith("## ")) {
-        doc.setFontSize(14); doc.setFont("helvetica", "bold"); y += 4;
-        doc.text(line.replace("## ", ""), margin, y); y += 8;
+        doc.setFillColor(245, 245, 250);
+        doc.rect(margin, y - 4, cw, 9, "F");
+        doc.setFontSize(14); doc.setFont("helvetica", "bold");
+        doc.setTextColor(88, 28, 135);
+        doc.text(line.replace("## ", ""), margin + 2, y + 1); y += 12;
+        doc.setTextColor(40, 40, 40);
       } else if (line.startsWith("### ")) {
         doc.setFontSize(11); doc.setFont("helvetica", "bold");
-        doc.text(line.replace("### ", ""), margin, y); y += 6;
+        doc.text(line.replace("### ", ""), margin, y); y += 7;
       } else if (line.trim()) {
         doc.setFontSize(10); doc.setFont("helvetica", "normal");
         const s = doc.splitTextToSize(line.replace(/\*\*/g, ""), cw);
@@ -459,10 +475,22 @@ Utilise TOUTES les données des phases stratégiques disponibles.`;
       } else { y += 3; }
     }
 
-    const fileName = `${type}-${projectName.replace(/\s+/g, "-")}.pdf`;
+    // Footer
+    const totalPages = doc.getNumberOfPages();
+    for (let p = 1; p <= totalPages; p++) {
+      doc.setPage(p);
+      doc.setFontSize(8); doc.setFont("helvetica", "italic");
+      doc.setTextColor(150);
+      doc.text(`StartUnUp — ${type === "pitch-deck" ? "Pitch Deck" : "Business Plan"} — Page ${p}/${totalPages}`, margin, 288);
+      doc.setDrawColor(200); doc.line(margin, 285, pw - margin, 285);
+      doc.setTextColor(0);
+    }
+
+    const timestamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-");
+    const fileName = `${type}-${projectName.replace(/\s+/g, "-")}-${timestamp}.pdf`;
     doc.save(fileName);
 
-    // Auto-upload to storage
+    // Auto-upload to storage with versioned name
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -476,7 +504,7 @@ Utilise TOUTES les données des phases stratégiques disponibles.`;
         await supabase.storage
           .from("incubation-reports")
           .upload(filePath, blob, { contentType: "application/pdf", upsert: true });
-        toast({ title: "✅ PDF téléchargé et archivé", description: `${type === "pitch-deck" ? "Pitch Deck" : "Business Plan"} sauvegardé dans vos documents.` });
+        toast({ title: "✅ PDF téléchargé et archivé", description: `Version sauvegardée : ${timestamp}` });
       }
     } catch (e) {
       console.error("Auto-upload error:", e);
@@ -883,26 +911,48 @@ Utilise TOUTES les données des phases stratégiques disponibles.`;
 
         {/* ─── Data Room Tab ─── */}
         <TabsContent value="dataroom" className="space-y-4 mt-4">
-          <Card className="border-amber-200 dark:border-amber-800">
-            <CardContent className="py-3 space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Building2 className="h-5 w-5 text-amber-600" />
-                  <h3 className="font-semibold text-sm">Data Room — Progression</h3>
+          {/* Data Room Guide Header */}
+          <div className="flex gap-4">
+            <Card className="flex-1 border-amber-200 dark:border-amber-800">
+              <CardContent className="py-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5 text-amber-600" />
+                    <h3 className="font-semibold text-sm">Data Room — Progression</h3>
+                  </div>
+                  <Badge variant="outline" className="text-amber-600 border-amber-300">
+                    {isLoadingDeliverables ? "..." : `${completedDeliverables.size}/${DELIVERABLES.length}`}
+                  </Badge>
                 </div>
-                <Badge variant="outline" className="text-amber-600 border-amber-300">
-                  {isLoadingDeliverables ? "..." : `${completedDeliverables.size}/${DELIVERABLES.length}`}
-                </Badge>
-              </div>
-              <Progress value={deliverableProgress} className="h-2" />
-              <p className="text-xs text-muted-foreground">
-                {deliverableProgress < 30 ? "🔴 Data Room insuffisante — Préparez vos livrables core en priorité"
-                  : deliverableProgress < 70 ? "🟡 Data Room en cours — Continuez à compléter les livrables"
-                  : deliverableProgress < 100 ? "🟢 Data Room presque complète — Finalisez les derniers éléments"
-                  : "✅ Data Room complète — Prête pour les investisseurs !"}
-              </p>
-            </CardContent>
-          </Card>
+                <Progress value={deliverableProgress} className="h-2" />
+                <p className="text-xs text-muted-foreground">
+                  {deliverableProgress < 30 ? "🔴 Data Room insuffisante — Préparez vos livrables core en priorité"
+                    : deliverableProgress < 70 ? "🟡 Data Room en cours — Continuez à compléter les livrables"
+                    : deliverableProgress < 100 ? "🟢 Data Room presque complète — Finalisez les derniers éléments"
+                    : "✅ Data Room complète — Prête pour les investisseurs !"}
+                </p>
+              </CardContent>
+            </Card>
+            {/* Guide livrable core */}
+            <Card className="w-72 shrink-0 border-primary/30 bg-primary/5">
+              <CardContent className="py-3 space-y-2">
+                <p className="font-semibold text-xs flex items-center gap-1.5">
+                  <BookOpen className="h-4 w-4 text-primary" /> Guide Livrables Core
+                </p>
+                <ul className="text-[10px] text-muted-foreground space-y-1">
+                  <li>📄 <strong>Pitch Deck</strong> — 12 slides max, focus traction</li>
+                  <li>📝 <strong>Teaser</strong> — 1 page, accroche investisseur</li>
+                  <li>📊 <strong>Business Plan</strong> — Projections 3 ans</li>
+                  <li>💰 <strong>Valorisation</strong> — Multi-méthodes (DCF, VC)</li>
+                  <li>📁 <strong>Data Room</strong> — Docs juridiques + financiers</li>
+                </ul>
+                <Button variant="outline" size="sm" className="w-full text-[10px] h-7 gap-1"
+                  onClick={() => sendMessage(`Donne-moi le guide complet des livrables core d'une Data Room pour investisseurs. Pour chaque livrable (Pitch Deck, Teaser, Investment Memo, Business Plan, Valorisation, Montage Financier), détaille : objectif, contenu attendu, format, erreurs courantes, et exemples. Cite les références Y Combinator, Sequoia, et les meilleures pratiques.`)}>
+                  <Bot className="h-3 w-3" /> Guide détaillé IA
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
 
           <div className="grid gap-3 md:grid-cols-2">
             {[

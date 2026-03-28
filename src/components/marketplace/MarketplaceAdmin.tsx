@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Shield, CheckCircle, XCircle, Plus, Globe, Loader2, Award, Trash2, Edit, Rocket } from "lucide-react";
+import { Shield, CheckCircle, XCircle, Plus, Globe, Loader2, Award, Trash2, Edit, Rocket, Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +30,9 @@ const MarketplaceAdmin = () => {
   const [ecoWebsite, setEcoWebsite] = useState("");
   const [ecoSectors, setEcoSectors] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [incubatedStartups, setIncubatedStartups] = useState<any[]>([]);
+  const [loadingIncubated, setLoadingIncubated] = useState(false);
+  const [importingId, setImportingId] = useState<string | null>(null);
 
   // Programme form
   const [programName, setProgramName] = useState("");
@@ -44,6 +47,49 @@ const MarketplaceAdmin = () => {
   const [isSavingStartup, setIsSavingStartup] = useState(false);
 
   useEffect(() => { fetchPrograms(); }, []);
+
+  const fetchIncubatedStartups = async () => {
+    setLoadingIncubated(true);
+    const { data } = await supabase
+      .from("incubation_projects")
+      .select("id, name, sector, stage, description, status, user_id")
+      .eq("status", "completed")
+      .order("updated_at", { ascending: false });
+    setIncubatedStartups(data || []);
+    setLoadingIncubated(false);
+  };
+
+  const importToMarketplace = async (proj: any) => {
+    setImportingId(proj.id);
+    const slug = proj.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") + "-" + Date.now().toString(36);
+    const { data: existing } = await supabase
+      .from("marketplace_startups")
+      .select("id")
+      .ilike("name", proj.name)
+      .maybeSingle();
+    if (existing) {
+      toast({ title: "Déjà présente", description: `"${proj.name}" existe déjà dans le marketplace.` });
+      setImportingId(null);
+      return;
+    }
+    const { error } = await supabase.from("marketplace_startups").insert({
+      name: proj.name,
+      slug,
+      sector: proj.sector || "tech",
+      stage: proj.stage || "early",
+      description: proj.description || "",
+      tagline: (proj.description || "").substring(0, 120),
+      created_by: proj.user_id,
+      is_approved: false,
+    });
+    setImportingId(null);
+    if (error) {
+      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "✅ Importée", description: `"${proj.name}" ajoutée au marketplace (en attente d'approbation).` });
+      queryClient.invalidateQueries({ queryKey: ["marketplace-startups-admin"] });
+    }
+  };
 
   const fetchPrograms = async () => {
     const { data } = await supabase.from("marketplace_programs").select("id, name, description").order("created_at", { ascending: false });
@@ -144,6 +190,9 @@ const MarketplaceAdmin = () => {
           <TabsTrigger value="ecosystems">Écosystèmes ({ecosystems?.length || 0})</TabsTrigger>
           <TabsTrigger value="add-ecosystem">{t("marketplace.addEcosystem")}</TabsTrigger>
           <TabsTrigger value="programs" className="gap-1"><Award className="h-3 w-3" /> Programmes ({programs.length})</TabsTrigger>
+          <TabsTrigger value="incubation" className="gap-1" onClick={() => { if (incubatedStartups.length === 0) fetchIncubatedStartups(); }}>
+            <Download className="h-3 w-3" /> Import Incubation
+          </TabsTrigger>
         </TabsList>
 
         {/* Startups Tab */}
@@ -368,6 +417,57 @@ const MarketplaceAdmin = () => {
                 ))}
                 {!programs.length && <p className="text-center text-muted-foreground py-6">{t("marketplace.noPrograms")}</p>}
               </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Incubation Import Tab */}
+        <TabsContent value="incubation" className="space-y-4 mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Download className="h-5 w-5 text-primary" /> Importer depuis l'Incubation IA
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-xs text-muted-foreground">
+                Les startups ayant complété les 7 étapes d'incubation IA apparaissent ici. Importez-les dans le marketplace pour les rendre visibles.
+              </p>
+              {loadingIncubated ? (
+                <div className="flex justify-center py-6"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
+              ) : incubatedStartups.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Rocket className="h-8 w-8 mx-auto mb-2 opacity-30" />
+                  <p className="text-sm">Aucune startup n'a encore achevé les 7 étapes d'incubation.</p>
+                  <Button variant="outline" size="sm" className="mt-3 gap-1" onClick={fetchIncubatedStartups}>
+                    <Loader2 className="h-3 w-3" /> Rafraîchir
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {incubatedStartups.map(proj => (
+                    <div key={proj.id} className="flex items-center justify-between p-3 rounded-lg border bg-muted/20">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-sm">{proj.name}</p>
+                        <div className="flex gap-2 mt-1">
+                          {proj.sector && <Badge variant="outline" className="text-[10px]">{proj.sector}</Badge>}
+                          {proj.stage && <Badge variant="secondary" className="text-[10px]">{proj.stage}</Badge>}
+                          <Badge className="bg-emerald-500/10 text-emerald-600 text-[10px]">✅ Incubation complétée</Badge>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="gap-1.5 shrink-0"
+                        disabled={importingId === proj.id}
+                        onClick={() => importToMarketplace(proj)}
+                      >
+                        {importingId === proj.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Plus className="h-3 w-3" />}
+                        Importer
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
