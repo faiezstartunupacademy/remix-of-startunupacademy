@@ -48,6 +48,49 @@ const MarketplaceAdmin = () => {
 
   useEffect(() => { fetchPrograms(); }, []);
 
+  const fetchIncubatedStartups = async () => {
+    setLoadingIncubated(true);
+    const { data } = await supabase
+      .from("incubation_projects")
+      .select("id, name, sector, stage, description, status, user_id")
+      .eq("status", "completed")
+      .order("updated_at", { ascending: false });
+    setIncubatedStartups(data || []);
+    setLoadingIncubated(false);
+  };
+
+  const importToMarketplace = async (proj: any) => {
+    setImportingId(proj.id);
+    const slug = proj.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") + "-" + Date.now().toString(36);
+    const { data: existing } = await supabase
+      .from("marketplace_startups")
+      .select("id")
+      .ilike("name", proj.name)
+      .maybeSingle();
+    if (existing) {
+      toast({ title: "Déjà présente", description: `"${proj.name}" existe déjà dans le marketplace.` });
+      setImportingId(null);
+      return;
+    }
+    const { error } = await supabase.from("marketplace_startups").insert({
+      name: proj.name,
+      slug,
+      sector: proj.sector || "tech",
+      stage: proj.stage || "early",
+      description: proj.description || "",
+      tagline: (proj.description || "").substring(0, 120),
+      created_by: proj.user_id,
+      is_approved: false,
+    });
+    setImportingId(null);
+    if (error) {
+      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "✅ Importée", description: `"${proj.name}" ajoutée au marketplace (en attente d'approbation).` });
+      queryClient.invalidateQueries({ queryKey: ["marketplace-startups-admin"] });
+    }
+  };
+
   const fetchPrograms = async () => {
     const { data } = await supabase.from("marketplace_programs").select("id, name, description").order("created_at", { ascending: false });
     if (data) setPrograms(data as any);
