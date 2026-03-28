@@ -30,6 +30,9 @@ const MarketplaceAdmin = () => {
   const [ecoWebsite, setEcoWebsite] = useState("");
   const [ecoSectors, setEcoSectors] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [incubatedStartups, setIncubatedStartups] = useState<any[]>([]);
+  const [loadingIncubated, setLoadingIncubated] = useState(false);
+  const [importingId, setImportingId] = useState<string | null>(null);
 
   // Programme form
   const [programName, setProgramName] = useState("");
