@@ -316,88 +316,173 @@ const IncubationProject = () => {
     try {
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
-      const margin = 15;
+      const margin = 20;
       const contentWidth = pageWidth - margin * 2;
 
-      // Cover page
+      // ── Cover page ──
       doc.setFillColor(88, 28, 135);
       doc.rect(0, 0, pageWidth, 297, "F");
+      // Decorative bar
+      doc.setFillColor(168, 85, 247);
+      doc.rect(0, 0, 8, 297, "F");
       doc.setTextColor(255, 255, 255);
-      doc.setFontSize(32);
-      doc.text("RAPPORT FINAL", margin, 60);
-      doc.text("D'INCUBATION", margin, 75);
-      doc.setFontSize(20);
-      doc.text(project.name, margin, 100);
-      doc.setFontSize(14);
-      if (project.sector) doc.text(`Secteur : ${project.sector}`, margin, 115);
-      if (project.stage) doc.text(`Stade : ${project.stage}`, margin, 128);
-      doc.setFontSize(12);
-      doc.text(`Généré le ${new Date().toLocaleDateString("fr-FR")}`, margin, 150);
-      doc.text("StartUnUp Academy — Plateforme d'Incubation IA", margin, 165);
-
-      // Summary page
-      doc.addPage();
-      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(36);
+      doc.setFont("helvetica", "bold");
+      doc.text("RAPPORT FINAL", margin + 5, 70);
+      doc.setFontSize(28);
+      doc.text("D'INCUBATION IA", margin + 5, 85);
+      doc.setDrawColor(168, 85, 247);
+      doc.setLineWidth(1);
+      doc.line(margin + 5, 92, pageWidth - margin, 92);
       doc.setFontSize(22);
-      doc.text("📊 Résumé Exécutif", margin, 25);
-
-      let y = 40;
-      doc.setFontSize(12);
-      doc.text(`Projet : ${project.name}`, margin, y); y += 8;
-      doc.text(`Description : ${project.description || "N/A"}`, margin, y); y += 8;
-      const completedSteps = steps.filter(s => s.status === "completed").length;
-      doc.text(`Progression : ${project.overall_progress || 0}%`, margin, y); y += 8;
-      doc.text(`Étapes complétées : ${completedSteps}/7`, margin, y); y += 15;
-
-      // Scores summary
-      doc.setFontSize(16);
-      doc.text("🎯 Scores par étape", margin, y); y += 10;
+      doc.text(project.name, margin + 5, 110);
+      doc.setFontSize(13);
+      doc.setFont("helvetica", "normal");
+      if (project.sector) doc.text(`Secteur : ${project.sector}`, margin + 5, 125);
+      if (project.stage) doc.text(`Stade : ${project.stage}`, margin + 5, 137);
       doc.setFontSize(11);
+      doc.text(`Généré le ${new Date().toLocaleDateString("fr-FR")}`, margin + 5, 160);
+      doc.text("StartUnUp Academy — Plateforme d'Incubation IA", margin + 5, 172);
 
-      steps.forEach((s, i) => {
-        if (y > 270) { doc.addPage(); y = 20; }
-        const score = s.ai_report_score || "N/A";
-        doc.setFont("helvetica", "bold");
-        doc.text(`${STEP_EMOJIS[i]} Étape ${s.step_number} — ${STEP_NAMES[i]}`, margin, y);
-        doc.setFont("helvetica", "normal");
-        doc.text(`Score : ${score}/100`, margin + 120, y);
-        y += 7;
-
-        const stepTests = testsByStep[s.id] || [];
-        const completed = stepTests.filter(t => t.status === "completed").length;
-        doc.text(`   Tests complétés : ${completed}/${stepTests.length}`, margin, y);
-        y += 10;
+      // ── Table of contents ──
+      doc.addPage();
+      doc.setTextColor(88, 28, 135);
+      doc.setFontSize(24);
+      doc.setFont("helvetica", "bold");
+      doc.text("TABLE DES MATIÈRES", margin, 30);
+      doc.setDrawColor(88, 28, 135);
+      doc.line(margin, 34, margin + 80, 34);
+      let tocY = 48;
+      doc.setTextColor(40, 40, 40);
+      doc.setFontSize(12);
+      const tocItems = ["Résumé Exécutif", "Scores par étape", ...steps.map((s, i) => `Étape ${s.step_number} — ${STEP_NAMES[i]}`)];
+      tocItems.forEach((item, idx) => {
+        doc.setFont("helvetica", idx < 2 ? "bold" : "normal");
+        doc.text(`${idx + 1}.  ${item}`, margin, tocY);
+        tocY += 9;
       });
 
-      // Detailed reports per step
-      steps.forEach((s, i) => {
-        doc.addPage();
-        doc.setFontSize(18);
-        doc.setFont("helvetica", "bold");
-        doc.text(`${STEP_EMOJIS[i]} Étape ${s.step_number} — ${s.name}`, margin, 25);
+      // ── Summary page ──
+      doc.addPage();
+      doc.setTextColor(88, 28, 135);
+      doc.setFontSize(22);
+      doc.setFont("helvetica", "bold");
+      doc.text("1. RÉSUMÉ EXÉCUTIF", margin, 28);
+      doc.setDrawColor(88, 28, 135);
+      doc.line(margin, 32, margin + 70, 32);
 
-        let sy = 40;
+      let y = 44;
+      doc.setTextColor(40, 40, 40);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "normal");
+      const summaryItems = [
+        ["Projet", project.name],
+        ["Description", project.description || "N/A"],
+        ["Secteur", project.sector || "N/A"],
+        ["Stade", project.stage || "N/A"],
+        ["Progression", `${project.overall_progress || 0}%`],
+        ["Étapes complétées", `${steps.filter(s => s.status === "completed").length}/7`],
+      ];
+      summaryItems.forEach(([label, value]) => {
+        doc.setFont("helvetica", "bold");
+        doc.text(`${label} :`, margin, y);
+        doc.setFont("helvetica", "normal");
+        const lines = doc.splitTextToSize(String(value), contentWidth - 50);
+        doc.text(lines, margin + 50, y);
+        y += lines.length * 6 + 4;
+      });
+
+      // ── Scores summary ──
+      y += 8;
+      doc.setTextColor(88, 28, 135);
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "bold");
+      doc.text("2. SCORES PAR ÉTAPE", margin, y); y += 5;
+      doc.setDrawColor(88, 28, 135);
+      doc.line(margin, y, margin + 60, y); y += 10;
+
+      doc.setTextColor(40, 40, 40);
+      steps.forEach((s, i) => {
+        if (y > 260) { doc.addPage(); y = 25; }
+        const score = s.ai_report_score || "—";
+        const stepTests = testsByStep[s.id] || [];
+        const completed = stepTests.filter((t: any) => t.status === "completed").length;
+        const failed = stepTests.filter((t: any) => t.status === "failed").length;
+        const ignored = stepTests.filter((t: any) => t.status === "skipped").length;
+
+        // Step row with colored bar
+        doc.setFillColor(s.status === "completed" ? 16 : 200, s.status === "completed" ? 185 : 200, s.status === "completed" ? 129 : 200);
+        doc.rect(margin, y - 4, 3, 18, "F");
+
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.text(`${STEP_EMOJIS[i]} Étape ${s.step_number} — ${STEP_NAMES[i]}`, margin + 6, y);
         doc.setFontSize(10);
         doc.setFont("helvetica", "normal");
+        doc.text(`Score : ${score}/100`, margin + 130, y);
+        y += 6;
+        doc.setFontSize(9);
+        doc.text(`Tests : ${completed}/${stepTests.length} validés | ${failed} échoués | ${ignored} ignorés`, margin + 6, y);
+        y += 12;
+      });
+
+      // ── Detailed reports per step ──
+      steps.forEach((s, i) => {
+        doc.addPage();
+        // Step header
+        doc.setFillColor(88, 28, 135);
+        doc.rect(0, 0, pageWidth, 40, "F");
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(18);
+        doc.setFont("helvetica", "bold");
+        doc.text(`${STEP_EMOJIS[i]}  Étape ${s.step_number} — ${s.name}`, margin, 26);
+
+        let sy = 52;
+        doc.setTextColor(40, 40, 40);
+
+        // Test stats for this step
+        const stepTests = testsByStep[s.id] || [];
+        if (stepTests.length > 0) {
+          const completed = stepTests.filter((t: any) => t.status === "completed").length;
+          const failed = stepTests.filter((t: any) => t.status === "failed").length;
+          doc.setFontSize(10);
+          doc.setFont("helvetica", "bold");
+          doc.text(`Tests MVP : ${completed}/${stepTests.length} validés, ${failed} échoués`, margin, sy);
+          sy += 8;
+          doc.setFont("helvetica", "normal");
+          stepTests.forEach((t: any) => {
+            if (sy > 275) { doc.addPage(); sy = 25; }
+            const icon = t.status === "completed" ? "✓" : t.status === "failed" ? "✗" : "○";
+            doc.setFontSize(9);
+            doc.text(`  ${icon}  ${t.name}`, margin, sy);
+            sy += 5;
+          });
+          sy += 6;
+        }
 
         const report = s.ai_report_content;
         if (report && typeof report === "object") {
           Object.entries(report).forEach(([key, value]) => {
-            if (sy > 270) { doc.addPage(); sy = 20; }
+            if (sy > 265) { doc.addPage(); sy = 25; }
+            // Section header
+            doc.setFillColor(245, 245, 250);
+            doc.rect(margin, sy - 4, contentWidth, 8, "F");
             doc.setFont("helvetica", "bold");
             doc.setFontSize(11);
-            doc.text(key.replace(/_/g, " ").toUpperCase(), margin, sy);
-            sy += 6;
+            doc.setTextColor(88, 28, 135);
+            doc.text(key.replace(/_/g, " ").toUpperCase(), margin + 2, sy + 1);
+            sy += 10;
             doc.setFont("helvetica", "normal");
             doc.setFontSize(9);
+            doc.setTextColor(40, 40, 40);
             const text = typeof value === "string" ? value : JSON.stringify(value, null, 2);
             const lines = doc.splitTextToSize(text, contentWidth);
             lines.forEach((line: string) => {
-              if (sy > 280) { doc.addPage(); sy = 20; }
+              if (sy > 278) { doc.addPage(); sy = 25; }
               doc.text(line, margin, sy);
               sy += 4.5;
             });
-            sy += 5;
+            sy += 6;
           });
         }
       });
@@ -408,7 +493,10 @@ const IncubationProject = () => {
         doc.setPage(p);
         doc.setFontSize(8);
         doc.setTextColor(150, 150, 150);
-        doc.text(`StartUnUp Academy — Rapport Final d'Incubation — Page ${p}/${totalPages}`, margin, 290);
+        doc.setFont("helvetica", "italic");
+        doc.text(`StartUnUp Academy — Rapport Final d'Incubation — Page ${p}/${totalPages}`, margin, 288);
+        doc.setDrawColor(200, 200, 200);
+        doc.line(margin, 285, pageWidth - margin, 285);
       }
 
       const fileName = `rapport-final-incubation-${project.name.toLowerCase().replace(/\s+/g, "-")}.pdf`;
