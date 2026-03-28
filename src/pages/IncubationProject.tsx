@@ -673,7 +673,7 @@ const IncubationProject = () => {
           </CardContent>
         </Card>
 
-        {/* Visual progress per step */}
+        {/* Visual progress per step — Interactive */}
         <Card className="mb-8 border-border/50">
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center justify-between">
@@ -687,7 +687,10 @@ const IncubationProject = () => {
             <div className="grid grid-cols-1 sm:grid-cols-7 gap-3">
               {steps.map((s, i) => {
                 const stepTests = testsByStep[s.id] || [];
-                const completed = stepTests.filter(t => t.status === "completed").length;
+                const completed = stepTests.filter((t: any) => t.status === "completed").length;
+                const failed = stepTests.filter((t: any) => t.status === "failed").length;
+                const skipped = stepTests.filter((t: any) => t.status === "skipped").length;
+                const inProgress = stepTests.filter((t: any) => t.status === "in_progress").length;
                 const total = stepTests.length;
                 const pct = total > 0 ? Math.round((completed / total) * 100) : (s.status === "completed" ? 100 : 0);
                 const isCompleted = s.status === "completed";
@@ -695,34 +698,66 @@ const IncubationProject = () => {
                 const isLocked = s.status === "locked";
 
                 return (
-                  <motion.div
-                    key={s.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    className={`flex flex-col items-center p-2 rounded-lg transition-all ${
-                      isLocked ? "opacity-40" : ""
-                    }`}
-                  >
-                    <span className="text-lg mb-1">{STEP_EMOJIS[i]}</span>
-                    <div className="w-full h-24 sm:h-28 bg-muted rounded-md relative overflow-hidden flex items-end">
-                      <motion.div
-                        className={`w-full rounded-md ${
-                          isCompleted ? "bg-emerald-500" :
-                          isActive ? "bg-primary" :
-                          "bg-muted-foreground/30"
-                        }`}
-                        initial={{ height: 0 }}
-                        animate={{ height: `${Math.max(pct, 4)}%` }}
-                        transition={{ duration: 0.6, delay: i * 0.08 }}
-                      />
-                      <span className="absolute inset-0 flex items-center justify-center text-xs font-bold">
-                        {pct}%
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-center text-muted-foreground mt-1 leading-tight">{STEP_NAMES[i]}</p>
-                    <p className="text-[10px] font-medium">{completed}/{total}</p>
-                  </motion.div>
+                  <TooltipProvider key={s.id} delayDuration={200}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: i * 0.05 }}
+                          className={`flex flex-col items-center p-2 rounded-lg transition-all cursor-pointer hover:ring-2 hover:ring-primary/30 ${
+                            isLocked ? "opacity-40" : ""
+                          }`}
+                          onClick={() => {
+                            if (!isLocked && stepRefs.current[s.id]) {
+                              stepRefs.current[s.id]?.scrollIntoView({ behavior: "smooth", block: "center" });
+                            }
+                          }}
+                        >
+                          <span className="text-lg mb-1">{STEP_EMOJIS[i]}</span>
+                          <div className={`w-full h-24 sm:h-28 rounded-md relative overflow-hidden flex items-end border-2 transition-all ${
+                            isCompleted ? "border-emerald-500/50" : isActive ? "border-primary/50" : "border-border"
+                          }`}>
+                            <motion.div
+                              className={`w-full rounded-b-md ${
+                                isCompleted ? "bg-emerald-500" :
+                                isActive ? "bg-primary" :
+                                "bg-muted-foreground/30"
+                              }`}
+                              initial={{ height: 0 }}
+                              animate={{ height: `${Math.max(pct, 4)}%` }}
+                              transition={{ duration: 0.6, delay: i * 0.08 }}
+                            />
+                            <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5 px-1">
+                              <span className="text-sm font-bold">{pct}%</span>
+                              {total > 0 && (
+                                <div className="text-[8px] leading-tight text-center space-y-0">
+                                  <p>✅{completed} ❌{failed} ⏭{skipped}</p>
+                                  <p className="text-muted-foreground">{inProgress} en cours</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <p className="text-[10px] text-center text-muted-foreground mt-1 leading-tight font-medium">{STEP_NAMES[i]}</p>
+                          <p className="text-[10px] font-bold">{completed}/{total}</p>
+                        </motion.div>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs p-3">
+                        <p className="font-bold text-xs mb-1">{STEP_EMOJIS[i]} {STEP_NAMES[i]}</p>
+                        <p className="text-xs text-muted-foreground mb-2">{STEP_TOOLTIPS[i].objective}</p>
+                        <p className="text-[10px] font-semibold">🎯 Finalité : <span className="font-normal">{STEP_TOOLTIPS[i].finalite}</span></p>
+                        <p className="text-[10px] font-semibold mt-1">🔗 Relation : <span className="font-normal">{STEP_TOOLTIPS[i].relation}</span></p>
+                        {total > 0 && (
+                          <div className="mt-2 pt-2 border-t text-[10px] space-y-0.5">
+                            <p>✅ Validés : {completed}/{total} ({total > 0 ? Math.round((completed/total)*100) : 0}%)</p>
+                            <p>❌ Échoués : {failed}/{total}</p>
+                            <p>⏭ Ignorés : {skipped}/{total}</p>
+                            <p>🔄 En cours : {inProgress}/{total}</p>
+                          </div>
+                        )}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 );
               })}
             </div>
