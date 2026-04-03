@@ -1,14 +1,58 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Grid3X3, Leaf, TrendingUp, BookOpen } from "lucide-react";
+import { Grid3X3, Leaf, TrendingUp, BookOpen, Bot } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import BMNavigator from "./BMNavigator";
 import SustainablePatterns from "./SustainablePatterns";
 import BMValidation from "./BMValidation";
 import BMClassifierChatbot from "./BMClassifierChatbot";
 import MustHaveBM from "./MustHaveBM";
+import PatternAssistant from "./PatternAssistant";
 
 type PatternTab = "navigator" | "sustainable" | "bmv" | "musthave";
+
+const ASSISTANT_CONFIG: Record<PatternTab, { title: string; color: string; icon: React.ReactNode; suggestions: string[] }> = {
+  navigator: {
+    title: "Patterns Navigator",
+    color: "bg-primary",
+    icon: <Grid3X3 className="h-5 w-5" />,
+    suggestions: [
+      "Quel pattern BM convient à une marketplace B2B ?",
+      "Quelle est la différence entre Freemium et Razor & Blade ?",
+      "Comment combiner Subscription et Lock-In ?",
+    ],
+  },
+  sustainable: {
+    title: "Patterns Durables",
+    color: "bg-emerald-500",
+    icon: <Leaf className="h-5 w-5" />,
+    suggestions: [
+      "Comment intégrer l'économie circulaire dans mon BM ?",
+      "Quels patterns durables pour une startup tech ?",
+      "Expliquez le pattern Cradle-to-Cradle.",
+    ],
+  },
+  bmv: {
+    title: "BM Validation",
+    color: "bg-amber-500",
+    icon: <TrendingUp className="h-5 w-5" />,
+    suggestions: [
+      "Comment valider mon hypothèse de pricing ?",
+      "Quels tests pour mesurer le product-market fit ?",
+      "Quand faut-il pivoter son Business Model ?",
+    ],
+  },
+  musthave: {
+    title: "Must Have BM",
+    color: "bg-rose-500",
+    icon: <BookOpen className="h-5 w-5" />,
+    suggestions: [
+      "Quels sont les composants essentiels d'un BM ?",
+      "Comment évaluer la scalabilité de mon modèle ?",
+      "Quelle structure de coûts pour un SaaS ?",
+    ],
+  },
+};
 
 export const PatternsSpace = () => {
   const [activeTab, setActiveTab] = useState<PatternTab>("navigator");
@@ -73,6 +117,12 @@ export const PatternsSpace = () => {
         </TabsContent>
       </Tabs>
 
+      {/* AI Assistant per tab */}
+      <PatternAssistant
+        space={activeTab}
+        {...ASSISTANT_CONFIG[activeTab]}
+      />
+      
       {/* BM Classifier Chatbot */}
       <BMClassifierChatbot />
     </div>
