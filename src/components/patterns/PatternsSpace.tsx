@@ -117,6 +117,12 @@ export const PatternsSpace = () => {
         </TabsContent>
       </Tabs>
 
+      {/* AI Assistant per tab */}
+      <PatternAssistant
+        space={activeTab}
+        {...ASSISTANT_CONFIG[activeTab]}
+      />
+      
       {/* BM Classifier Chatbot */}
       <BMClassifierChatbot />
     </div>
