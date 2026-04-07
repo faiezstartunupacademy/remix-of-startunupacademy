@@ -1,45 +1,34 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, Send, X, Bot, User, Lightbulb, ChevronDown } from "lucide-react";
+import { MessageSquare, Send, X, Bot, User, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BM_PATTERNS } from "@/data/businessModelPatterns";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+interface ClassificationResult {
+  primary: {
+    number: number;
+    symbol: string;
+    name: string;
+    confidence: number;
+    reasoning: string;
+    characteristics: string[];
+    incubation_alignment: Record<string, string>;
+  };
+  alternatives: { number: number; symbol: string; name: string; reasoning: string }[];
+  key_metrics: { name: string; description: string; target: string; decision_rule: string }[];
+  go_nogo_rules: string[];
+}
 
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
-  patterns?: typeof BM_PATTERNS;
+  classification?: ClassificationResult;
 }
-
-const initialQuestions = [
-  "Quel est votre secteur d'activité ?",
-  "Décrivez votre produit ou service en une phrase.",
-  "Comment générez-vous des revenus actuellement ?",
-  "Qui sont vos clients principaux (B2B, B2C, les deux) ?",
-];
-
-const sectorKeywords: Record<string, string[]> = {
-  "tech": ["saas", "logiciel", "application", "software", "plateforme", "digital", "numérique", "ia", "ai"],
-  "retail": ["commerce", "vente", "boutique", "magasin", "e-commerce", "retail", "produit"],
-  "service": ["service", "conseil", "consulting", "freelance", "prestation", "accompagnement"],
-  "manufacturing": ["fabrication", "production", "industrie", "usine", "manufacture"],
-  "marketplace": ["marketplace", "place de marché", "mise en relation", "plateforme"],
-  "subscription": ["abonnement", "subscription", "récurrent", "mensuel", "saas"],
-  "freemium": ["gratuit", "free", "freemium", "premium", "version gratuite"],
-};
-
-const patternsByContext: Record<string, number[]> = {
-  "tech": [1, 4, 12, 17, 24, 35, 42, 54],
-  "retail": [2, 8, 15, 22, 29, 37, 48],
-  "service": [3, 9, 14, 21, 28, 41, 55],
-  "marketplace": [5, 11, 19, 30, 38, 45, 52],
-  "subscription": [4, 12, 24, 35, 42, 54],
-  "freemium": [17, 24, 42, 54],
-  "manufacturing": [6, 13, 20, 27, 33, 44, 51],
-};
 
 export const BMClassifierChatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,106 +36,79 @@ export const BMClassifierChatbot = () => {
     {
       id: "1",
       role: "assistant",
-      content: "👋 Bonjour ! Je suis votre assistant pour classifier et découvrir les patterns de Business Model les plus adaptés à votre projet.\n\nDécrivez-moi votre activité et je vous suggérerai les patterns les plus pertinents parmi les 60 patterns de Gassmann.",
+      content: "👋 Bonjour ! Je suis votre assistant IA pour classifier automatiquement votre Business Model parmi les 60 patterns de Gassmann.\n\nDécrivez votre projet (nom, problème, solution, secteur) et je vous proposerai le pattern le plus adapté avec des métriques clés.",
     },
   ]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const analyzeInput = (text: string): typeof BM_PATTERNS => {
-    const lowerText = text.toLowerCase();
-    const detectedContexts: string[] = [];
-
-    // Detect contexts based on keywords
-    Object.entries(sectorKeywords).forEach(([context, keywords]) => {
-      if (keywords.some(keyword => lowerText.includes(keyword))) {
-        detectedContexts.push(context);
-      }
-    });
-
-    // Get relevant pattern numbers
-    const relevantPatternNumbers = new Set<number>();
-    detectedContexts.forEach(context => {
-      patternsByContext[context]?.forEach(num => relevantPatternNumbers.add(num));
-    });
-
-    // If no specific context found, suggest general patterns
-    if (relevantPatternNumbers.size === 0) {
-      [1, 4, 12, 17, 24, 35, 42, 54].forEach(num => relevantPatternNumbers.add(num));
-    }
-
-    // Get full pattern data
-    return BM_PATTERNS.filter(p => relevantPatternNumbers.has(p.number)).slice(0, 6);
-  };
-
-  const [selectedPattern, setSelectedPattern] = useState<typeof BM_PATTERNS[0] | null>(null);
-
-  const generateResponse = (userMessage: string): { content: string; patterns: typeof BM_PATTERNS } => {
-    const patterns = analyzeInput(userMessage);
-    
-    let content = "";
-    
-    if (patterns.length > 0) {
-      content = `🎯 Basé sur votre description, voici les patterns de Business Model qui pourraient correspondre à votre projet :\n\n`;
-      
-      patterns.forEach((pattern, index) => {
-        content += `**${index + 1}. ${pattern.name}** (${pattern.symbol})\n`;
-        content += `   💡 ${pattern.idea}\n\n`;
+  const classifyBM = async (userText: string): Promise<{ content: string; classification?: ClassificationResult }> => {
+    try {
+      const { data, error } = await supabase.functions.invoke("classify-bm", {
+        body: {
+          name: "Projet utilisateur",
+          description: userText,
+          problem: userText,
+          solution: userText,
+          sector: "",
+        },
       });
-      
-      content += `\n📌 Cliquez sur un pattern pour voir ses détails, combinaisons possibles et KPIs.\n\n💡 **Combiner des patterns ?** Les patterns compatibles sont indiqués dans les détails de chaque pattern. Une combinaison stratégique de 2-3 patterns complémentaires renforce souvent le business model.`;
-    } else {
-      content = "Je comprends ! Pour vous aider à identifier les meilleurs patterns, pouvez-vous me préciser :\n\n• Votre modèle de revenus (abonnement, commission, vente directe...)\n• Votre cible (B2B, B2C)\n• Votre différenciation principale";
-    }
 
-    return { content, patterns };
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      const result = data as ClassificationResult;
+      let content = `🎯 **Classification IA terminée** (Confiance : ${result.primary.confidence}%)\n\n`;
+      content += `**Pattern principal : ${result.primary.symbol} — ${result.primary.name}**\n`;
+      content += `${result.primary.reasoning}\n\n`;
+      content += `📊 **Caractéristiques clés :**\n`;
+      result.primary.characteristics.forEach(c => { content += `• ${c}\n`; });
+      content += `\n🔄 **Patterns alternatifs :**\n`;
+      result.alternatives.forEach(a => { content += `• **${a.symbol} ${a.name}** — ${a.reasoning}\n`; });
+      content += `\n📈 **Métriques pivots :**\n`;
+      result.key_metrics.forEach(m => { content += `• **${m.name}** : ${m.description} (Cible: ${m.target})\n`; });
+      content += `\n🚦 **Règles GO/NO-GO :**\n`;
+      result.go_nogo_rules.forEach(r => { content += `• ${r}\n`; });
+
+      return { content, classification: result };
+    } catch (e: any) {
+      if (e?.message?.includes("429") || e?.status === 429) {
+        return { content: "⚠️ Trop de requêtes. Veuillez réessayer dans quelques instants." };
+      }
+      if (e?.message?.includes("402") || e?.status === 402) {
+        return { content: "⚠️ Crédits IA épuisés. Veuillez recharger vos crédits dans les paramètres." };
+      }
+      console.error("classify-bm error:", e);
+      return { content: "❌ Erreur lors de la classification. Veuillez réessayer." };
+    }
   };
 
   const handleSend = async () => {
-    if (!input.trim()) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content: input,
-    };
-
+    if (!input.trim() || isTyping) return;
+    const userMessage: Message = { id: Date.now().toString(), role: "user", content: input };
     setMessages(prev => [...prev, userMessage]);
+    const userInput = input;
     setInput("");
     setIsTyping(true);
 
-    // Simulate AI thinking
-    setTimeout(() => {
-      const { content, patterns } = generateResponse(input);
-      
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content,
-        patterns,
-      };
-
-      setMessages(prev => [...prev, assistantMessage]);
-      setIsTyping(false);
-    }, 1000);
-  };
-
-  const handleQuickQuestion = (question: string) => {
-    setInput(question);
+    const { content, classification } = await classifyBM(userInput);
+    setMessages(prev => [...prev, {
+      id: (Date.now() + 1).toString(),
+      role: "assistant",
+      content,
+      classification,
+    }]);
+    setIsTyping(false);
   };
 
   return (
     <>
-      {/* Floating Button */}
       <AnimatePresence>
         {!isOpen && (
           <motion.button
@@ -163,38 +125,30 @@ export const BMClassifierChatbot = () => {
         )}
       </AnimatePresence>
 
-      {/* Chat Window */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-6 right-6 z-50 w-[400px] max-w-[calc(100vw-48px)] h-[600px] max-h-[calc(100vh-100px)]"
+            className="fixed bottom-6 right-6 z-50 w-[420px] max-w-[calc(100vw-48px)] h-[600px] max-h-[calc(100vh-100px)]"
           >
             <Card className="h-full flex flex-col shadow-elevated overflow-hidden">
-              {/* Header */}
               <div className="bg-primary text-primary-foreground p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
                     <Bot className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">BM Pattern Classifier</h3>
-                    <p className="text-xs text-white/70">Trouvez votre business model</p>
+                    <h3 className="font-semibold">BM Classifier IA</h3>
+                    <p className="text-xs text-white/70">Classification automatique Gassmann</p>
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsOpen(false)}
-                  className="text-white hover:bg-white/20"
-                >
+                <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="text-white hover:bg-white/20">
                   <X className="h-5 w-5" />
                 </Button>
               </div>
 
-              {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/30">
                 {messages.map((message) => (
                   <motion.div
@@ -208,42 +162,27 @@ export const BMClassifierChatbot = () => {
                     }`}>
                       {message.role === "user" ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
                     </div>
-                    <div className={`max-w-[80%] rounded-2xl p-3 ${
-                      message.role === "user" 
-                        ? "bg-primary text-primary-foreground rounded-tr-sm" 
+                    <div className={`max-w-[85%] rounded-2xl p-3 ${
+                      message.role === "user"
+                        ? "bg-primary text-primary-foreground rounded-tr-sm"
                         : "bg-card border rounded-tl-sm"
                     }`}>
                       <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                      
-                      {/* Pattern badges */}
-                      {message.patterns && message.patterns.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-3">
-                          {message.patterns.map((pattern) => (
-                            <Badge 
-                              key={pattern.number} 
-                              variant="secondary"
-                              className="text-xs cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
-                              onClick={() => setSelectedPattern(selectedPattern?.number === pattern.number ? null : pattern)}
-                            >
-                              {pattern.symbol} {pattern.name}
+
+                      {message.classification && (
+                        <div className="mt-3 space-y-2">
+                          <div className="flex flex-wrap gap-1">
+                            <Badge className="bg-primary/90 text-primary-foreground cursor-pointer" onClick={() => setExpandedSection(expandedSection === `inc-${message.id}` ? null : `inc-${message.id}`)}>
+                              📋 Alignement Incubation
                             </Badge>
-                          ))}
-                        </div>
-                      )}
-                      {/* Pattern detail inline */}
-                      {message.patterns && selectedPattern && message.patterns.some(p => p.number === selectedPattern.number) && (
-                        <div className="mt-2 p-3 rounded-lg bg-primary/5 border border-primary/20 text-xs space-y-2">
-                          <div className="flex items-center justify-between">
-                            <p className="font-bold text-primary">{selectedPattern.symbol} {selectedPattern.name}</p>
-                            <button onClick={() => setSelectedPattern(null)} className="text-muted-foreground hover:text-foreground">✕</button>
                           </div>
-                          <p>💡 {selectedPattern.idea}</p>
-                          <p>📊 <strong>KPI :</strong> {selectedPattern.kpi}</p>
-                          <p>🎯 <strong>BI :</strong> {selectedPattern.bi}</p>
-                          <p>📈 <strong>Maturité :</strong> {selectedPattern.maturity}</p>
-                          <p>✅ <strong>Compatible avec :</strong> {selectedPattern.compatible}</p>
-                          <p>❌ <strong>Anti-patterns :</strong> {selectedPattern.antiPatterns}</p>
-                          <p>📉 <strong>YC Metrics :</strong> {selectedPattern.ycMetrics}</p>
+                          {expandedSection === `inc-${message.id}` && (
+                            <div className="p-2 rounded bg-muted/50 text-xs space-y-1 border">
+                              {Object.entries(message.classification.primary.incubation_alignment).map(([k, v]) => (
+                                <p key={k}><strong className="capitalize">{k.replace(/_/g, " ")} :</strong> {v}</p>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -251,40 +190,29 @@ export const BMClassifierChatbot = () => {
                 ))}
 
                 {isTyping && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="flex gap-3"
-                  >
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3">
                     <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
                       <Bot className="h-4 w-4" />
                     </div>
-                    <div className="bg-card border rounded-2xl rounded-tl-sm p-3">
-                      <div className="flex gap-1">
-                        <span className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-bounce" style={{ animationDelay: "0ms" }} />
-                        <span className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-bounce" style={{ animationDelay: "150ms" }} />
-                        <span className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-bounce" style={{ animationDelay: "300ms" }} />
-                      </div>
+                    <div className="bg-card border rounded-2xl rounded-tl-sm p-3 flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span className="text-sm text-muted-foreground">Classification en cours...</span>
                     </div>
                   </motion.div>
                 )}
-
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Quick Questions */}
               {messages.length <= 2 && (
                 <div className="px-4 py-2 border-t bg-background">
-                  <p className="text-xs text-muted-foreground mb-2">Questions rapides :</p>
+                  <p className="text-xs text-muted-foreground mb-2">Exemples :</p>
                   <div className="flex flex-wrap gap-1">
-                    {["SaaS B2B", "E-commerce", "Marketplace", "Abonnement"].map((q) => (
-                      <Button
-                        key={q}
-                        variant="outline"
-                        size="sm"
-                        className="text-xs h-7 rounded-full"
-                        onClick={() => handleQuickQuestion(`Mon projet est un ${q}`)}
-                      >
+                    {[
+                      "SaaS B2B de gestion RH par abonnement",
+                      "Marketplace de services freelance",
+                      "App mobile freemium de fitness",
+                    ].map((q) => (
+                      <Button key={q} variant="outline" size="sm" className="text-xs h-7 rounded-full" onClick={() => setInput(q)}>
                         {q}
                       </Button>
                     ))}
@@ -292,22 +220,17 @@ export const BMClassifierChatbot = () => {
                 </div>
               )}
 
-              {/* Input */}
               <div className="p-4 border-t bg-background">
                 <div className="flex gap-2">
                   <Input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                    placeholder="Décrivez votre business model..."
+                    placeholder="Décrivez votre projet..."
                     className="rounded-full"
+                    disabled={isTyping}
                   />
-                  <Button 
-                    onClick={handleSend} 
-                    size="icon"
-                    className="rounded-full flex-shrink-0"
-                    disabled={!input.trim()}
-                  >
+                  <Button onClick={handleSend} size="icon" className="rounded-full flex-shrink-0" disabled={!input.trim() || isTyping}>
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
