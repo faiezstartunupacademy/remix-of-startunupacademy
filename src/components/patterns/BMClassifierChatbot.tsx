@@ -21,6 +21,8 @@ interface ClassificationResult {
   alternatives: { number: number; symbol: string; name: string; reasoning: string }[];
   key_metrics: { name: string; description: string; target: string; decision_rule: string }[];
   go_nogo_rules: string[];
+  source?: "ai" | "fallback";
+  notice?: string;
 }
 
 interface Message {
@@ -64,7 +66,11 @@ export const BMClassifierChatbot = () => {
       if (data?.error) throw new Error(data.error);
 
       const result = data as ClassificationResult;
-      let content = `🎯 **Classification IA terminée** (Confiance : ${result.primary.confidence}%)\n\n`;
+      const isFallback = result.source === "fallback";
+      let content = `${isFallback ? "🧭 **Classification automatique de secours**" : "🎯 **Classification IA terminée**"} (Confiance : ${result.primary.confidence}%)\n\n`;
+      if (result.notice) {
+        content += `${result.notice}\n\n`;
+      }
       content += `**Pattern principal : ${result.primary.symbol} — ${result.primary.name}**\n`;
       content += `${result.primary.reasoning}\n\n`;
       content += `📊 **Caractéristiques clés :**\n`;
@@ -76,7 +82,7 @@ export const BMClassifierChatbot = () => {
       content += `\n🚦 **Règles GO/NO-GO :**\n`;
       result.go_nogo_rules.forEach(r => { content += `• ${r}\n`; });
 
-      return { content, classification: result };
+      return { content, classification: result };”}}]}]}.
     } catch (e: any) {
       if (e?.message?.includes("429") || e?.status === 429) {
         return { content: "⚠️ Trop de requêtes. Veuillez réessayer dans quelques instants." };

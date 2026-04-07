@@ -69,6 +69,8 @@ interface BMClassification {
   alternatives: { number: number; symbol: string; name: string; reasoning: string }[];
   key_metrics: { name: string; description: string; target: string; decision_rule: string }[];
   go_nogo_rules: string[];
+  source?: "ai" | "fallback";
+  notice?: string;
 }
 
 const NewIncubationProject = () => {
@@ -155,10 +157,16 @@ const NewIncubationProject = () => {
         },
       });
       if (error) throw error;
-      if (data?.primary) {
-        setBmClassification(data);
-        update("business_model", data.primary.name);
-        update("business_model_symbol", data.primary.symbol);
+      if (!data?.primary) throw new Error("Classification indisponible pour le moment");
+
+      setBmClassification(data);
+      update("business_model", data.primary.name);
+      update("business_model_symbol", data.primary.symbol);
+
+      if (data.source === "fallback") {
+        toast.success(`BM classifié automatiquement : ${data.primary.symbol} — ${data.primary.name}`);
+        if (data.notice) toast.info(data.notice);
+      } else {
         toast.success(`BM classifié : ${data.primary.symbol} — ${data.primary.name} (${data.primary.confidence}% confiance)`);
       }
     } catch (err: any) {
