@@ -96,6 +96,11 @@ Réponds UNIQUEMENT en JSON valide avec cette structure:
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: "Crédits IA épuisés. Rechargez vos crédits dans Settings → Workspace → Usage." }), {
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       throw new Error(`AI gateway error: ${response.status}`);
     }
 
