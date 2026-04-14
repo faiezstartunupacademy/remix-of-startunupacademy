@@ -5,6 +5,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import {
+  getGeneratedVisualExtension,
+  getGeneratedVisualMessage,
+  type GeneratedVisualResponse,
+} from "@/utils/generatedVisuals";
 
 type Message = { role: "user" | "assistant"; content: string; images?: string[] };
 
@@ -157,14 +162,27 @@ const FormationChatbot = ({ formationName, formationContext }: FormationChatbotP
         throw new Error(body.error || "Erreur de génération");
       }
 
-      const data = await resp.json();
+      const data: GeneratedVisualResponse = await resp.json();
+      const message = getGeneratedVisualMessage(
+        data,
+        `Cliquez sur l'image pour la télécharger.`,
+      );
       
       if (data.images && data.images.length > 0) {
+        if (data.fallback) {
+          toast({
+            title: "Mode de secours activé",
+            description: message,
+          });
+        }
+
         setMessages(prev => {
           const updated = [...prev];
           updated[updated.length - 1] = {
             role: "assistant",
-            content: `✅ Voici votre ${label} pour **${formationName}** !\n\n${data.text || `Cliquez sur l'image pour la télécharger.`}`,
+            content: data.fallback
+              ? `⚠️ Voici une version de secours de la ${label} pour **${formationName}**.\n\n${message}`
+              : `✅ Voici votre ${label} pour **${formationName}** !\n\n${message}`,
             images: data.images.filter((img: string) => img),
           };
           return updated;
@@ -174,9 +192,17 @@ const FormationChatbot = ({ formationName, formationContext }: FormationChatbotP
           const updated = [...prev];
           updated[updated.length - 1] = {
             role: "assistant",
-            content: `⚠️ La génération de l'image n'a pas abouti. ${data.text || "Veuillez réessayer."}`,
+            content: data.fallback
+              ? `⚠️ ${message}`
+              : `⚠️ La génération de l'image n'a pas abouti. ${message}`,
           };
           return updated;
+        });
+
+        toast({
+          title: data.fallback ? "Génération limitée" : "Erreur",
+          description: message,
+          variant: data.fallback ? undefined : "destructive",
         });
       }
     } catch (err) {
@@ -198,7 +224,9 @@ const FormationChatbot = ({ formationName, formationContext }: FormationChatbotP
   const downloadImage = (dataUrl: string, filename: string) => {
     const a = document.createElement("a");
     a.href = dataUrl;
-    a.download = filename;
+    const extension = getGeneratedVisualExtension(dataUrl);
+    const normalizedFilename = filename.replace(/\.(png|jpg|jpeg|webp|svg)$/i, "");
+    a.download = `${normalizedFilename}.${extension}`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

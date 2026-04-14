@@ -5,6 +5,11 @@ import { BrainCircuit, Loader2, Download, ZoomIn, RefreshCw } from "lucide-react
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import {
+  getGeneratedVisualExtension,
+  getGeneratedVisualMessage,
+  type GeneratedVisualResponse,
+} from "@/utils/generatedVisuals";
 
 interface MindMapGeneratorProps {
   formations: {
@@ -69,12 +74,21 @@ const MindMapGenerator = ({ formations }: MindMapGeneratorProps) => {
         throw new Error(body.error || "Erreur de génération");
       }
 
-      const data = await resp.json();
+      const data: GeneratedVisualResponse = await resp.json();
       if (data.images && data.images.length > 0) {
         setGeneratedImages(data.images.filter((img: string) => img));
-        toast({ title: "✅ Carte mentale générée !", description: "Vous pouvez la télécharger ci-dessous." });
+        toast({
+          title: data.fallback ? "⚠️ Carte mentale de secours générée" : "✅ Carte mentale générée !",
+          description: data.fallback
+            ? getGeneratedVisualMessage(data, "La version IA n'est pas disponible pour le moment.")
+            : "Vous pouvez la télécharger ci-dessous.",
+        });
       } else {
-        toast({ title: "Aucune image", description: data.text || "Réessayez", variant: "destructive" });
+        toast({
+          title: data.fallback ? "Génération limitée" : "Aucune image",
+          description: getGeneratedVisualMessage(data, "Réessayez"),
+          variant: data.fallback ? undefined : "destructive",
+        });
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erreur inconnue";
@@ -87,7 +101,7 @@ const MindMapGenerator = ({ formations }: MindMapGeneratorProps) => {
   const downloadImage = (dataUrl: string) => {
     const a = document.createElement("a");
     a.href = dataUrl;
-    a.download = `mindmap-startunup-${Date.now()}.png`;
+    a.download = `mindmap-startunup-${Date.now()}.${getGeneratedVisualExtension(dataUrl)}`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
