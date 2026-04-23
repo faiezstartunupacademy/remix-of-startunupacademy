@@ -882,6 +882,726 @@ const ecosystemElements: EcosystemElement[] = [
     location: "Tunis",
     target_phase: "Early Stage"
   },
+
+  // GOV - Compléments Gouvernementaux & Agences Nationales
+  {
+    id: "GOV-09",
+    symbol: "AN",
+    name: "ANETI",
+    category: "Entité Publique",
+    description: "Agence Nationale pour l'Emploi et le Travail Indépendant, opérateur public d'accompagnement à la création d'entreprise.",
+    services: ["Programmes CREE/CEFE", "Bureaux Emploi", "Accompagnement créateurs", "Stages SIVP"],
+    duration: "Permanent",
+    location: "National (Réseau bureaux)",
+    target_phase: "Pré-création / Création"
+  },
+  {
+    id: "GOV-10",
+    symbol: "BF",
+    name: "BFPME",
+    category: "Banque Publique",
+    description: "Banque de Financement des Petites et Moyennes Entreprises, financement direct des PME et startups en phase de croissance.",
+    services: ["Crédits investissement", "Crédits gestion", "Co-financement", "Garantie SOTUGAR"],
+    duration: "Selon projet",
+    location: "National",
+    target_phase: "Création / PME"
+  },
+  {
+    id: "GOV-11",
+    symbol: "SG",
+    name: "SOTUGAR",
+    category: "Entité Publique",
+    description: "Société Tunisienne de Garantie, mécanisme national de garantie des crédits aux PME et startups.",
+    services: ["Garantie de crédits", "Garantie capital-risque", "Couverture risque", "Co-garantie"],
+    duration: "Selon contrat",
+    location: "Tunis (National)",
+    target_phase: "PME / Startups"
+  },
+  {
+    id: "GOV-12",
+    symbol: "CD",
+    name: "CDC Tunisie",
+    category: "Fonds d'Investissement Public",
+    description: "Caisse des Dépôts et Consignations, investisseur institutionnel de long terme pour le développement économique.",
+    services: ["Investissement direct", "Fonds VC", "Infrastructures", "Capital développement"],
+    duration: "Long terme",
+    location: "Tunis (National)",
+    target_phase: "Growth / Scale-up"
+  },
+  {
+    id: "GOV-13",
+    symbol: "DG",
+    name: "DGPME",
+    category: "Ministère",
+    description: "Direction Générale de la Promotion des PME au Ministère de l'Industrie, pilotage des politiques d'appui aux PME.",
+    services: ["Politiques PME", "Programmes appui", "Études sectorielles", "Coordination"],
+    duration: "Permanent",
+    location: "Tunis (National)",
+    target_phase: "PME / Tous stades"
+  },
+  {
+    id: "GOV-14",
+    symbol: "AT",
+    name: "API Tunisia (Agriculture)",
+    category: "Entité Publique",
+    description: "Agence de Promotion des Investissements Agricoles, guichet unique pour les projets agricoles et agroalimentaires.",
+    services: ["Création projets agricoles", "Avantages fiscaux", "Études filières", "Foncier agricole"],
+    duration: "Permanent",
+    location: "National",
+    target_phase: "AgriTech / Agroalimentaire"
+  },
+  {
+    id: "GOV-15",
+    symbol: "FX",
+    name: "FIPA Tunisia",
+    category: "Entité Publique",
+    description: "Foreign Investment Promotion Agency, agence de promotion de l'investissement étranger en Tunisie.",
+    services: ["Attraction IDE", "Accompagnement investisseurs", "Soft-landing", "Promotion internationale"],
+    duration: "Permanent",
+    location: "Tunis (National)",
+    target_phase: "Scale-up / International"
+  },
+  {
+    id: "GOV-16",
+    symbol: "CE",
+    name: "CEPEX",
+    category: "Entité Publique",
+    description: "Centre de Promotion des Exportations, accompagnement des entreprises tunisiennes à l'export.",
+    services: ["Diagnostic export", "Salons internationaux", "Études marchés", "Financement export"],
+    duration: "Permanent",
+    location: "Tunis (National)",
+    target_phase: "Scale-up / Export"
+  },
+  {
+    id: "GOV-17",
+    symbol: "MJ",
+    name: "Ministère Jeunesse & Sport",
+    category: "Ministère",
+    description: "Ministère en charge des politiques jeunesse, soutien à l'entrepreneuriat des jeunes via maisons des jeunes.",
+    services: ["Maisons des jeunes", "Programmes jeunesse", "Subventions associatives", "Formation"],
+    duration: "Permanent",
+    location: "National",
+    target_phase: "Jeunes entrepreneurs"
+  },
+  {
+    id: "GOV-18",
+    symbol: "MI",
+    name: "Ministère Industrie & PME",
+    category: "Ministère",
+    description: "Ministère pilote de la politique industrielle et de soutien aux PME et startups innovantes.",
+    services: ["Stratégie industrielle", "Politique innovation", "Cadre réglementaire", "Plans sectoriels"],
+    duration: "Permanent",
+    location: "Tunis (National)",
+    target_phase: "Industrie / Innovation"
+  },
+  {
+    id: "GOV-19",
+    symbol: "MT",
+    name: "Ministère Technologies de la Communication",
+    category: "Ministère",
+    description: "Ministère en charge du numérique, de la transformation digitale et du développement TIC.",
+    services: ["Stratégie digitale Tunisie 2025", "Cadre numérique", "Cybersécurité", "e-Gov"],
+    duration: "Permanent",
+    location: "Tunis (National)",
+    target_phase: "Digital / Tech"
+  },
+  {
+    id: "GOV-20",
+    symbol: "OD",
+    name: "ODNO",
+    category: "Établissement Public",
+    description: "Office de Développement du Nord-Ouest, organisme régional de développement économique du Nord-Ouest tunisien.",
+    services: ["Développement régional", "Études territoriales", "Appui projets", "Animation territoriale"],
+    duration: "Permanent",
+    location: "Nord-Ouest (Béja)",
+    target_phase: "Régional / Tous stades"
+  },
+  {
+    id: "GOV-21",
+    symbol: "OS",
+    name: "ODS",
+    category: "Établissement Public",
+    description: "Office de Développement du Sud, organisme régional pour le développement du Sud tunisien.",
+    services: ["Développement Sud", "Appui projets locaux", "Études", "Coordination régionale"],
+    duration: "Permanent",
+    location: "Sud (Médenine)",
+    target_phase: "Régional"
+  },
+  {
+    id: "GOV-22",
+    symbol: "OC",
+    name: "ODCO",
+    category: "Établissement Public",
+    description: "Office de Développement du Centre-Ouest, soutien au développement économique du Centre-Ouest tunisien.",
+    services: ["Développement Centre-Ouest", "Appui régional", "Études territoriales", "Animation"],
+    duration: "Permanent",
+    location: "Centre-Ouest (Kasserine)",
+    target_phase: "Régional"
+  },
+
+  // FND - Fonds VC Privés & Capital-Risque
+  {
+    id: "FND-04",
+    symbol: "AI",
+    name: "AfricInvest",
+    category: "Fonds National",
+    description: "Société de capital-investissement panafricaine basée à Tunis, leader régional en private equity et venture capital.",
+    services: ["Capital développement", "Capital-risque", "Buy-out", "Mezzanine"],
+    duration: "5-7 ans",
+    location: "Tunis (Panafricain)",
+    target_phase: "Growth / Scale-up"
+  },
+  {
+    id: "FND-05",
+    symbol: "BC",
+    name: "BIAT Capital Risque",
+    category: "Fonds National",
+    description: "Filiale capital-risque de la BIAT, financement des PME tunisiennes en croissance.",
+    services: ["Capital amorçage", "Capital développement", "Co-investissement", "Accompagnement"],
+    duration: "4-6 ans",
+    location: "Tunis (National)",
+    target_phase: "Seed / Growth"
+  },
+  {
+    id: "FND-06",
+    symbol: "UG",
+    name: "UGFS",
+    category: "Fonds National",
+    description: "United Gulf Financial Services, gestionnaire de fonds d'investissement panafricains depuis Tunis.",
+    services: ["Capital-risque", "Private equity", "Gestion d'actifs", "Conseil financier"],
+    duration: "Long terme",
+    location: "Tunis",
+    target_phase: "Growth / Scale-up"
+  },
+  {
+    id: "FND-07",
+    symbol: "SC",
+    name: "SAGES Capital",
+    category: "Fonds National",
+    description: "Société de gestion de fonds d'investissement spécialisée dans le capital-développement en Tunisie.",
+    services: ["Capital-développement", "Capital-transmission", "Investissement PME", "Conseil"],
+    duration: "5-8 ans",
+    location: "Tunis",
+    target_phase: "Growth / PME"
+  },
+  {
+    id: "FND-08",
+    symbol: "MX",
+    name: "Maxula Gestion",
+    category: "Fonds National",
+    description: "Société de gestion d'actifs et de fonds communs de placement à risque en Tunisie.",
+    services: ["FCPR", "SICAR", "Gestion collective", "Conseil investissement"],
+    duration: "Long terme",
+    location: "Tunis",
+    target_phase: "PME / Growth"
+  },
+  {
+    id: "FND-09",
+    symbol: "TA",
+    name: "Tuninvest Africa",
+    category: "Fonds National",
+    description: "Branche du groupe Integra dédiée à l'investissement panafricain en capital-risque.",
+    services: ["Venture capital", "Croissance Afrique", "Co-investissement", "Mentorat"],
+    duration: "5-7 ans",
+    location: "Tunis (Afrique)",
+    target_phase: "Growth / Pan-Africain"
+  },
+  {
+    id: "FND-10",
+    symbol: "CV",
+    name: "Capsa Capital",
+    category: "Fonds National",
+    description: "Fonds de capital-investissement tunisien spécialisé dans les PME à fort potentiel.",
+    services: ["Capital développement", "Restructuration", "Conseil stratégique", "Accompagnement"],
+    duration: "4-6 ans",
+    location: "Tunis",
+    target_phase: "PME / Growth"
+  },
+  {
+    id: "FND-11",
+    symbol: "DT",
+    name: "Diaspora Tunisienne Invest",
+    category: "Fonds National",
+    description: "Fonds dédié à mobiliser la diaspora tunisienne pour investir dans les startups locales.",
+    services: ["Investissement diaspora", "Mentorat international", "Mise en réseau", "Co-investissement"],
+    duration: "Variable",
+    location: "Tunis / International",
+    target_phase: "Seed / Growth"
+  },
+
+  // TEC - Pôles & Centres Techniques Sectoriels
+  {
+    id: "TEC-07",
+    symbol: "PM",
+    name: "Pôle de Compétitivité Monastir-El Fejja",
+    category: "Pôle Régional",
+    description: "Pôle de compétitivité dédié au textile-habillement, leader national du secteur textile.",
+    services: ["Innovation textile", "R&D matériaux", "Formation métiers", "Centre essais"],
+    duration: "Long terme",
+    location: "Monastir / El Fejja",
+    target_phase: "Textile / Mode"
+  },
+  {
+    id: "TEC-08",
+    symbol: "PB",
+    name: "Pôle Bizerte Mateur",
+    category: "Pôle Régional",
+    description: "Pôle agroalimentaire et industriel du Nord, soutien aux entreprises de transformation.",
+    services: ["Agroalimentaire", "Industrie", "R&D filières", "Hébergement entreprises"],
+    duration: "Long terme",
+    location: "Bizerte / Mateur",
+    target_phase: "Agro / Industrie"
+  },
+  {
+    id: "TEC-09",
+    symbol: "CT",
+    name: "CETTEX",
+    category: "Établissement Public",
+    description: "Centre Technique du Textile, centre national de R&D et services au secteur textile-habillement.",
+    services: ["R&D textile", "Essais & contrôles", "Formation technique", "Veille sectorielle"],
+    duration: "Permanent",
+    location: "Ksar Said (Tunis)",
+    target_phase: "Textile / R&D"
+  },
+  {
+    id: "TEC-10",
+    symbol: "PC",
+    name: "PACKTEC",
+    category: "Établissement Public",
+    description: "Centre Technique de l'Emballage et du Conditionnement, expertise nationale en packaging.",
+    services: ["R&D emballage", "Tests qualité", "Formation packaging", "Conseil industriel"],
+    duration: "Permanent",
+    location: "Tunis",
+    target_phase: "Industrie / Packaging"
+  },
+  {
+    id: "TEC-11",
+    symbol: "CC",
+    name: "CETIME",
+    category: "Établissement Public",
+    description: "Centre Technique des Industries Mécaniques et Électriques, R&D et essais industriels.",
+    services: ["R&D mécanique", "Essais électriques", "Certification", "Formation technique"],
+    duration: "Permanent",
+    location: "Ksar Said (Tunis)",
+    target_phase: "Industrie / Mécatronique"
+  },
+  {
+    id: "TEC-12",
+    symbol: "CA",
+    name: "CTAA",
+    category: "Établissement Public",
+    description: "Centre Technique de l'Agroalimentaire, expertise nationale pour l'industrie agroalimentaire.",
+    services: ["R&D agroalimentaire", "Analyses", "HACCP", "Formation"],
+    duration: "Permanent",
+    location: "Tunis",
+    target_phase: "AgriFood / R&D"
+  },
+
+  // SSO - Incubateurs Universitaires & Régionaux
+  {
+    id: "SSO-28",
+    symbol: "EI",
+    name: "ESPRIT Incubator",
+    category: "Incubateur",
+    description: "Incubateur universitaire de l'École Supérieure Privée d'Ingénierie et Technologies, accompagnement projets étudiants.",
+    services: ["Incubation étudiante", "Mentorat académique", "Prototypage", "Pré-amorçage"],
+    duration: "12 mois",
+    location: "Tunis (ESPRIT)",
+    target_phase: "Étudiants / Idéation"
+  },
+  {
+    id: "SSO-29",
+    symbol: "IN",
+    name: "INSAT Junior Entreprise",
+    category: "Incubateur",
+    description: "Structure d'accompagnement à l'entrepreneuriat de l'INSAT pour étudiants ingénieurs.",
+    services: ["Junior Entreprise", "Mentorat", "Prototypage", "Networking ingénieurs"],
+    duration: "Variable",
+    location: "Tunis (INSAT)",
+    target_phase: "Étudiants / Tech"
+  },
+  {
+    id: "SSO-30",
+    symbol: "PT",
+    name: "Polytech Incubateur",
+    category: "Incubateur",
+    description: "Incubateur de l'École Polytechnique de Tunisie pour les projets innovants de ses étudiants et alumni.",
+    services: ["Incubation tech", "R&D laboratoires", "Mentorat", "Pré-amorçage"],
+    duration: "12-24 mois",
+    location: "La Marsa",
+    target_phase: "Étudiants / DeepTech"
+  },
+  {
+    id: "SSO-31",
+    symbol: "MS",
+    name: "Mediterranean School of Business",
+    category: "Incubateur",
+    description: "MSB Entrepreneurship Center, formation et accompagnement à l'entrepreneuriat.",
+    services: ["Formation entrepreneuriat", "Mentorat business", "Bootcamps", "Pitch competitions"],
+    duration: "Variable",
+    location: "Tunis (MSB)",
+    target_phase: "Étudiants / Early Stage"
+  },
+  {
+    id: "SSO-32",
+    symbol: "UC",
+    name: "UCAR Innovation Center",
+    category: "Incubateur",
+    description: "Centre d'innovation de l'Université Centrale de Tunis pour la valorisation de la recherche.",
+    services: ["Valorisation recherche", "Incubation", "Mentorat académique", "Brevets"],
+    duration: "Variable",
+    location: "Tunis",
+    target_phase: "DeepTech / Recherche"
+  },
+  {
+    id: "SSO-33",
+    symbol: "TM",
+    name: "Tunis Business School Incubator",
+    category: "Incubateur",
+    description: "Incubateur de la Tunis Business School pour étudiants et alumni en management et entrepreneuriat.",
+    services: ["Incubation business", "Mentorat", "Networking", "Pré-amorçage"],
+    duration: "12 mois",
+    location: "Tunis (TBS)",
+    target_phase: "Étudiants / MBA"
+  },
+  {
+    id: "SSO-34",
+    symbol: "FK",
+    name: "FabLab Kairouan",
+    category: "FabLab",
+    description: "FabLab régional de Kairouan, prototypage rapide et inclusion numérique au Centre.",
+    services: ["Prototypage 3D", "Découpe laser", "Formation", "Inclusion numérique"],
+    duration: "Flexible",
+    location: "Kairouan",
+    target_phase: "Idéation / Hardware"
+  },
+  {
+    id: "SSO-35",
+    symbol: "FG",
+    name: "FabLab Gabès",
+    category: "FabLab",
+    description: "FabLab régional du Sud-Est, espace de prototypage et d'innovation pour le Sud tunisien.",
+    services: ["Fabrication numérique", "Formation makers", "Workshops", "Networking"],
+    duration: "Flexible",
+    location: "Gabès",
+    target_phase: "Idéation / Hardware"
+  },
+
+  // PEP - Pépinières Régionales Complémentaires
+  {
+    id: "PEP-06",
+    symbol: "PG",
+    name: "Pépinière de Gabès",
+    category: "Pépinière",
+    description: "Pépinière d'entreprises du Sud-Est, accompagnement des créateurs dans la région de Gabès.",
+    services: ["Hébergement", "Accompagnement", "Formation", "Orientation financement"],
+    duration: "12-24 mois",
+    location: "Gabès",
+    target_phase: "Création"
+  },
+  {
+    id: "PEP-07",
+    symbol: "PT",
+    name: "Pépinière de Tataouine",
+    category: "Pépinière",
+    description: "Pépinière du Sud profond, soutien à la création d'entreprises dans le gouvernorat de Tataouine.",
+    services: ["Hébergement", "Accompagnement", "Formation", "Inclusion économique"],
+    duration: "12-24 mois",
+    location: "Tataouine",
+    target_phase: "Création / Régional"
+  },
+  {
+    id: "PEP-08",
+    symbol: "PZ",
+    name: "Pépinière de Zaghouan",
+    category: "Pépinière",
+    description: "Pépinière régionale du gouvernorat de Zaghouan pour les créateurs locaux.",
+    services: ["Hébergement", "Coaching", "Formation", "Networking régional"],
+    duration: "12-24 mois",
+    location: "Zaghouan",
+    target_phase: "Création"
+  },
+  {
+    id: "PEP-09",
+    symbol: "PL",
+    name: "Pépinière de Médenine",
+    category: "Pépinière",
+    description: "Pépinière du Sud-Est tunisien, accompagnement des projets dans la région de Médenine et Djerba.",
+    services: ["Hébergement", "Accompagnement", "Formation", "Tourisme & artisanat"],
+    duration: "12-24 mois",
+    location: "Médenine",
+    target_phase: "Création / Tourisme"
+  },
+  {
+    id: "PEP-10",
+    symbol: "PN",
+    name: "Pépinière de Nabeul",
+    category: "Pépinière",
+    description: "Pépinière du Cap Bon, accompagnement des créateurs d'entreprises dans la région de Nabeul.",
+    services: ["Hébergement", "Accompagnement", "Formation", "Mise en réseau"],
+    duration: "12-24 mois",
+    location: "Nabeul",
+    target_phase: "Création"
+  },
+  {
+    id: "PEP-11",
+    symbol: "PB",
+    name: "Pépinière de Béja",
+    category: "Pépinière",
+    description: "Pépinière du Nord-Ouest pour les créateurs d'entreprises et projets agricoles innovants.",
+    services: ["Hébergement", "Accompagnement", "AgriBusiness", "Formation"],
+    duration: "12-24 mois",
+    location: "Béja",
+    target_phase: "Création / AgriTech"
+  },
+  {
+    id: "PEP-12",
+    symbol: "PR",
+    name: "Pépinière de Sidi Bouzid",
+    category: "Pépinière",
+    description: "Pépinière du Centre-Ouest, soutien aux créateurs et projets d'inclusion économique.",
+    services: ["Hébergement", "Formation", "Coaching", "Inclusion"],
+    duration: "12-24 mois",
+    location: "Sidi Bouzid",
+    target_phase: "Création / Inclusion"
+  },
+  {
+    id: "PEP-13",
+    symbol: "PA",
+    name: "Pépinière de Kasserine",
+    category: "Pépinière",
+    description: "Pépinière du Centre-Ouest, soutien aux entrepreneurs et projets de développement local.",
+    services: ["Hébergement", "Accompagnement", "Formation", "Développement local"],
+    duration: "12-24 mois",
+    location: "Kasserine",
+    target_phase: "Création"
+  },
+  {
+    id: "PEP-14",
+    symbol: "PF",
+    name: "Pépinière de Gafsa",
+    category: "Pépinière",
+    description: "Pépinière du Sud-Ouest, accompagnement des créateurs dans le bassin minier de Gafsa.",
+    services: ["Hébergement", "Accompagnement", "Reconversion mineurs", "Formation"],
+    duration: "12-24 mois",
+    location: "Gafsa",
+    target_phase: "Création / Reconversion"
+  },
+
+  // SSO - Acteurs ESS & Innovation Sociale Régionaux
+  {
+    id: "SSO-36",
+    symbol: "IT",
+    name: "IECD Tunisie",
+    category: "Incubateur ESS",
+    description: "Institut Européen de Coopération et Développement, programmes d'insertion par l'entrepreneuriat.",
+    services: ["Insertion économique", "Formation", "Microfinance", "Accompagnement"],
+    duration: "Variable",
+    location: "Tunis / Régions",
+    target_phase: "Inclusion / Micro-entreprise"
+  },
+  {
+    id: "SSO-37",
+    symbol: "EN",
+    name: "Enda Tamweel",
+    category: "Incubateur ESS",
+    description: "Institution de microfinance leader en Tunisie, financement et accompagnement des micro-entrepreneurs.",
+    services: ["Microcrédits", "Formation entrepreneuriale", "Accompagnement", "Réseau national"],
+    duration: "Selon prêt",
+    location: "National (90+ agences)",
+    target_phase: "Micro-entreprises"
+  },
+  {
+    id: "SSO-38",
+    symbol: "TQ",
+    name: "Taysir Microfinance",
+    category: "Incubateur ESS",
+    description: "Institution de microfinance accompagnant les TPE et porteurs de projets en Tunisie.",
+    services: ["Microcrédits", "Accompagnement", "Formation gestion", "Réseau régional"],
+    duration: "Selon contrat",
+    location: "National",
+    target_phase: "TPE / Micro"
+  },
+  {
+    id: "SSO-39",
+    symbol: "MT",
+    name: "Microcred Tunisie",
+    category: "Incubateur ESS",
+    description: "Institution de microfinance internationale présente en Tunisie pour le financement des TPE.",
+    services: ["Microcrédits", "Comptes épargne", "Formation", "Inclusion financière"],
+    duration: "Selon contrat",
+    location: "National",
+    target_phase: "TPE / Inclusion"
+  },
+  {
+    id: "SSO-40",
+    symbol: "MB",
+    name: "Mashrou3i (ONUDI)",
+    category: "Programme",
+    description: "Programme ONUDI-Italie d'appui à la création d'entreprises et à l'employabilité en Tunisie.",
+    services: ["Formation entrepreneuriale", "Coaching", "Financement", "Soutien sectoriel"],
+    duration: "Variable",
+    location: "National (Régions)",
+    target_phase: "Création / TPE"
+  },
+  {
+    id: "SSO-41",
+    symbol: "PA",
+    name: "PAQ-Collabora",
+    category: "Programme",
+    description: "Programme d'appui à la qualité de l'enseignement supérieur, volet entrepreneuriat universitaire.",
+    services: ["Entrepreneuriat universitaire", "Formation enseignants", "Bootcamps étudiants", "Innovation"],
+    duration: "Programmes pluriannuels",
+    location: "National (Universités)",
+    target_phase: "Étudiants / Académique"
+  },
+  {
+    id: "SSO-42",
+    symbol: "JI",
+    name: "JICA Tunisie",
+    category: "Coopération Internationale",
+    description: "Agence japonaise de coopération internationale avec programmes d'appui aux PME et startups tunisiennes.",
+    services: ["Assistance technique", "Formation Japon", "Financement projets", "Partenariats"],
+    duration: "Projets pluriannuels",
+    location: "Tunis (National)",
+    target_phase: "PME / Tous stades"
+  },
+  {
+    id: "SSO-43",
+    symbol: "BR",
+    name: "BERD Tunisie",
+    category: "Coopération Internationale",
+    description: "Banque Européenne pour la Reconstruction et le Développement, financement et assistance aux PME.",
+    services: ["Financement PME", "Conseil entreprises (ASB)", "Lignes de crédit", "Capital-risque"],
+    duration: "Long terme",
+    location: "Tunis",
+    target_phase: "PME / Growth"
+  },
+  {
+    id: "SSO-44",
+    symbol: "SF",
+    name: "SFI - IFC Tunisie",
+    category: "Coopération Internationale",
+    description: "Société Financière Internationale (Groupe Banque Mondiale), financement du secteur privé en Tunisie.",
+    services: ["Investissement direct", "Conseil", "Mobilisation capitaux", "Assistance technique"],
+    duration: "Long terme",
+    location: "Tunis",
+    target_phase: "PME / Growth"
+  },
+  {
+    id: "SSO-45",
+    symbol: "BA",
+    name: "Banque Africaine de Développement",
+    category: "Coopération Internationale",
+    description: "BAD - Programmes de financement et d'appui au secteur privé tunisien et à l'innovation.",
+    services: ["Financement projets", "Lignes de crédit", "Appui PME", "Programmes sectoriels"],
+    duration: "Long terme",
+    location: "Tunis (Siège régional)",
+    target_phase: "PME / Infrastructure"
+  },
+
+  // CPT - Compétitions & Programmes Complémentaires
+  {
+    id: "CPT-11",
+    symbol: "MI",
+    name: "MIT Enterprise Forum Pan Arab",
+    category: "Compétition",
+    description: "Compétition régionale MIT Enterprise Forum pour startups innovantes du monde arabe avec finale internationale.",
+    services: ["Mentorat MIT", "Prix régionaux", "Formation", "Réseau global"],
+    duration: "6-9 mois",
+    location: "Régional (MENA)",
+    target_phase: "Tech / Innovation"
+  },
+  {
+    id: "CPT-12",
+    symbol: "WS",
+    name: "Women Startup Challenge",
+    category: "Compétition",
+    description: "Compétition dédiée aux startups fondées ou co-fondées par des femmes en Tunisie.",
+    services: ["Prix dédiés femmes", "Mentorat", "Visibilité", "Networking féminin"],
+    duration: "3-4 mois",
+    location: "National",
+    target_phase: "Femmes entrepreneures"
+  },
+  {
+    id: "CPT-13",
+    symbol: "GE",
+    name: "GEW Tunisia",
+    category: "Programme Compétitif",
+    description: "Global Entrepreneurship Week, semaine mondiale de l'entrepreneuriat avec événements en Tunisie.",
+    services: ["Événements nationaux", "Workshops", "Pitch sessions", "Networking"],
+    duration: "1 semaine annuelle",
+    location: "National",
+    target_phase: "Tous stades"
+  },
+  {
+    id: "CPT-14",
+    symbol: "AW",
+    name: "AWS Activate",
+    category: "Programme Compétitif",
+    description: "Programme Amazon Web Services offrant crédits cloud et support technique aux startups.",
+    services: ["AWS credits", "Support technique", "Formation cloud", "Réseau startups"],
+    duration: "Selon plan",
+    location: "Global",
+    target_phase: "Tech / Cloud"
+  },
+  {
+    id: "CPT-15",
+    symbol: "NV",
+    name: "NVIDIA Inception",
+    category: "Programme Compétitif",
+    description: "Programme NVIDIA dédié aux startups IA, deep learning et data science.",
+    services: ["GPU credits", "Formation IA", "Mentorat tech", "Réseau global"],
+    duration: "Selon stade",
+    location: "Global",
+    target_phase: "AI / DeepTech"
+  },
+
+  // COW - Coworking & Hubs Régionaux
+  {
+    id: "COW-08",
+    symbol: "WK",
+    name: "WeStart Sfax",
+    category: "Coworking",
+    description: "Espace de coworking et hub entrepreneurial à Sfax, communauté tech du Sud.",
+    services: ["Coworking", "Événements tech", "Formations", "Networking"],
+    duration: "Flexible",
+    location: "Sfax",
+    target_phase: "Tech / Régional"
+  },
+  {
+    id: "COW-09",
+    symbol: "MK",
+    name: "MakerLab Sousse",
+    category: "FabLab",
+    description: "Espace maker et FabLab dans la région du Sahel, prototypage et fabrication numérique.",
+    services: ["Prototypage", "Workshops", "Formation makers", "Coworking"],
+    duration: "Flexible",
+    location: "Sousse",
+    target_phase: "Hardware / Maker"
+  },
+  {
+    id: "COW-10",
+    symbol: "HJ",
+    name: "Hub Djerba",
+    category: "Hub",
+    description: "Hub d'innovation à Djerba pour les nomades digitaux, entrepreneurs et créateurs locaux.",
+    services: ["Coworking", "Tourism tech", "Networking", "Événements"],
+    duration: "Flexible",
+    location: "Djerba",
+    target_phase: "Nomades / Tourisme"
+  },
+  {
+    id: "COW-11",
+    symbol: "KH",
+    name: "Kairouan Hub",
+    category: "Hub",
+    description: "Hub entrepreneurial du Centre tunisien, soutien aux jeunes créateurs de Kairouan.",
+    services: ["Coworking", "Formation", "Mentorat", "Événements"],
+    duration: "Flexible",
+    location: "Kairouan",
+    target_phase: "Régional / Jeunes"
+  },
 ];
 
 const categoryColors: Record<string, string> = {
