@@ -1602,6 +1602,17 @@ const ecosystemElements: EcosystemElement[] = [
     location: "Kairouan",
     target_phase: "Régional / Jeunes"
   },
+  {
+    id: "GOV-23",
+    symbol: "EE",
+    name: "Espace Entreprendre",
+    category: "Entité Publique",
+    description: "Réseau national d'Espaces Entreprendre logés dans les bureaux ANETI, guichet unique d'accompagnement des porteurs de projets de la pré-création au démarrage.",
+    services: ["Accueil & orientation", "Formation entrepreneuriale (CREE/CEFE/MORAINE)", "Aide au business plan", "Mise en relation financement", "Suivi post-création"],
+    duration: "Permanent",
+    location: "National (24 gouvernorats)",
+    target_phase: "Pré-création / Création"
+  },
 ];
 
 const categoryColors: Record<string, string> = {
