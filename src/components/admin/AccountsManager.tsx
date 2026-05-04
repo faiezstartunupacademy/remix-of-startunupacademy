@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Crown, Lock, Search, ShieldCheck, UserCheck, UserX, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const OWNER_EMAIL = "faiez.ghorbel@gmail.com";
+const OWNER_EMAILS = ["faiez.ghorbel@gmail.com", "faiezghorbel6@gmail.com"];
+const isOwnerEmail = (email: string | null) => !!email && OWNER_EMAILS.includes(email);
 
 interface AccountRow {
   user_id: string;
