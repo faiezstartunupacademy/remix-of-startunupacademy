@@ -33,6 +33,7 @@ import AdminProjectsList from "@/components/admin/AdminProjectsList";
 import AdminOverviewDashboard from "@/components/admin/AdminOverviewDashboard";
 import logoStartunup from "@/assets/logo_startunup_new.png";
 import StrategicAccessManager from "@/components/admin/StrategicAccessManager";
+import AccountsManager from "@/components/admin/AccountsManager";
 
 interface UserProfile {
   id: string;
@@ -248,10 +249,14 @@ const AdminDashboard = () => {
 
           {/* Dashboard Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-             <TabsList className="grid w-full max-w-2xl grid-cols-5">
+             <TabsList className="grid w-full max-w-3xl grid-cols-6">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <LayoutDashboard className="h-4 w-4" />
                 <span className="hidden sm:inline">Aperçu</span>
+              </TabsTrigger>
+              <TabsTrigger value="accounts" className="flex items-center gap-2">
+                <Crown className="h-4 w-4" />
+                <span className="hidden sm:inline">Comptes</span>
               </TabsTrigger>
               <TabsTrigger value="access" className="flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4" />
@@ -270,6 +275,10 @@ const AdminDashboard = () => {
                 <span className="hidden sm:inline">Projets</span>
               </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="accounts">
+              <AccountsManager />
+            </TabsContent>
 
             <TabsContent value="overview">
               <AdminOverviewDashboard onNavigateTab={setActiveTab} />
