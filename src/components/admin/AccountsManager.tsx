@@ -81,7 +81,7 @@ const AccountsManager = () => {
               Gestion des comptes
             </CardTitle>
             <CardDescription>
-              Compte propriétaire : <span className="font-mono">{OWNER_EMAIL}</span> — seul autorisé en tant qu'administrateur.
+              Comptes propriétaires : <span className="font-mono">{OWNER_EMAILS.join(", ")}</span> — seuls autorisés en tant qu'administrateurs.
               {" "}
               <Badge variant="secondary" className="ml-2">
                 {adminCount} admin / {rows.length} comptes
