@@ -125,7 +125,7 @@ const AccountsManager = () => {
                   </TableRow>
                 ) : (
                   filtered.map((r) => {
-                    const isOwner = r.email === OWNER_EMAIL;
+                    const isOwner = isOwnerEmail(r.email);
                     return (
                       <TableRow key={r.user_id}>
                         <TableCell className="font-mono text-xs">
