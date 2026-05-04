@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Crown, Lock, Search, ShieldCheck, UserCheck, UserX, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const OWNER_EMAIL = "faiez.ghorbel@gmail.com";
+const OWNER_EMAILS = ["faiez.ghorbel@gmail.com", "faiezghorbel6@gmail.com"];
+const isOwnerEmail = (email: string | null) => !!email && OWNER_EMAILS.includes(email);
 
 interface AccountRow {
   user_id: string;
@@ -41,10 +42,10 @@ const AccountsManager = () => {
   }, []);
 
   const setRole = async (userId: string, email: string | null, role: "admin" | "user") => {
-    if (role === "admin" && email !== OWNER_EMAIL) {
+    if (role === "admin" && !isOwnerEmail(email)) {
       toast({
         title: "Action interdite",
-        description: `Le rôle administrateur est réservé au compte propriétaire (${OWNER_EMAIL}).`,
+        description: `Le rôle administrateur est réservé aux comptes propriétaires (${OWNER_EMAILS.join(", ")}).`,
         variant: "destructive",
       });
       return;
@@ -80,7 +81,7 @@ const AccountsManager = () => {
               Gestion des comptes
             </CardTitle>
             <CardDescription>
-              Compte propriétaire : <span className="font-mono">{OWNER_EMAIL}</span> — seul autorisé en tant qu'administrateur.
+              Comptes propriétaires : <span className="font-mono">{OWNER_EMAILS.join(", ")}</span> — seuls autorisés en tant qu'administrateurs.
               {" "}
               <Badge variant="secondary" className="ml-2">
                 {adminCount} admin / {rows.length} comptes
@@ -124,7 +125,7 @@ const AccountsManager = () => {
                   </TableRow>
                 ) : (
                   filtered.map((r) => {
-                    const isOwner = r.email === OWNER_EMAIL;
+                    const isOwner = isOwnerEmail(r.email);
                     return (
                       <TableRow key={r.user_id}>
                         <TableCell className="font-mono text-xs">
