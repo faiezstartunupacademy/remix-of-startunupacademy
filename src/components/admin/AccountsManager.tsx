@@ -42,10 +42,10 @@ const AccountsManager = () => {
   }, []);
 
   const setRole = async (userId: string, email: string | null, role: "admin" | "user") => {
-    if (role === "admin" && email !== OWNER_EMAIL) {
+    if (role === "admin" && !isOwnerEmail(email)) {
       toast({
         title: "Action interdite",
-        description: `Le rôle administrateur est réservé au compte propriétaire (${OWNER_EMAIL}).`,
+        description: `Le rôle administrateur est réservé aux comptes propriétaires (${OWNER_EMAILS.join(", ")}).`,
         variant: "destructive",
       });
       return;
