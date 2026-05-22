@@ -208,6 +208,177 @@ export type Database = {
         }
         Relationships: []
       }
+      deal_room_access_log: {
+        Row: {
+          action: string
+          created_at: string
+          document_id: string
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+          viewer_email: string | null
+          viewer_id: string | null
+        }
+        Insert: {
+          action?: string
+          created_at?: string
+          document_id: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          viewer_email?: string | null
+          viewer_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          document_id?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          viewer_email?: string | null
+          viewer_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deal_room_access_log_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "deal_room_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deal_room_documents: {
+        Row: {
+          allow_download: boolean
+          category: string
+          created_at: string
+          expires_at: string | null
+          file_path: string
+          file_size: number | null
+          id: string
+          mime_type: string | null
+          name: string
+          nda_required: boolean
+          startup_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          visibility: string
+          watermark_enabled: boolean
+        }
+        Insert: {
+          allow_download?: boolean
+          category: string
+          created_at?: string
+          expires_at?: string | null
+          file_path: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          name: string
+          nda_required?: boolean
+          startup_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          visibility?: string
+          watermark_enabled?: boolean
+        }
+        Update: {
+          allow_download?: boolean
+          category?: string
+          created_at?: string
+          expires_at?: string | null
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          name?: string
+          nda_required?: boolean
+          startup_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          visibility?: string
+          watermark_enabled?: boolean
+        }
+        Relationships: []
+      }
+      deal_room_nda_acceptances: {
+        Row: {
+          accepted_at: string
+          document_id: string
+          id: string
+          ip_address: string | null
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          document_id: string
+          id?: string
+          ip_address?: string | null
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string
+          document_id?: string
+          id?: string
+          ip_address?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deal_room_nda_acceptances_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "deal_room_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deal_room_share_links: {
+        Row: {
+          created_at: string
+          created_by: string
+          document_id: string
+          expires_at: string | null
+          id: string
+          password_hash: string | null
+          revoked: boolean
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          document_id: string
+          expires_at?: string | null
+          id?: string
+          password_hash?: string | null
+          revoked?: boolean
+          token: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          document_id?: string
+          expires_at?: string | null
+          id?: string
+          password_hash?: string | null
+          revoked?: boolean
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deal_room_share_links_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "deal_room_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       formation_completions: {
         Row: {
           access_level: string
@@ -2414,6 +2585,42 @@ export type Database = {
           file_url?: string | null
           id?: string
           uploaded_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      startup_journey_progress: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          milestone_id: string
+          phase_id: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          milestone_id: string
+          phase_id: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          milestone_id?: string
+          phase_id?: number
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
