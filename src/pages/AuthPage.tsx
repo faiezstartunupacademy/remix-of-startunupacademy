@@ -14,6 +14,9 @@ import logoStartunup from "@/assets/logo_startunup_new.png";
 import { z } from "zod";
 import MfaVerification from "@/components/MfaVerification";
 import { useTranslation } from "react-i18next";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Link } from "react-router-dom";
+import PasswordStrengthMeter from "@/components/legal/PasswordStrengthMeter";
 
 const AuthPage = () => {
   const { t } = useTranslation();
