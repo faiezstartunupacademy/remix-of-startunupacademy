@@ -46,6 +46,9 @@ import AIBusinessPage from "./pages/AIBusinessPage";
 import MarketplacePage from "./pages/MarketplacePage";
 import StartupDetailPage from "./pages/StartupDetailPage";
 import StartupPrivateSpace from "./pages/StartupPrivateSpace";
+import LegalPage from "./pages/LegalPage";
+import MyConsentPage from "./pages/MyConsentPage";
+import CookieConsentBanner from "./components/legal/CookieConsentBanner";
 const queryClient = new QueryClient();
 
 const App = () => (
