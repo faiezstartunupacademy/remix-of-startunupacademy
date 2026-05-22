@@ -303,8 +303,29 @@ const AuthPage = () => {
                           </button>
                         </div>
                         {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+                        <PasswordStrengthMeter password={password} className="mt-2" />
                       </div>
-                      <Button type="submit" className="w-full" disabled={isLoading}>
+
+                      <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+                        <label className="flex items-start gap-2 cursor-pointer">
+                          <Checkbox checked={acceptTerms} onCheckedChange={(v) => setAcceptTerms(v === true)} className="mt-0.5" />
+                          <span className="text-xs text-muted-foreground leading-relaxed">
+                            J'accepte les{" "}
+                            <Link to="/legal/terms" target="_blank" className="underline text-primary">CGU</Link>{" "}
+                            et la{" "}
+                            <Link to="/legal/privacy" target="_blank" className="underline text-primary">Politique de confidentialité</Link>.
+                          </span>
+                        </label>
+                        <label className="flex items-start gap-2 cursor-pointer">
+                          <Checkbox checked={acceptDataProcessing} onCheckedChange={(v) => setAcceptDataProcessing(v === true)} className="mt-0.5" />
+                          <span className="text-xs text-muted-foreground leading-relaxed">
+                            Je consens au traitement de mes données personnelles conformément à la loi tunisienne n°2004-63 (INPDP) et au RGPD.
+                          </span>
+                        </label>
+                        {consentError && <p className="text-xs text-destructive">{consentError}</p>}
+                      </div>
+
+                      <Button type="submit" className="w-full" disabled={isLoading || !acceptTerms || !acceptDataProcessing}>
                         {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : (<>{t("auth.createAccount")}<ArrowRight className="ml-2 h-4 w-4" /></>)}
                       </Button>
                     </form>
