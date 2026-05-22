@@ -58,6 +58,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <WelcomeVideoModal />
+        <CookieConsentBanner />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/admin" element={<AdminDashboard />} />
