@@ -23,6 +23,7 @@ import {
 } from "@/hooks/useMarketplace";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import LegalStatusCard from "@/components/legal/LegalStatusCard";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import StartupPrivateChat from "@/components/marketplace/StartupPrivateChat";
 
