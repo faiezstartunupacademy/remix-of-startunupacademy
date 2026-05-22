@@ -38,6 +38,8 @@ import AccountsManager from "@/components/admin/AccountsManager";
 import FundingProgramsManager from "@/components/admin/FundingProgramsManager";
 import ApplicationsPipeline from "@/components/admin/ApplicationsPipeline";
 import CohortAnalytics from "@/components/admin/CohortAnalytics";
+import LegalVerificationPanel from "@/components/admin/LegalVerificationPanel";
+
 
 interface UserProfile {
   id: string;
@@ -290,6 +292,10 @@ const AdminDashboard = () => {
                 <Kanban className="h-4 w-4" />
                 <span className="hidden lg:inline">Pipeline</span>
               </TabsTrigger>
+              <TabsTrigger value="legal" className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4" />
+                <span className="hidden lg:inline">Startup Act</span>
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="cohort">
@@ -303,6 +309,11 @@ const AdminDashboard = () => {
             <TabsContent value="pipeline">
               <ApplicationsPipeline />
             </TabsContent>
+
+            <TabsContent value="legal">
+              <LegalVerificationPanel />
+            </TabsContent>
+
 
 
             <TabsContent value="accounts">

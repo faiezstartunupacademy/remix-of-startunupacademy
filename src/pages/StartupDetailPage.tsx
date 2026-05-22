@@ -23,6 +23,7 @@ import {
 } from "@/hooks/useMarketplace";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import LegalStatusCard from "@/components/legal/LegalStatusCard";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import StartupPrivateChat from "@/components/marketplace/StartupPrivateChat";
 
@@ -170,7 +171,9 @@ const StartupDetailPage = () => {
                   <Badge variant="outline" className={`${stageColors[startup.stage]} border`}>{stageLabels[startup.stage]}</Badge>
                   {s.category && <Badge variant="secondary">{s.category}</Badge>}
                 </div>
-                <p className="text-lg text-white/60 mb-4">{startup.tagline}</p>
+                <p className="text-lg text-white/60 mb-3">{startup.tagline}</p>
+                <div className="mb-4"><LegalStatusCard userId={startup.created_by} variant="compact" /></div>
+
                 <div className="flex items-center gap-4 text-sm text-white/50 flex-wrap">
                   {startup.sector && <Badge variant="secondary">{startup.sector}</Badge>}
                   {startup.location && <span className="flex items-center gap-1"><MapPin className="h-4 w-4" /> {startup.location}</span>}

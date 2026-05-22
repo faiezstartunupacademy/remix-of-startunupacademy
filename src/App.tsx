@@ -62,8 +62,10 @@ import FundingApplicationsPage from "./pages/FundingApplicationsPage";
 import CommunityFeedPage from "./pages/CommunityFeedPage";
 import EventsPage from "./pages/EventsPage";
 import CofounderMatchingPage from "./pages/CofounderMatchingPage";
+import LegalCompliancePage from "./pages/LegalCompliancePage";
 import BottomNav from "./components/BottomNav";
 import LanguageSync from "./components/LanguageSync";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -131,7 +133,9 @@ const App = () => (
           <Route path="/feed" element={<CommunityFeedPage />} />
           <Route path="/evenements" element={<EventsPage />} />
           <Route path="/cofounders" element={<CofounderMatchingPage />} />
+          <Route path="/profil/conformite" element={<LegalCompliancePage />} />
           <Route path="*" element={<NotFound />} />
+
         </Routes>
         <BottomNav />
       </BrowserRouter>
