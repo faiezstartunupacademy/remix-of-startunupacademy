@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Mail, MapPin, Phone, Linkedin, Twitter, Youtube, Instagram } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import logoStartunup from "@/assets/logo_startunup_new.png";
+import TrustBadge from "@/components/legal/TrustBadge";
 
 const Footer = () => {
   const { t } = useTranslation();
