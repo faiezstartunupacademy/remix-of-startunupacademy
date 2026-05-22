@@ -253,32 +253,57 @@ const AdminDashboard = () => {
 
           {/* Dashboard Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-             <TabsList className="grid w-full max-w-3xl grid-cols-6">
+             <TabsList className="grid w-full grid-cols-3 md:grid-cols-9 h-auto">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <LayoutDashboard className="h-4 w-4" />
-                <span className="hidden sm:inline">Aperçu</span>
+                <span className="hidden lg:inline">Aperçu</span>
+              </TabsTrigger>
+              <TabsTrigger value="cohort" className="flex items-center gap-2">
+                <PieChart className="h-4 w-4" />
+                <span className="hidden lg:inline">Cohorte</span>
               </TabsTrigger>
               <TabsTrigger value="accounts" className="flex items-center gap-2">
                 <Crown className="h-4 w-4" />
-                <span className="hidden sm:inline">Comptes</span>
+                <span className="hidden lg:inline">Comptes</span>
               </TabsTrigger>
               <TabsTrigger value="access" className="flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4" />
-                <span className="hidden sm:inline">Accès</span>
+                <span className="hidden lg:inline">Accès</span>
               </TabsTrigger>
               <TabsTrigger value="licenses" className="flex items-center gap-2">
                 <Key className="h-4 w-4" />
-                <span className="hidden sm:inline">Licences</span>
+                <span className="hidden lg:inline">Licences</span>
               </TabsTrigger>
               <TabsTrigger value="users" className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
-                <span className="hidden sm:inline">Utilisateurs</span>
+                <span className="hidden lg:inline">Users</span>
               </TabsTrigger>
               <TabsTrigger value="projects" className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
-                <span className="hidden sm:inline">Projets</span>
+                <span className="hidden lg:inline">Projets</span>
+              </TabsTrigger>
+              <TabsTrigger value="programs" className="flex items-center gap-2">
+                <Briefcase className="h-4 w-4" />
+                <span className="hidden lg:inline">Programmes</span>
+              </TabsTrigger>
+              <TabsTrigger value="pipeline" className="flex items-center gap-2">
+                <Kanban className="h-4 w-4" />
+                <span className="hidden lg:inline">Pipeline</span>
               </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="cohort">
+              <CohortAnalytics />
+            </TabsContent>
+
+            <TabsContent value="programs">
+              <FundingProgramsManager />
+            </TabsContent>
+
+            <TabsContent value="pipeline">
+              <ApplicationsPipeline />
+            </TabsContent>
+
 
             <TabsContent value="accounts">
               <AccountsManager />
