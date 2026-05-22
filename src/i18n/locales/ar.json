@@ -195,12 +195,24 @@
     "strategic": "القطب الاستراتيجي",
     "marketplace": "السوق",
     "mvpValidator": "MVP Validator",
-    "admin": "الإدارة",
+    "admin": "المشرف",
     "foundations": "الأسس",
     "search": "بحث",
-    "logout": "تسجيل الخروج",
-    "login": "تسجيل الدخول",
-    "formation": "التكوين"
+    "logout": "خروج",
+    "login": "دخول",
+    "formation": "التكوين",
+    "academy": "الأكاديمية",
+    "incubation": "الاحتضان",
+    "tools": "الأدوات",
+    "mentors": "المرشدون",
+    "funding": "التمويل",
+    "events": "الفعاليات",
+    "feed": "آخر الأخبار",
+    "cofounders": "الشركاء المؤسسون",
+    "dealRoom": "غرفة المفاوضات",
+    "roadmap": "المسار",
+    "missionControl": "لوحة القيادة",
+    "signup": "تسجيل"
   },
   "common": {
     "login": "تسجيل الدخول",
@@ -576,5 +588,38 @@
     "reply": "رد",
     "helpful": "مفيد",
     "notHelpful": "غير مفيد"
+  },
+  "mobileNav": {
+    "home": "الرئيسية",
+    "roadmap": "المسار",
+    "sessions": "الجلسات",
+    "docs": "الوثائق",
+    "profile": "ملفي"
+  },
+  "language": {
+    "label": "اللغة",
+    "fr": "الفرنسية",
+    "ar": "العربية",
+    "en": "الإنجليزية",
+    "contributeTranslation": "ساهم في الترجمة",
+    "easternNumerals": "الأرقام العربية المشرقية (١٢٣)"
+  },
+  "success": {
+    "saved": "تم الحفظ ✓",
+    "bravo": "براڤو! 🎉",
+    "youProgressed": "تقدمت يا بطل 🚀",
+    "milestoneUnlocked": "مرحلة جديدة مفتوحة!",
+    "wellDone": "أحسنت!"
+  },
+  "errors": {
+    "generic": "صار خطأ، عاود المحاولة.",
+    "network": "ما نجمناش نتصلو. شيك على الإنترنت متاعك.",
+    "notFound": "ما لقيناش شي",
+    "unauthorized": "لازمك تكون مسجّل دخول",
+    "tryAgain": "عاود"
+  },
+  "empty": {
+    "noResults": "ما عندناش حاجة نوريوها توا",
+    "encourage": "ابدا مشروعك الأول 👇"
   }
 }

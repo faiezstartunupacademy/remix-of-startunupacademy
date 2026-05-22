@@ -258,3 +258,28 @@
     border: 2px solid transparent;
   }
 }
+
+/* ===== i18n: Arabic font + RTL helpers ===== */
+.font-arabic,
+html[lang="ar"] body {
+  font-family: 'Cairo', 'Noto Sans Arabic', 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Flip directional icons in RTL contexts (chevrons/arrows) */
+html[dir="rtl"] .rtl-flip {
+  transform: scaleX(-1);
+}
+
+/* Ensure bottom-nav safe space on mobile so content isn't hidden behind it */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom));
+  }
+}
+
+/* Larger touch targets on mobile (WCAG 2.5.5) */
+@media (max-width: 480px) {
+  button, [role="button"], a.btn, .btn {
+    min-height: 40px;
+  }
+}

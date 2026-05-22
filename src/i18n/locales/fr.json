@@ -195,12 +195,24 @@
     "strategic": "Pôle Stratégique",
     "marketplace": "Marketplace",
     "mvpValidator": "MVP Validator",
-    "admin": "Administration",
+    "admin": "Admin",
     "foundations": "Fondements",
     "search": "Rechercher",
     "logout": "Déconnexion",
     "login": "Connexion",
-    "formation": "Formation"
+    "formation": "Formation",
+    "academy": "Académie",
+    "incubation": "Incubation",
+    "tools": "Outils",
+    "mentors": "Mentors",
+    "funding": "Financement",
+    "events": "Événements",
+    "feed": "Fil d'actualité",
+    "cofounders": "Co-fondateurs",
+    "dealRoom": "Deal Room",
+    "roadmap": "Parcours",
+    "missionControl": "Tableau de bord",
+    "signup": "Inscription"
   },
   "common": {
     "login": "Se connecter",
@@ -576,5 +588,38 @@
     "reply": "Répondre",
     "helpful": "Utile",
     "notHelpful": "Pas utile"
+  },
+  "mobileNav": {
+    "home": "Accueil",
+    "roadmap": "Parcours",
+    "sessions": "Sessions",
+    "docs": "Documents",
+    "profile": "Profil"
+  },
+  "language": {
+    "label": "Langue",
+    "fr": "Français",
+    "ar": "Arabe",
+    "en": "Anglais",
+    "contributeTranslation": "Contribuer une traduction",
+    "easternNumerals": "Chiffres arabes orientaux (١٢٣)"
+  },
+  "success": {
+    "saved": "Enregistré ✓",
+    "bravo": "Bravo ! 🎉",
+    "youProgressed": "Tu as progressé 🚀",
+    "milestoneUnlocked": "Étape débloquée !",
+    "wellDone": "Bien joué !"
+  },
+  "errors": {
+    "generic": "Une erreur est survenue, réessaie.",
+    "network": "Connexion impossible. Vérifie ton réseau.",
+    "notFound": "Introuvable",
+    "unauthorized": "Tu dois être connecté(e)",
+    "tryAgain": "Réessayer"
+  },
+  "empty": {
+    "noResults": "Rien à afficher pour le moment",
+    "encourage": "Commence par créer ton premier projet 👇"
   }
 }
