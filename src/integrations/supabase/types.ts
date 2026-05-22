@@ -1843,6 +1843,144 @@ export type Database = {
           },
         ]
       }
+      mentor_availability: {
+        Row: {
+          created_at: string
+          day_of_week: number | null
+          end_time: string
+          id: string
+          is_recurring: boolean
+          mentor_id: string
+          specific_date: string | null
+          start_time: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week?: number | null
+          end_time: string
+          id?: string
+          is_recurring?: boolean
+          mentor_id: string
+          specific_date?: string | null
+          start_time: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: number | null
+          end_time?: string
+          id?: string
+          is_recurring?: boolean
+          mentor_id?: string
+          specific_date?: string | null
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_availability_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentor_reviews: {
+        Row: {
+          created_at: string
+          feedback: string | null
+          id: string
+          rating: number
+          reviewee_id: string
+          reviewer_id: string
+          reviewer_role: string
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          rating: number
+          reviewee_id: string
+          reviewer_id: string
+          reviewer_role: string
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          rating?: number
+          reviewee_id?: string
+          reviewer_id?: string
+          reviewer_role?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_reviews_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "mentor_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentor_sessions: {
+        Row: {
+          agenda: string
+          created_at: string
+          duration_minutes: number
+          id: string
+          meet_link: string | null
+          mentor_id: string
+          mentor_notes: string | null
+          scheduled_at: string
+          session_type: string
+          startup_notes: string | null
+          startup_user_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          agenda: string
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          meet_link?: string | null
+          mentor_id: string
+          mentor_notes?: string | null
+          scheduled_at: string
+          session_type: string
+          startup_notes?: string | null
+          startup_user_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          agenda?: string
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          meet_link?: string | null
+          mentor_id?: string
+          mentor_notes?: string | null
+          scheduled_at?: string
+          session_type?: string
+          startup_notes?: string | null
+          startup_user_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_sessions_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mentoring_sessions: {
         Row: {
           created_at: string
@@ -1885,6 +2023,69 @@ export type Database = {
           topic?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      mentors: {
+        Row: {
+          avg_rating: number | null
+          bio: string | null
+          companies: string[] | null
+          country_code: string | null
+          created_at: string
+          expertise_tags: string[] | null
+          full_name: string
+          hourly_rate: number | null
+          id: string
+          is_active: boolean
+          languages: string[] | null
+          linkedin_url: string | null
+          photo_url: string | null
+          reviews_count: number | null
+          sectors: string[] | null
+          updated_at: string
+          user_id: string
+          years_experience: number | null
+        }
+        Insert: {
+          avg_rating?: number | null
+          bio?: string | null
+          companies?: string[] | null
+          country_code?: string | null
+          created_at?: string
+          expertise_tags?: string[] | null
+          full_name: string
+          hourly_rate?: number | null
+          id?: string
+          is_active?: boolean
+          languages?: string[] | null
+          linkedin_url?: string | null
+          photo_url?: string | null
+          reviews_count?: number | null
+          sectors?: string[] | null
+          updated_at?: string
+          user_id: string
+          years_experience?: number | null
+        }
+        Update: {
+          avg_rating?: number | null
+          bio?: string | null
+          companies?: string[] | null
+          country_code?: string | null
+          created_at?: string
+          expertise_tags?: string[] | null
+          full_name?: string
+          hourly_rate?: number | null
+          id?: string
+          is_active?: boolean
+          languages?: string[] | null
+          linkedin_url?: string | null
+          photo_url?: string | null
+          reviews_count?: number | null
+          sectors?: string[] | null
+          updated_at?: string
+          user_id?: string
+          years_experience?: number | null
         }
         Relationships: []
       }
