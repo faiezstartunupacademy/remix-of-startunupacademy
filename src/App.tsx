@@ -49,6 +49,9 @@ import StartupPrivateSpace from "./pages/StartupPrivateSpace";
 import LegalPage from "./pages/LegalPage";
 import MyConsentPage from "./pages/MyConsentPage";
 import CookieConsentBanner from "./components/legal/CookieConsentBanner";
+import DataRightsCenter from "./pages/DataRightsCenter";
+import OnboardingPage from "./pages/OnboardingPage";
+import MissionControl from "./pages/MissionControl";
 const queryClient = new QueryClient();
 
 const App = () => (
