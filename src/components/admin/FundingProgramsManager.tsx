@@ -19,6 +19,8 @@ interface Program {
   type: string;
   sectors: string[] | null;
   stages: string[] | null;
+  target_governorates?: string[] | null;
+  regional_priority?: boolean | null;
   min_amount_tnd: number | null;
   max_amount_tnd: number | null;
   equity_required: boolean | null;
@@ -65,6 +67,9 @@ const FundingProgramsManager = () => {
       ...editing,
       sectors: typeof editing.sectors === "string" ? (editing.sectors as any).split(",").map((s: string) => s.trim()).filter(Boolean) : editing.sectors,
       stages: typeof editing.stages === "string" ? (editing.stages as any).split(",").map((s: string) => s.trim()).filter(Boolean) : editing.stages,
+      target_governorates: typeof editing.target_governorates === "string"
+        ? (editing.target_governorates as any).split(",").map((s: string) => s.trim()).filter(Boolean)
+        : editing.target_governorates,
     } as any;
     const { error } = editing.id
       ? await supabase.from("funding_programs").update(payload).eq("id", editing.id)
@@ -84,7 +89,7 @@ const FundingProgramsManager = () => {
   };
 
   const startEdit = (p: Program) => {
-    setEditing({ ...p, sectors: (p.sectors || []).join(", ") as any, stages: (p.stages || []).join(", ") as any });
+    setEditing({ ...p, sectors: (p.sectors || []).join(", ") as any, stages: (p.stages || []).join(", ") as any, target_governorates: (p.target_governorates || []).join(", ") as any });
     setOpen(true);
   };
 
