@@ -59,6 +59,9 @@ import MentorProfilePage from "./pages/MentorProfilePage";
 import MentorDashboard from "./pages/MentorDashboard";
 import FundingPage from "./pages/FundingPage";
 import FundingApplicationsPage from "./pages/FundingApplicationsPage";
+import CommunityFeedPage from "./pages/CommunityFeedPage";
+import EventsPage from "./pages/EventsPage";
+import CofounderMatchingPage from "./pages/CofounderMatchingPage";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -121,6 +124,9 @@ const App = () => (
           <Route path="/mentor-dashboard" element={<MentorDashboard />} />
           <Route path="/financement" element={<FundingPage />} />
           <Route path="/candidatures" element={<FundingApplicationsPage />} />
+          <Route path="/feed" element={<CommunityFeedPage />} />
+          <Route path="/evenements" element={<EventsPage />} />
+          <Route path="/cofounders" element={<CofounderMatchingPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -133,6 +133,261 @@ export type Database = {
         }
         Relationships: []
       }
+      cofounder_profiles: {
+        Row: {
+          anonymous_first_contact: boolean
+          bio: string | null
+          commitment: string | null
+          created_at: string
+          has_idea: boolean | null
+          headline: string
+          id: string
+          idea_summary: string | null
+          is_active: boolean
+          linkedin_url: string | null
+          location: string | null
+          present_role: string | null
+          role_seeking: string
+          sector: string | null
+          skills_have: string[] | null
+          skills_need: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          anonymous_first_contact?: boolean
+          bio?: string | null
+          commitment?: string | null
+          created_at?: string
+          has_idea?: boolean | null
+          headline: string
+          id?: string
+          idea_summary?: string | null
+          is_active?: boolean
+          linkedin_url?: string | null
+          location?: string | null
+          present_role?: string | null
+          role_seeking: string
+          sector?: string | null
+          skills_have?: string[] | null
+          skills_need?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          anonymous_first_contact?: boolean
+          bio?: string | null
+          commitment?: string | null
+          created_at?: string
+          has_idea?: boolean | null
+          headline?: string
+          id?: string
+          idea_summary?: string | null
+          is_active?: boolean
+          linkedin_url?: string | null
+          location?: string | null
+          present_role?: string | null
+          role_seeking?: string
+          sector?: string | null
+          skills_have?: string[] | null
+          skills_need?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      community_event_rsvps: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_event_rsvps_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "community_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_events: {
+        Row: {
+          capacity: number | null
+          cover_image: string | null
+          created_at: string
+          description: string | null
+          end_date: string | null
+          event_date: string
+          event_type: string
+          id: string
+          is_published: boolean
+          location: string | null
+          meeting_url: string | null
+          rsvp_count: number
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          capacity?: number | null
+          cover_image?: string | null
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          event_date: string
+          event_type?: string
+          id?: string
+          is_published?: boolean
+          location?: string | null
+          meeting_url?: string | null
+          rsvp_count?: number
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          capacity?: number | null
+          cover_image?: string | null
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          event_date?: string
+          event_type?: string
+          id?: string
+          is_published?: boolean
+          location?: string | null
+          meeting_url?: string | null
+          rsvp_count?: number
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      community_post_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_post_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_post_likes: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_posts: {
+        Row: {
+          category: string | null
+          comments_count: number
+          content: string
+          created_at: string
+          id: string
+          image_url: string | null
+          is_pinned: boolean
+          likes_count: number
+          link_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          comments_count?: number
+          content: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_pinned?: boolean
+          likes_count?: number
+          link_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          comments_count?: number
+          content?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_pinned?: boolean
+          likes_count?: number
+          link_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       data_access_log: {
         Row: {
           access_type: string
@@ -1925,6 +2180,7 @@ export type Database = {
           keywords: string[] | null
           location: string | null
           logo_url: string | null
+          looking_for: string[] | null
           mvp_url: string | null
           name: string
           pitch_deck_url: string | null
@@ -1955,6 +2211,7 @@ export type Database = {
           keywords?: string[] | null
           location?: string | null
           logo_url?: string | null
+          looking_for?: string[] | null
           mvp_url?: string | null
           name: string
           pitch_deck_url?: string | null
@@ -1985,6 +2242,7 @@ export type Database = {
           keywords?: string[] | null
           location?: string | null
           logo_url?: string | null
+          looking_for?: string[] | null
           mvp_url?: string | null
           name?: string
           pitch_deck_url?: string | null

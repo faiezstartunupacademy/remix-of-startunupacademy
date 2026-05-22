@@ -140,12 +140,13 @@ const Header = () => {
               <NavigationMenuContent>
                 <ul className="grid w-[420px] gap-2 p-4">
                   {[
+                    { to: "/feed", icon: "✨", title: "Feed", desc: "Wins, questions, ressources" },
                     { to: "/mentors", icon: "👥", title: "Mentors", desc: "Annuaire & booking" },
-                    { to: "/communaute", icon: "💬", title: "Communauté", desc: "Feed, échanges" },
-                    { to: "/communaute/forum", icon: "🗨️", title: "Forum", desc: "Discussions techniques" },
+                    { to: "/evenements", icon: "📅", title: "Événements", desc: "Pitch days, meetups" },
+                    { to: "/cofounders", icon: "🤝", title: "Co-founders", desc: "Matching binôme" },
+                    { to: "/communaute/forum", icon: "🗨️", title: "Forum", desc: "Discussions" },
                     { to: "/marketplace", icon: "🛍️", title: "Marketplace", desc: "Startups du programme" },
                     { to: "/ecosysteme", icon: "🌐", title: "Écosystème TN", desc: "Acteurs Tunisie" },
-                    { to: "/startups", icon: "🏢", title: "Fondations", desc: "Bases startup" },
                   ].map(it => (
                     <li key={it.to}>
                       <NavigationMenuLink asChild>
