@@ -65,6 +65,8 @@ import CofounderMatchingPage from "./pages/CofounderMatchingPage";
 import LegalCompliancePage from "./pages/LegalCompliancePage";
 import BottomNav from "./components/BottomNav";
 import LanguageSync from "./components/LanguageSync";
+import InstallPwaPrompt from "./components/InstallPwaPrompt";
+import PartnersDirectoryPage from "./pages/PartnersDirectoryPage";
 
 const queryClient = new QueryClient();
 
@@ -134,10 +136,13 @@ const App = () => (
           <Route path="/evenements" element={<EventsPage />} />
           <Route path="/cofounders" element={<CofounderMatchingPage />} />
           <Route path="/profil/conformite" element={<LegalCompliancePage />} />
+          <Route path="/annuaire" element={<PartnersDirectoryPage />} />
+          <Route path="/partenaires" element={<PartnersDirectoryPage />} />
           <Route path="*" element={<NotFound />} />
 
         </Routes>
         <BottomNav />
+        <InstallPwaPrompt />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

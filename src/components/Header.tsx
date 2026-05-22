@@ -147,6 +147,7 @@ const Header = () => {
                     { to: "/communaute/forum", icon: "🗨️", title: "Forum", desc: "Discussions" },
                     { to: "/marketplace", icon: "🛍️", title: "Marketplace", desc: "Startups du programme" },
                     { to: "/ecosysteme", icon: "🌐", title: "Écosystème TN", desc: "Acteurs Tunisie" },
+                    { to: "/annuaire", icon: "🤝", title: "Annuaire Partenaires", desc: "Accélérateurs, VC, institutions" },
                   ].map(it => (
                     <li key={it.to}>
                       <NavigationMenuLink asChild>
