@@ -196,6 +196,11 @@ export default function FundingPage() {
                                   ⚡ {p._score}% match
                                 </Badge>
                               )}
+                              {profile.wilaya && p.target_governorates?.includes(profile.wilaya) && (
+                                <Badge className="bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30">
+                                  📍 {profile.wilaya}
+                                </Badge>
+                              )}
                             </div>
                             <p className="text-xs text-muted-foreground font-medium">{p.organization}</p>
                             <p className="text-sm text-muted-foreground line-clamp-2">{p.description}</p>
