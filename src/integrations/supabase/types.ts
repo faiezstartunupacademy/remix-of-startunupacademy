@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_deletion_requests: {
+        Row: {
+          cancelled_at: string | null
+          completed_at: string | null
+          id: string
+          metadata: Json | null
+          reason: string | null
+          requested_at: string
+          scheduled_deletion_at: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          completed_at?: string | null
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          requested_at?: string
+          scheduled_deletion_at?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          completed_at?: string | null
+          id?: string
+          metadata?: Json | null
+          reason?: string | null
+          requested_at?: string
+          scheduled_deletion_at?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       api_test_logs: {
         Row: {
           created_at: string
@@ -93,6 +129,45 @@ export type Database = {
           reviews_count?: number
           status?: string
           submitted_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      data_access_log: {
+        Row: {
+          access_type: string
+          accessed_by: string | null
+          created_at: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          resource_id: string | null
+          resource_type: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          access_type: string
+          accessed_by?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          access_type?: string
+          accessed_by?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string | null
+          user_agent?: string | null
           user_id?: string
         }
         Relationships: []
@@ -1597,6 +1672,51 @@ export type Database = {
           },
         ]
       }
+      mentoring_sessions: {
+        Row: {
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          meet_link: string | null
+          mentor_email: string | null
+          mentor_name: string
+          notes: string | null
+          scheduled_at: string
+          status: string
+          topic: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          meet_link?: string | null
+          mentor_email?: string | null
+          mentor_name: string
+          notes?: string | null
+          scheduled_at: string
+          status?: string
+          topic?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          meet_link?: string | null
+          mentor_email?: string | null
+          mentor_name?: string
+          notes?: string | null
+          scheduled_at?: string
+          status?: string
+          topic?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       mvp_features: {
         Row: {
           completion_percentage: number
@@ -2155,27 +2275,69 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           created_at: string | null
+          expertise_domain: string | null
           full_name: string | null
           id: string
+          investment_thesis: string | null
+          onboarding_completed: boolean
+          onboarding_step: number
+          phone: string | null
+          problem_statement: string | null
+          program_name: string | null
+          role_type: Database["public"]["Enums"]["user_role_type"] | null
+          startup_name: string | null
+          startup_sector: string | null
+          startup_stage: string | null
+          team_size: number | null
           updated_at: string | null
           user_id: string
+          wilaya: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string | null
+          expertise_domain?: string | null
           full_name?: string | null
           id?: string
+          investment_thesis?: string | null
+          onboarding_completed?: boolean
+          onboarding_step?: number
+          phone?: string | null
+          problem_statement?: string | null
+          program_name?: string | null
+          role_type?: Database["public"]["Enums"]["user_role_type"] | null
+          startup_name?: string | null
+          startup_sector?: string | null
+          startup_stage?: string | null
+          team_size?: number | null
           updated_at?: string | null
           user_id: string
+          wilaya?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string | null
+          expertise_domain?: string | null
           full_name?: string | null
           id?: string
+          investment_thesis?: string | null
+          onboarding_completed?: boolean
+          onboarding_step?: number
+          phone?: string | null
+          problem_statement?: string | null
+          program_name?: string | null
+          role_type?: Database["public"]["Enums"]["user_role_type"] | null
+          startup_name?: string | null
+          startup_sector?: string | null
+          startup_stage?: string | null
+          team_size?: number | null
           updated_at?: string | null
           user_id?: string
+          wilaya?: string | null
         }
         Relationships: []
       }
@@ -2225,6 +2387,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      startup_documents: {
+        Row: {
+          doc_name: string
+          doc_type: string
+          file_size_bytes: number | null
+          file_url: string | null
+          id: string
+          uploaded_at: string
+          user_id: string
+        }
+        Insert: {
+          doc_name: string
+          doc_type: string
+          file_size_bytes?: number | null
+          file_url?: string | null
+          id?: string
+          uploaded_at?: string
+          user_id: string
+        }
+        Update: {
+          doc_name?: string
+          doc_type?: string
+          file_size_bytes?: number | null
+          file_url?: string | null
+          id?: string
+          uploaded_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       startup_private_documents: {
         Row: {
@@ -2662,6 +2854,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      user_role_type: "startuper" | "mentor" | "investor" | "incubator"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2790,6 +2983,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      user_role_type: ["startuper", "mentor", "investor", "incubator"],
     },
   },
 } as const
