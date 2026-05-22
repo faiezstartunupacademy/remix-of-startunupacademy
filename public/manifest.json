@@ -1,0 +1,23 @@
+{
+  "name": "StartUp Academy Plus",
+  "short_name": "SAP",
+  "description": "La plateforme de référence des entrepreneurs tunisiens",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "lang": "fr",
+  "dir": "auto",
+  "categories": ["education", "business", "productivity"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Roadmap", "url": "/roadmap", "description": "Votre feuille de route" },
+    { "name": "Mentors", "url": "/mentors", "description": "Trouver un mentor" },
+    { "name": "Funding", "url": "/funding", "description": "Programmes de financement" }
+  ]
+}
