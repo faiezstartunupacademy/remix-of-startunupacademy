@@ -770,6 +770,199 @@ export type Database = {
         }
         Relationships: []
       }
+      funding_application_events: {
+        Row: {
+          application_id: string
+          created_at: string
+          description: string | null
+          event_type: string
+          id: string
+          metadata: Json | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          application_id: string
+          created_at?: string
+          description?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          application_id?: string
+          created_at?: string
+          description?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "funding_application_events_application_id_fkey"
+            columns: ["application_id"]
+            isOneToOne: false
+            referencedRelation: "funding_applications"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      funding_applications: {
+        Row: {
+          amount_awarded_tnd: number | null
+          amount_requested_tnd: number | null
+          created_at: string
+          custom_program_name: string | null
+          decision_date: string | null
+          documents_ready: boolean | null
+          id: string
+          match_score: number | null
+          next_action: string | null
+          next_action_date: string | null
+          notes: string | null
+          priority: string | null
+          program_id: string | null
+          startup_id: string | null
+          status: string
+          submission_date: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_awarded_tnd?: number | null
+          amount_requested_tnd?: number | null
+          created_at?: string
+          custom_program_name?: string | null
+          decision_date?: string | null
+          documents_ready?: boolean | null
+          id?: string
+          match_score?: number | null
+          next_action?: string | null
+          next_action_date?: string | null
+          notes?: string | null
+          priority?: string | null
+          program_id?: string | null
+          startup_id?: string | null
+          status?: string
+          submission_date?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_awarded_tnd?: number | null
+          amount_requested_tnd?: number | null
+          created_at?: string
+          custom_program_name?: string | null
+          decision_date?: string | null
+          documents_ready?: boolean | null
+          id?: string
+          match_score?: number | null
+          next_action?: string | null
+          next_action_date?: string | null
+          notes?: string | null
+          priority?: string | null
+          program_id?: string | null
+          startup_id?: string | null
+          status?: string
+          submission_date?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "funding_applications_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "funding_programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      funding_programs: {
+        Row: {
+          application_url: string | null
+          benefits: string | null
+          contact_email: string | null
+          country: string
+          created_at: string
+          deadline: string | null
+          description: string | null
+          difficulty: string | null
+          duration_months: number | null
+          eligibility: string | null
+          equity_required: boolean | null
+          id: string
+          is_active: boolean | null
+          is_rolling: boolean | null
+          logo_url: string | null
+          max_amount_tnd: number | null
+          min_amount_tnd: number | null
+          name: string
+          organization: string
+          sectors: string[] | null
+          stages: string[] | null
+          tags: string[] | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          application_url?: string | null
+          benefits?: string | null
+          contact_email?: string | null
+          country?: string
+          created_at?: string
+          deadline?: string | null
+          description?: string | null
+          difficulty?: string | null
+          duration_months?: number | null
+          eligibility?: string | null
+          equity_required?: boolean | null
+          id?: string
+          is_active?: boolean | null
+          is_rolling?: boolean | null
+          logo_url?: string | null
+          max_amount_tnd?: number | null
+          min_amount_tnd?: number | null
+          name: string
+          organization: string
+          sectors?: string[] | null
+          stages?: string[] | null
+          tags?: string[] | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          application_url?: string | null
+          benefits?: string | null
+          contact_email?: string | null
+          country?: string
+          created_at?: string
+          deadline?: string | null
+          description?: string | null
+          difficulty?: string | null
+          duration_months?: number | null
+          eligibility?: string | null
+          equity_required?: boolean | null
+          id?: string
+          is_active?: boolean | null
+          is_rolling?: boolean | null
+          logo_url?: string | null
+          max_amount_tnd?: number | null
+          min_amount_tnd?: number | null
+          name?: string
+          organization?: string
+          sectors?: string[] | null
+          stages?: string[] | null
+          tags?: string[] | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       incubation_activities: {
         Row: {
           activity_type: string

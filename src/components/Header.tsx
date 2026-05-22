@@ -116,6 +116,8 @@ const Header = () => {
                     { to: "/deal-room", icon: "🔐", title: "Deal Room", desc: "Documents sécurisés, INPDP" },
                     { to: "/lean-canvas-lab", icon: "📋", title: "Lean Canvas Lab", desc: "Atelier interactif" },
                     { to: "/market-intelligence", icon: "📊", title: "Market Intelligence", desc: "Analyse marché Tunisie" },
+                    { to: "/financement", icon: "💰", title: "Financement", desc: "Smart Capital, Flat6Labs, VC TN" },
+                    { to: "/candidatures", icon: "📥", title: "Mes Candidatures", desc: "Kanban pipeline" },
                   ].map(it => (
                     <li key={it.to}>
                       <NavigationMenuLink asChild>
