@@ -57,6 +57,8 @@ import DealRoomPage from "./pages/DealRoomPage";
 import MentorsPage from "./pages/MentorsPage";
 import MentorProfilePage from "./pages/MentorProfilePage";
 import MentorDashboard from "./pages/MentorDashboard";
+import FundingPage from "./pages/FundingPage";
+import FundingApplicationsPage from "./pages/FundingApplicationsPage";
 const queryClient = new QueryClient();
 
 const App = () => (
