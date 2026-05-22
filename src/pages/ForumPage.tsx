@@ -189,7 +189,7 @@ const ForumPage = () => {
       if (formationPlan.trim()) insertData.formation_plan = formationPlan.trim();
       insertData.meet_link = meetLink.trim() || generateMeetLink();
     }
-    const { data: threadData, error } = await supabase.from("forum_threads").insert(insertData).select().single();
+    const { data: threadData, error } = await supabase.from("forum_threads").insert(insertData).select("id, title, category").single();
     if (error) {
       toast({ title: "Erreur", description: error.message, variant: "destructive" });
     } else {
