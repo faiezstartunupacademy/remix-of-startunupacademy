@@ -1,0 +1,1 @@
+ALTER VIEW public.regional_equity_stats SET (security_invoker = on);
