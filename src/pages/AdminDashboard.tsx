@@ -4,7 +4,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { 
   Shield, Key, Users, LayoutDashboard, LogOut, 
   Home, Settings, BarChart3, Loader2, Crown,
-  UserCheck, UserX, ChevronDown, Search, ShieldCheck
+  UserCheck, UserX, ChevronDown, Search, ShieldCheck,
+  Briefcase, Kanban, PieChart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
