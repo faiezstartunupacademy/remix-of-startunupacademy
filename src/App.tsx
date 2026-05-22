@@ -59,6 +59,9 @@ import MentorProfilePage from "./pages/MentorProfilePage";
 import MentorDashboard from "./pages/MentorDashboard";
 import FundingPage from "./pages/FundingPage";
 import FundingApplicationsPage from "./pages/FundingApplicationsPage";
+import CommunityFeedPage from "./pages/CommunityFeedPage";
+import EventsPage from "./pages/EventsPage";
+import CofounderMatchingPage from "./pages/CofounderMatchingPage";
 const queryClient = new QueryClient();
 
 const App = () => (
