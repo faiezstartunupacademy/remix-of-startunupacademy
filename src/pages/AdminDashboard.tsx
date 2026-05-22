@@ -40,6 +40,7 @@ import ApplicationsPipeline from "@/components/admin/ApplicationsPipeline";
 import CohortAnalytics from "@/components/admin/CohortAnalytics";
 import LegalVerificationPanel from "@/components/admin/LegalVerificationPanel";
 import RegionalEquityDashboard from "@/components/admin/RegionalEquityDashboard";
+import PartnersAdminManager from "@/components/admin/PartnersAdminManager";
 
 
 interface UserProfile {
@@ -301,6 +302,10 @@ const AdminDashboard = () => {
                 <MapPin className="h-4 w-4" />
                 <span className="hidden lg:inline">Régions</span>
               </TabsTrigger>
+              <TabsTrigger value="partners" className="flex items-center gap-2">
+                <Briefcase className="h-4 w-4" />
+                <span className="hidden lg:inline">Partenaires</span>
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="cohort">
@@ -321,6 +326,10 @@ const AdminDashboard = () => {
 
             <TabsContent value="regional">
               <RegionalEquityDashboard />
+            </TabsContent>
+
+            <TabsContent value="partners">
+              <PartnersAdminManager />
             </TabsContent>
 
 
