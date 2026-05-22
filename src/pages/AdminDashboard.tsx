@@ -5,7 +5,7 @@ import {
   Shield, Key, Users, LayoutDashboard, LogOut, 
   Home, Settings, BarChart3, Loader2, Crown,
   UserCheck, UserX, ChevronDown, Search, ShieldCheck,
-  Briefcase, Kanban, PieChart
+  Briefcase, Kanban, PieChart, MapPin
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +39,7 @@ import FundingProgramsManager from "@/components/admin/FundingProgramsManager";
 import ApplicationsPipeline from "@/components/admin/ApplicationsPipeline";
 import CohortAnalytics from "@/components/admin/CohortAnalytics";
 import LegalVerificationPanel from "@/components/admin/LegalVerificationPanel";
+import RegionalEquityDashboard from "@/components/admin/RegionalEquityDashboard";
 
 
 interface UserProfile {
@@ -296,6 +297,10 @@ const AdminDashboard = () => {
                 <ShieldCheck className="h-4 w-4" />
                 <span className="hidden lg:inline">Startup Act</span>
               </TabsTrigger>
+              <TabsTrigger value="regional" className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                <span className="hidden lg:inline">Régions</span>
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="cohort">
@@ -312,6 +317,10 @@ const AdminDashboard = () => {
 
             <TabsContent value="legal">
               <LegalVerificationPanel />
+            </TabsContent>
+
+            <TabsContent value="regional">
+              <RegionalEquityDashboard />
             </TabsContent>
 
 

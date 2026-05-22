@@ -31,8 +31,7 @@ export const RegionalEquityDashboard = () => {
 
   useEffect(() => {
     (async () => {
-      // @ts-expect-error view not in generated types
-      const { data, error } = await supabase.from("regional_equity_stats").select("*");
+      const { data, error } = await (supabase as any).from("regional_equity_stats").select("*");
       if (!error && data) setRows(data as Row[]);
       setLoading(false);
     })();
