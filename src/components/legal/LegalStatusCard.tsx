@@ -57,7 +57,7 @@ const LegalStatusCard = ({ userId, variant = "full" }: Props) => {
         .eq("user_id", userId)
         .maybeSingle();
       if (!cancelled) {
-        setRow((data as Row) || null);
+        setRow(((data as unknown) as Row) || null);
         setLoading(false);
       }
     })();
