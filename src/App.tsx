@@ -104,6 +104,9 @@ const App = () => (
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/legal/:slug" element={<LegalPage />} />
           <Route path="/profil/consentement" element={<MyConsentPage />} />
+          <Route path="/profil/donnees" element={<DataRightsCenter />} />
+          <Route path="/onboarding" element={<OnboardingPage />} />
+          <Route path="/mission-control" element={<MissionControl />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
