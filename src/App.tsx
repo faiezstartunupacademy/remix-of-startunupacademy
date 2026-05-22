@@ -99,6 +99,8 @@ const App = () => (
           <Route path="/strategic-console/:projectId" element={<StrategicConsolePage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/legal/:slug" element={<LegalPage />} />
+          <Route path="/profil/consentement" element={<MyConsentPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
