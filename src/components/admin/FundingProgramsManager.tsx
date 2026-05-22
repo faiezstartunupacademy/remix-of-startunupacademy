@@ -19,6 +19,8 @@ interface Program {
   type: string;
   sectors: string[] | null;
   stages: string[] | null;
+  target_governorates?: string[] | null;
+  regional_priority?: boolean | null;
   min_amount_tnd: number | null;
   max_amount_tnd: number | null;
   equity_required: boolean | null;
@@ -65,6 +67,9 @@ const FundingProgramsManager = () => {
       ...editing,
       sectors: typeof editing.sectors === "string" ? (editing.sectors as any).split(",").map((s: string) => s.trim()).filter(Boolean) : editing.sectors,
       stages: typeof editing.stages === "string" ? (editing.stages as any).split(",").map((s: string) => s.trim()).filter(Boolean) : editing.stages,
+      target_governorates: typeof editing.target_governorates === "string"
+        ? (editing.target_governorates as any).split(",").map((s: string) => s.trim()).filter(Boolean)
+        : editing.target_governorates,
     } as any;
     const { error } = editing.id
       ? await supabase.from("funding_programs").update(payload).eq("id", editing.id)
@@ -84,7 +89,7 @@ const FundingProgramsManager = () => {
   };
 
   const startEdit = (p: Program) => {
-    setEditing({ ...p, sectors: (p.sectors || []).join(", ") as any, stages: (p.stages || []).join(", ") as any });
+    setEditing({ ...p, sectors: (p.sectors || []).join(", ") as any, stages: (p.stages || []).join(", ") as any, target_governorates: (p.target_governorates || []).join(", ") as any });
     setOpen(true);
   };
 
@@ -122,6 +127,8 @@ const FundingProgramsManager = () => {
                 <div><Label>Montant max (TND)</Label><Input type="number" value={editing.max_amount_tnd || ""} onChange={(e) => setEditing({ ...editing, max_amount_tnd: Number(e.target.value) })} /></div>
                 <div className="col-span-2"><Label>Secteurs (virgules)</Label><Input value={editing.sectors as any || ""} onChange={(e) => setEditing({ ...editing, sectors: e.target.value as any })} placeholder="Fintech, AgriTech, HealthTech" /></div>
                 <div className="col-span-2"><Label>Stages (virgules)</Label><Input value={editing.stages as any || ""} onChange={(e) => setEditing({ ...editing, stages: e.target.value as any })} placeholder="ideation, mvp, growth" /></div>
+                <div className="col-span-2"><Label>Gouvernorats ciblés (virgules, vide = national)</Label><Input value={editing.target_governorates as any || ""} onChange={(e) => setEditing({ ...editing, target_governorates: e.target.value as any })} placeholder="Kasserine, Sidi Bouzid, Gafsa" /></div>
+                <div className="col-span-2 flex items-center gap-2"><Switch checked={!!editing.regional_priority} onCheckedChange={(v) => setEditing({ ...editing, regional_priority: v })} /><Label>Priorité régionale (équité)</Label></div>
                 <div className="col-span-2"><Label>Description</Label><Textarea value={editing.description || ""} onChange={(e) => setEditing({ ...editing, description: e.target.value })} /></div>
                 <div className="col-span-2"><Label>Éligibilité</Label><Textarea value={editing.eligibility || ""} onChange={(e) => setEditing({ ...editing, eligibility: e.target.value })} /></div>
                 <div className="col-span-2"><Label>Bénéfices</Label><Textarea value={editing.benefits || ""} onChange={(e) => setEditing({ ...editing, benefits: e.target.value })} /></div>

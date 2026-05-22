@@ -1158,9 +1158,11 @@ export type Database = {
           min_amount_tnd: number | null
           name: string
           organization: string
+          regional_priority: boolean | null
           sectors: string[] | null
           stages: string[] | null
           tags: string[] | null
+          target_governorates: string[] | null
           type: string
           updated_at: string
         }
@@ -1184,9 +1186,11 @@ export type Database = {
           min_amount_tnd?: number | null
           name: string
           organization: string
+          regional_priority?: boolean | null
           sectors?: string[] | null
           stages?: string[] | null
           tags?: string[] | null
+          target_governorates?: string[] | null
           type: string
           updated_at?: string
         }
@@ -1210,9 +1214,11 @@ export type Database = {
           min_amount_tnd?: number | null
           name?: string
           organization?: string
+          regional_priority?: boolean | null
           sectors?: string[] | null
           stages?: string[] | null
           tags?: string[] | null
+          target_governorates?: string[] | null
           type?: string
           updated_at?: string
         }
@@ -1315,6 +1321,7 @@ export type Database = {
           current_step: number | null
           description: string | null
           differentiator: string | null
+          governorate: string | null
           has_revenue: boolean | null
           has_users: boolean | null
           id: string
@@ -1341,6 +1348,7 @@ export type Database = {
           current_step?: number | null
           description?: string | null
           differentiator?: string | null
+          governorate?: string | null
           has_revenue?: boolean | null
           has_users?: boolean | null
           id?: string
@@ -1367,6 +1375,7 @@ export type Database = {
           current_step?: number | null
           description?: string | null
           differentiator?: string | null
+          governorate?: string | null
           has_revenue?: boolean | null
           has_users?: boolean | null
           id?: string
@@ -3733,7 +3742,16 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      regional_equity_stats: {
+        Row: {
+          governorate: string | null
+          projects_count: number | null
+          startups_count: number | null
+          targeted_programs_count: number | null
+          users_count: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_quiz_questions_safe: {

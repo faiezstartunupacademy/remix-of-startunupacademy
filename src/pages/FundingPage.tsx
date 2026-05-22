@@ -31,17 +31,24 @@ function fmtTND(n: number | null | undefined) {
   return `${n} TND`;
 }
 
-function computeMatchScore(program: any, profile: { stage?: string; sector?: string }) {
-  if (!profile?.stage && !profile?.sector) return null;
+function computeMatchScore(program: any, profile: { stage?: string; sector?: string; wilaya?: string }) {
+  if (!profile?.stage && !profile?.sector && !profile?.wilaya) return null;
   let score = 50;
   if (profile.stage && program.stages?.includes(profile.stage)) score += 25;
   if (profile.sector && (program.sectors?.length === 0 || program.sectors?.includes(profile.sector))) score += 15;
+  // Regional targeting bonus
+  if (profile.wilaya) {
+    const targets: string[] | null = program.target_governorates || null;
+    if (!targets || targets.length === 0) score += 2; // national programs
+    else if (targets.includes(profile.wilaya)) score += 15 + (program.regional_priority ? 5 : 0);
+    else score -= 10; // explicitly excludes user's region
+  }
   if (program.is_active) score += 5;
   if (program.deadline) {
     const days = (new Date(program.deadline).getTime() - Date.now()) / 86400000;
     if (days > 0 && days < 60) score += 5;
   }
-  return Math.min(100, score);
+  return Math.max(0, Math.min(100, score));
 }
 
 export default function FundingPage() {
@@ -52,7 +59,7 @@ export default function FundingPage() {
   const [filterStage, setFilterStage] = useState<string[]>([]);
   const [tab, setTab] = useState("all");
   const [userId, setUserId] = useState<string | null>(null);
-  const [profile, setProfile] = useState<{ stage?: string; sector?: string }>({});
+  const [profile, setProfile] = useState<{ stage?: string; sector?: string; wilaya?: string }>({});
   const [savingId, setSavingId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -63,10 +70,15 @@ export default function FundingPage() {
       setPrograms(data || []);
 
       if (u.user?.id) {
-        const { data: proj } = await supabase
-          .from("incubation_projects").select("stage,sector")
-          .eq("user_id", u.user.id).limit(1).maybeSingle();
-        if (proj) setProfile({ stage: proj.stage || undefined, sector: proj.sector || undefined });
+        const [{ data: proj }, { data: prof }] = await Promise.all([
+          supabase.from("incubation_projects").select("stage,sector,governorate").eq("user_id", u.user.id).limit(1).maybeSingle(),
+          supabase.from("profiles").select("wilaya").eq("user_id", u.user.id).maybeSingle(),
+        ]);
+        setProfile({
+          stage: proj?.stage || undefined,
+          sector: proj?.sector || undefined,
+          wilaya: (proj as any)?.governorate || prof?.wilaya || undefined,
+        });
       }
       setLoading(false);
     })();
@@ -118,12 +130,14 @@ export default function FundingPage() {
           </div>
         </motion.div>
 
-        {profile.stage && (
-          <Card className="p-4 bg-primary/5 border-primary/20 flex items-center gap-3">
+        {(profile.stage || profile.wilaya) && (
+          <Card className="p-4 bg-primary/5 border-primary/20 flex items-center gap-3 flex-wrap">
             <Sparkles className="h-5 w-5 text-primary" />
             <p className="text-sm">
-              Matching basé sur votre projet — Stage: <Badge variant="outline">{profile.stage}</Badge>
+              Matching basé sur votre profil
+              {profile.stage && <> — Stage: <Badge variant="outline">{profile.stage}</Badge></>}
               {profile.sector && <> · Secteur: <Badge variant="outline">{profile.sector}</Badge></>}
+              {profile.wilaya && <> · Région: <Badge variant="outline">{profile.wilaya}</Badge></>}
             </p>
           </Card>
         )}
@@ -180,6 +194,11 @@ export default function FundingPage() {
                               {p._score !== null && p._score >= 70 && (
                                 <Badge className="bg-green-500/15 text-green-600 dark:text-green-400 border-green-500/30">
                                   ⚡ {p._score}% match
+                                </Badge>
+                              )}
+                              {profile.wilaya && p.target_governorates?.includes(profile.wilaya) && (
+                                <Badge className="bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30">
+                                  📍 {profile.wilaya}
                                 </Badge>
                               )}
                             </div>
