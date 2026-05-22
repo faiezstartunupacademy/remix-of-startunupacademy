@@ -1,49 +1,61 @@
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Globe } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-const languages = [
-  { code: "fr", label: "Français" },
-  { code: "en", label: "English" },
-  { code: "ar", label: "العربية" },
-];
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 
 const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
+  const { user } = useAuth();
+  const current = i18n.language.startsWith("ar") ? "ar" : "fr";
 
-  const changeLang = (lang: string) => {
-    i18n.changeLanguage(lang);
+  const setLang = async (lang: "fr" | "ar") => {
+    if (lang === current) return;
+    await i18n.changeLanguage(lang);
     localStorage.setItem("lang", lang);
-    document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
-    document.documentElement.lang = lang;
+    if (user) {
+      // Persist preference silently — non-blocking
+      supabase
+        .from("profiles")
+        .update({ preferred_language: lang })
+        .eq("user_id", user.id)
+        .then(() => {});
+    }
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="rounded-full h-9 px-3 gap-1.5">
-          <Globe className="h-4 w-4" />
-          <span className="text-xs font-medium uppercase">{i18n.language}</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        {languages.map((lang) => (
-          <DropdownMenuItem
-            key={lang.code}
-            onClick={() => changeLang(lang.code)}
-            className={i18n.language === lang.code ? "bg-accent" : ""}
-          >
-            {lang.label}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div
+      className="inline-flex items-center rounded-full border border-border bg-background/60 backdrop-blur p-0.5 text-xs font-semibold"
+      role="group"
+      aria-label="Language switcher"
+    >
+      <button
+        type="button"
+        onClick={() => setLang("fr")}
+        className={cn(
+          "px-2.5 h-7 rounded-full transition-colors",
+          current === "fr"
+            ? "bg-primary text-primary-foreground shadow-sm"
+            : "text-muted-foreground hover:text-foreground"
+        )}
+        aria-pressed={current === "fr"}
+      >
+        FR
+      </button>
+      <button
+        type="button"
+        onClick={() => setLang("ar")}
+        className={cn(
+          "px-2.5 h-7 rounded-full transition-colors font-arabic text-sm",
+          current === "ar"
+            ? "bg-primary text-primary-foreground shadow-sm"
+            : "text-muted-foreground hover:text-foreground"
+        )}
+        aria-pressed={current === "ar"}
+      >
+        عر
+      </button>
+    </div>
   );
 };
 
