@@ -52,6 +52,8 @@ import CookieConsentBanner from "./components/legal/CookieConsentBanner";
 import DataRightsCenter from "./pages/DataRightsCenter";
 import OnboardingPage from "./pages/OnboardingPage";
 import MissionControl from "./pages/MissionControl";
+import RoadmapPage from "./pages/RoadmapPage";
+import DealRoomPage from "./pages/DealRoomPage";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -107,6 +109,8 @@ const App = () => (
           <Route path="/profil/donnees" element={<DataRightsCenter />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/mission-control" element={<MissionControl />} />
+          <Route path="/roadmap" element={<RoadmapPage />} />
+          <Route path="/deal-room" element={<DealRoomPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

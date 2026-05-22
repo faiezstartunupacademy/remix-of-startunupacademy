@@ -1,67 +1,67 @@
-## Plan — 3 chantiers à enchaîner
+# Plan — Roadmap Startup + Deal Room
 
-### Chantier A — Lot 2 RGPD/INPDP (Centre des droits)
-**DB**: 
-- `data_access_log` (user_id, accessed_by, access_type, resource_type, ip, ua, created_at) + RLS (user voit le sien, admin voit tout)
-- `account_deletion_requests` (user_id, reason, status, requested_at, scheduled_deletion_at +30j, confirmed_at)
-- Trigger `log_data_access()` optionnel sur tables sensibles
+Deux chantiers livrés en 1 migration unique, puis UI.
 
-**Edge functions**:
-- `export-user-data` → agrège profiles, incubation_projects, mvp_validator_projects, marketplace_*, consentements → renvoie ZIP JSON
-- `request-account-deletion` → crée demande, envoie mail confirmation, soft-flag profile
+## Chantier A — Roadmap interactif 5 phases
 
-**Frontend**: `/profil/donnees` (DataRightsCenter.tsx) avec 4 sections : télécharger mes données, supprimer mon compte (modal confirmation), journal d'accès (90j), info rétention.
+### Base de données (1 table)
+- `startup_journey_progress` : `user_id`, `phase_id` (1-5), `milestone_id` (text), `completed`, `completed_at`, `metadata jsonb`
+  - Unique (user_id, phase_id, milestone_id)
+  - RLS : user gère ses lignes, admin lit tout
 
----
+### Frontend (`/roadmap`)
+- `RoadmapPage.tsx` : timeline horizontale scrollable (overflow-x), 5 `PhaseCard` côte à côte
+- Phases avec gradients sémantiques (purple→blue→green→orange→gold) définis dans `index.css`
+- Chaque phase : icône emoji, titre, % progression (barre), liste milestones cochables, badge Locked/Unlocked
+- Logique unlock : phase N+1 déverrouillée quand phase N à 100%
+- `framer-motion` pour transitions cartes + `canvas-confetti` au passage 100% d'une phase
+- Données milestones/outils définis en constante locale (FR), pas en base
+- Liens "Tools" vers routes existantes (BMC builder, pitch deck, KPI tracker) ou placeholders
 
-### Chantier B — Onboarding rôle-based
-**DB**:
-- Ajouter à `profiles`: `role_type` ('startuper'|'mentor'|'investor'|'incubator'), `onboarding_completed` bool, `onboarding_step` int, `wilaya`, `team_size`, `problem_statement`, `startup_name`, `startup_sector`, `startup_stage`, `expertise_domain`, `investment_thesis`, `program_name`
-- Trigger handle_new_user déjà existant — pas de modif
+### Contenu phases
+1. **Idéation** 💡 — validation problème, BMC, étude marché, concurrence
+2. **Pré-incubation** 🛠️ — MVP, équipe, structure légale (SUARL/SA/Startup Act), interviews
+3. **Incubation** 🚀 — PMF, premier CA, 8 mentor sessions, KPI dashboard, deck investisseur
+4. **Accélération** ⚡ — scale équipe, Series A, export, partenariats CEPEX
+5. **Alumni & Impact** 🌟 — contribution, mentoring junior, levée complétée
 
-**Frontend**:
-- `RoleSelectionScreen.tsx` — 4 cartes animées (Framer Motion), gradients, hover scale
-- `OnboardingWizard.tsx` orchestrateur avec progress bar
-- `StartuperProfileForm.tsx` (nom, secteur dropdown 7 secteurs prio, stage, 24 wilayas, team size, problème)
-- `MentorProfileForm.tsx`, `InvestorProfileForm.tsx`, `IncubatorProfileForm.tsx` (versions simples)
-- Route `/onboarding` — redirect après signup si `onboarding_completed=false`
-- Google OAuth via `lovable.auth.signInWithOAuth("google")` ajouté à AuthPage
+## Chantier B — Deal Room sécurisé
 
----
+### Base de données
+- Bucket Storage `deal-room-documents` (privé, signed URLs uniquement)
+- Table `deal_room_documents` : `user_id`, `startup_id` (nullable), `category` (financials/legal/pitch/team/traction), `name`, `file_path`, `file_size`, `mime_type`, `visibility` (private/program/investor), `status` (draft/complete/verified), `expires_at`, `allow_download`, `watermark_enabled`, `nda_required`
+- Table `deal_room_access_log` : `document_id`, `viewer_id`, `viewer_email`, `ip_address`, `user_agent`, `action` (view/download), `created_at`
+- Table `deal_room_nda_acceptances` : `document_id`, `user_id`, `accepted_at`, `ip_address`
+- Table `deal_room_share_links` : `document_id`, `token` (unique), `password_hash` (nullable), `expires_at`, `created_by`
+- RLS strictes :
+  - `deal_room_documents` SELECT : owner OR (visibility='investor' AND has_role('investor')) OR (visibility='program' AND has_role('admin'))
+  - Log accès en INSERT-only pour utilisateurs ayant droit de vue
+  - Storage policies : seul owner upload/delete, lecture via signed URL côté Edge Function
 
-### Chantier C — Mission Control Dashboard
-**Route**: `/mission-control` (réservé `role_type='startuper'`)
+### Edge Functions
+- `dealroom-signed-url` : vérifie droits, log accès, retourne signed URL (60s), applique watermark si PDF
+- `dealroom-share-link` : valide token + password + expiry, log accès anonyme
 
-**Composants**:
-- `MissionControl.tsx` — layout sidebar + main (utilise shadcn sidebar)
-- `MissionControlSidebar.tsx` — 8 liens icônes (Parcours, Dossier, Programmes, Équipe, Mentorat, Financement, Alumni, Paramètres)
-- `HealthScoreGauge.tsx` — Recharts RadialBarChart 0-100, calcul côté client à partir de :
-  - profil complet, programmes, sessions mentorat, milestones, docs
-- `NextStepCard.tsx` — CTA prochaine action (heuristique selon health score)
-- `ProgramProgressTimeline.tsx` — barre + milestones
-- `UpcomingSessionsWidget.tsx` — calendrier sessions (table à créer : `mentoring_sessions`)
-- `NotificationsFeed.tsx` — réutilise NotificationBell data
-- `RecommendedResources.tsx` — selon `startup_stage`
+### Frontend (`/deal-room`)
+- `DealRoomPage.tsx` : layout Notion/Dropbox-like
+  - Sidebar catégories (5 icônes)
+  - Zone principale : drag-drop upload (`react-dropzone` déjà ou input natif), grille fichiers
+  - Carte document : preview, badge statut, toggle visibilité (3 options), menu actions (partage, expiration, NDA, watermark, supprimer)
+  - Modal "Qui a consulté" : table logs (viewer, action, date, IP)
+  - Modal "Générer lien" : password optionnel, expiry, copie 2 clics
+- Vue investor/program : filtrage automatique selon `has_role`, bouton download masqué si `allow_download=false`
 
-**Tables nouvelles** (minimales) :
-- `mentoring_sessions` (user_id, mentor_name, scheduled_at, status, meet_link)
-- `startup_documents` (user_id, doc_type, file_url, uploaded_at)
+## Ordre d'exécution
+1. **Migration unique** (table roadmap + 4 tables deal room + bucket + RLS + policies storage)
+2. **Edge functions** dealroom (signed URL + share link)
+3. **UI Roadmap** (1 page + composants PhaseCard)
+4. **UI Deal Room** (page + composants Upload/DocCard/AccessLog/ShareLink)
+5. Ajout routes dans `App.tsx` + liens depuis Mission Control sidebar
+6. Mise à jour `mem://index.md` (nouvelle feature)
 
-Health score = somme pondérée des 5 critères, calculé à la volée via queries Supabase.
-
-Animations Framer Motion : entrée des cartes en stagger, gauge animée.
-
----
-
-### Ordre d'exécution
-1. **Migration unique** regroupant : data_access_log + account_deletion_requests + profile fields + mentoring_sessions + startup_documents (RLS strict partout)
-2. Edge functions Lot 2
-3. UI Lot 2 (`/profil/donnees`)
-4. Onboarding wizard + Google OAuth
-5. Mission Control dashboard + sidebar
-
-### Points à confirmer avant de coder
-- OK pour migration unique (vs 3 séparées) ?
-- Mission Control : OK de créer `mentoring_sessions` et `startup_documents` vides (l'utilisateur les remplira) ?
-- Onboarding : si user existant déjà inscrit (sans `role_type`), on le force à passer par `/onboarding` au prochain login ?
-- Google OAuth : j'utilise la solution managée Lovable Cloud (par défaut, aucune config requise) ?
+## Décisions par défaut (sans questions bloquantes)
+- Roadmap accessible à tous les utilisateurs connectés (pas seulement startupers)
+- Deal Room réservé aux `role_type='startuper'` (rédaction) ; investisseurs/admins en lecture filtrée
+- Watermark : overlay client-side sur preview PDF (pas de re-stamping serveur du PDF — performance) ; mention nom/email visible
+- Confetti via `canvas-confetti` (lib légère ~2kB)
+- Pas de notification email lors d'un accès (peut être ajouté plus tard)
