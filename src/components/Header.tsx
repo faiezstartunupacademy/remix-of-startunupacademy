@@ -75,195 +75,149 @@ const Header = () => {
           />
         </Link>
 
-        {/* Desktop Navigation */}
-        <NavigationMenu className="hidden lg:flex ml-4">
-          <NavigationMenuList className="gap-2">
+        {/* Desktop Navigation - Megamenu compact 4 groupes */}
+        <NavigationMenu className="hidden lg:flex flex-1 justify-center">
+          <NavigationMenuList className="gap-1">
+            {/* Apprendre */}
             <NavigationMenuItem>
-              <Link
-                to="/startups"
-                className={cn(
-                  "group inline-flex h-11 w-max items-center justify-center rounded-full px-5 py-2 text-sm font-medium transition-all duration-300 border",
-                  location.pathname === "/startups" 
-                    ? "bg-gradient-to-r from-blue-500/20 to-indigo-500/20 text-blue-600 border-blue-500/30" 
-                    : "hover:bg-blue-500/10 border-transparent hover:border-blue-500/20"
-                )}
-              >
-                <Building2 className="mr-2 h-4 w-4" />
-                {t("nav.foundations")}
-              </Link>
-            </NavigationMenuItem>
-
-            <NavigationMenuItem>
-              <Link
-                to="/ecosysteme"
-                className={cn(
-                  "group inline-flex h-11 w-max items-center justify-center rounded-full px-5 py-2 text-sm font-medium transition-all duration-300 border",
-                  location.pathname === "/ecosysteme" 
-                    ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-600 border-emerald-500/30" 
-                    : "hover:bg-emerald-500/10 border-transparent hover:border-emerald-500/20"
-                )}
-              >
-                <Users className="mr-2 h-4 w-4" />
-                {t("nav.ecosystem")}
-              </Link>
-            </NavigationMenuItem>
-
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className="bg-gradient-to-r from-primary/10 to-purple-500/10 hover:from-primary/20 hover:to-purple-500/20 data-[state=open]:from-primary/20 data-[state=open]:to-purple-500/20 h-11 px-5 gap-2 rounded-full font-medium transition-all border border-primary/20">
-                <BookOpen className="h-4 w-4 text-primary" />
-                <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent font-semibold">{t("nav.formation")}</span>
+              <NavigationMenuTrigger className="h-10 px-3 rounded-full text-sm">
+                <BookOpen className="h-4 w-4 mr-1.5" /> Apprendre
               </NavigationMenuTrigger>
               <NavigationMenuContent>
-                <motion.ul 
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="grid w-[550px] gap-3 p-5 md:w-[700px] md:grid-cols-2"
-                >
-                  {formationItems.map((item, index) => (
-                    <motion.li 
-                      key={item.href}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                    >
+                <ul className="grid w-[600px] gap-2 p-4 md:grid-cols-2">
+                  {formationItems.map(item => (
+                    <li key={item.href}>
                       <NavigationMenuLink asChild>
-                        <Link
-                          to={item.href}
-                          className={cn(
-                            "block select-none space-y-1 rounded-2xl p-4 leading-none no-underline outline-none transition-all duration-300 relative",
-                            `bg-gradient-to-br ${item.color} hover:shadow-lg hover:scale-[1.02]`,
-                            location.pathname === item.href && "ring-2 ring-primary shadow-lg"
-                          )}
-                        >
-                          {'isNew' in item && item.isNew && (
-                            <span className="absolute top-2 right-2 px-2 py-0.5 bg-rose-500 text-white text-[10px] font-bold rounded-full">
-                              NEW
-                            </span>
-                          )}
-                          <div className="flex items-center gap-4">
-                            <span className="text-3xl">{item.icon}</span>
-                            <div>
-                              <div className="text-sm font-bold leading-none mb-1">{item.title}</div>
-                              <p className="line-clamp-2 text-xs leading-snug text-muted-foreground">
-                                {item.description}
-                              </p>
-                            </div>
+                        <Link to={item.href} className={cn("flex items-center gap-3 rounded-xl p-3 transition", `bg-gradient-to-br ${item.color}`, "hover:scale-[1.02]")}>
+                          <span className="text-2xl">{item.icon}</span>
+                          <div className="min-w-0">
+                            <div className="text-sm font-semibold truncate">{item.title}</div>
+                            <p className="text-xs text-muted-foreground line-clamp-1">{item.description}</p>
                           </div>
                         </Link>
                       </NavigationMenuLink>
-                    </motion.li>
+                    </li>
                   ))}
-                </motion.ul>
+                </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
 
+            {/* Construire */}
             <NavigationMenuItem>
-              <Link
-                to="/communaute"
-                className={cn(
-                  "group inline-flex h-11 w-max items-center justify-center rounded-full px-5 py-2 text-sm font-medium transition-all duration-300 border",
-                  location.pathname.startsWith("/communaute")
-                    ? "bg-gradient-to-r from-violet-500/20 to-purple-500/20 text-violet-600 border-violet-500/30" 
-                    : "hover:bg-violet-500/10 border-transparent hover:border-violet-500/20"
-                )}
-              >
-                <Users className="mr-2 h-4 w-4" />
-                {t("nav.community")}
-              </Link>
+              <NavigationMenuTrigger className="h-10 px-3 rounded-full text-sm">
+                <Rocket className="h-4 w-4 mr-1.5" /> Construire
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid w-[420px] gap-2 p-4">
+                  {[
+                    { to: "/pole-strategique", icon: "🎯", title: "Pôle Stratégique", desc: "Validation MVP, incubation 7 étapes" },
+                    { to: "/roadmap", icon: "🗺️", title: "Mon Parcours", desc: "Roadmap gamifié 5 phases" },
+                    { to: "/mission-control", icon: "🚀", title: "Mission Control", desc: "Dashboard startup, health score" },
+                    { to: "/deal-room", icon: "🔐", title: "Deal Room", desc: "Documents sécurisés, INPDP" },
+                    { to: "/lean-canvas-lab", icon: "📋", title: "Lean Canvas Lab", desc: "Atelier interactif" },
+                    { to: "/market-intelligence", icon: "📊", title: "Market Intelligence", desc: "Analyse marché Tunisie" },
+                  ].map(it => (
+                    <li key={it.to}>
+                      <NavigationMenuLink asChild>
+                        <Link to={it.to} className="flex items-center gap-3 rounded-xl p-3 hover:bg-muted transition">
+                          <span className="text-2xl">{it.icon}</span>
+                          <div><div className="text-sm font-semibold">{it.title}</div><p className="text-xs text-muted-foreground">{it.desc}</p></div>
+                        </Link>
+                      </NavigationMenuLink>
+                    </li>
+                  ))}
+                </ul>
+              </NavigationMenuContent>
             </NavigationMenuItem>
 
+            {/* Communauté */}
             <NavigationMenuItem>
-              <Link
-                to="/marketplace"
-                className={cn(
-                  "group inline-flex h-11 w-max items-center justify-center rounded-full px-5 py-2 text-sm font-medium transition-all duration-300 border",
-                  location.pathname.startsWith("/marketplace")
-                    ? "bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-600 border-emerald-500/30" 
-                    : "hover:bg-emerald-500/10 border-transparent hover:border-emerald-500/20"
-                )}
-              >
-                <Rocket className="mr-2 h-4 w-4" />
-                Marketplace
-              </Link>
+              <NavigationMenuTrigger className="h-10 px-3 rounded-full text-sm">
+                <Users className="h-4 w-4 mr-1.5" /> Communauté
+              </NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid w-[420px] gap-2 p-4">
+                  {[
+                    { to: "/mentors", icon: "👥", title: "Mentors", desc: "Annuaire & booking" },
+                    { to: "/communaute", icon: "💬", title: "Communauté", desc: "Feed, échanges" },
+                    { to: "/communaute/forum", icon: "🗨️", title: "Forum", desc: "Discussions techniques" },
+                    { to: "/marketplace", icon: "🛍️", title: "Marketplace", desc: "Startups du programme" },
+                    { to: "/ecosysteme", icon: "🌐", title: "Écosystème TN", desc: "Acteurs Tunisie" },
+                    { to: "/startups", icon: "🏢", title: "Fondations", desc: "Bases startup" },
+                  ].map(it => (
+                    <li key={it.to}>
+                      <NavigationMenuLink asChild>
+                        <Link to={it.to} className="flex items-center gap-3 rounded-xl p-3 hover:bg-muted transition">
+                          <span className="text-2xl">{it.icon}</span>
+                          <div><div className="text-sm font-semibold">{it.title}</div><p className="text-xs text-muted-foreground">{it.desc}</p></div>
+                        </Link>
+                      </NavigationMenuLink>
+                    </li>
+                  ))}
+                </ul>
+              </NavigationMenuContent>
             </NavigationMenuItem>
+
+            {/* Mon Compte */}
+            {user && (
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="h-10 px-3 rounded-full text-sm">
+                  <Brain className="h-4 w-4 mr-1.5" /> Mon Compte
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-[320px] gap-2 p-4">
+                    {[
+                      { to: "/mentor-dashboard", icon: "🎓", title: "Espace Mentor" },
+                      { to: "/profil/donnees", icon: "🛡️", title: "Mes Données (RGPD)" },
+                      { to: "/profil/consentement", icon: "✅", title: "Mon Consentement" },
+                      { to: "/onboarding", icon: "🧭", title: "Mon Profil" },
+                    ].map(it => (
+                      <li key={it.to}>
+                        <NavigationMenuLink asChild>
+                          <Link to={it.to} className="flex items-center gap-3 rounded-xl p-3 hover:bg-muted transition">
+                            <span className="text-xl">{it.icon}</span>
+                            <span className="text-sm font-medium">{it.title}</span>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    ))}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            )}
           </NavigationMenuList>
         </NavigationMenu>
 
+
         {/* Right Actions */}
-        <div className="hidden lg:flex items-center gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-full h-11 px-4 gap-2 text-muted-foreground"
-            onClick={() => setSearchOpen(true)}
-          >
+        <div className="hidden lg:flex items-center gap-1.5 shrink-0">
+          <Button variant="ghost" size="icon" className="rounded-full h-9 w-9" onClick={() => setSearchOpen(true)} title="Recherche (⌘K)">
             <Search className="h-4 w-4" />
-            <span className="text-sm">{t("nav.search")}</span>
-            <kbd className="hidden xl:inline-flex h-5 items-center gap-0.5 rounded border bg-muted px-1.5 text-[10px] font-medium text-muted-foreground">
-              ⌘K
-            </kbd>
           </Button>
           <NotificationBell />
+          <LanguageSwitcher />
+          <Button variant="ghost" size="icon" onClick={toggleDarkMode} className="rounded-full h-9 w-9">
+            {isDark ? <Sun className="h-4 w-4 text-amber-500" /> : <Moon className="h-4 w-4" />}
+          </Button>
           {user ? (
             <>
-              <LanguageSwitcher />
               <MfaSetup />
-              <span className="text-sm text-muted-foreground truncate max-w-[120px]">{user.email}</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="rounded-full h-11 px-4 hover:bg-destructive/10 text-destructive"
-                onClick={signOut}
-              >
-                <LogIn className="mr-2 h-4 w-4" />
-                {t("nav.logout")}
+              <Button variant="ghost" size="sm" className="rounded-full h-9 px-3 text-destructive" onClick={signOut} title={user.email || ""}>
+                <LogIn className="h-4 w-4" />
               </Button>
             </>
           ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="rounded-full h-11 px-4 hover:bg-primary/10"
-              asChild
-            >
-              <Link to="/auth">
-                <LogIn className="mr-2 h-4 w-4" />
-                {t("nav.login")}
-              </Link>
+            <Button variant="default" size="sm" className="rounded-full h-9 px-4" asChild>
+              <Link to="/auth"><LogIn className="mr-1.5 h-4 w-4" />{t("nav.login")}</Link>
             </Button>
           )}
           {isAdmin && (
-            <Button
-              variant="default"
-              size="sm"
-              className="rounded-full h-11 px-5 bg-red-600 hover:bg-red-700 text-white font-bold shadow-lg shadow-red-500/25 animate-pulse-slow border-0"
-              asChild
-            >
-              <Link to="/admin">
-                <Shield className="mr-2 h-4 w-4" />
-                Admin
-              </Link>
+            <Button variant="default" size="sm" className="rounded-full h-9 px-3 bg-red-600 hover:bg-red-700 text-white font-semibold border-0" asChild>
+              <Link to="/admin"><Shield className="h-4 w-4" /></Link>
             </Button>
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleDarkMode}
-            className="rounded-full h-11 w-11 hover:bg-primary/10"
-          >
-            <AnimatePresence mode="wait">
-              {isDark ? (
-                <motion.div key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                  <Sun className="h-5 w-5 text-amber-500" />
-                </motion.div>
-              ) : (
-                <motion.div key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                  <Moon className="h-5 w-5" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </Button>
         </div>
+
 
         {/* Mobile Menu Button */}
         <div className="flex items-center gap-3 lg:hidden">

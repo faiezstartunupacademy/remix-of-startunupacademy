@@ -54,6 +54,9 @@ import OnboardingPage from "./pages/OnboardingPage";
 import MissionControl from "./pages/MissionControl";
 import RoadmapPage from "./pages/RoadmapPage";
 import DealRoomPage from "./pages/DealRoomPage";
+import MentorsPage from "./pages/MentorsPage";
+import MentorProfilePage from "./pages/MentorProfilePage";
+import MentorDashboard from "./pages/MentorDashboard";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -111,6 +114,9 @@ const App = () => (
           <Route path="/mission-control" element={<MissionControl />} />
           <Route path="/roadmap" element={<RoadmapPage />} />
           <Route path="/deal-room" element={<DealRoomPage />} />
+          <Route path="/mentors" element={<MentorsPage />} />
+          <Route path="/mentors/:id" element={<MentorProfilePage />} />
+          <Route path="/mentor-dashboard" element={<MentorDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
