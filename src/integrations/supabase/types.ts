@@ -634,6 +634,69 @@ export type Database = {
           },
         ]
       }
+      ecosystem_partners: {
+        Row: {
+          active_programs_count: number | null
+          claimed_at: string | null
+          claimed_by: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string | null
+          description: string | null
+          governorate: string | null
+          id: string
+          is_published: boolean | null
+          is_verified: boolean | null
+          logo_url: string | null
+          name: string
+          partner_type: string
+          sectors: string[] | null
+          slug: string
+          updated_at: string | null
+          website: string | null
+        }
+        Insert: {
+          active_programs_count?: number | null
+          claimed_at?: string | null
+          claimed_by?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description?: string | null
+          governorate?: string | null
+          id?: string
+          is_published?: boolean | null
+          is_verified?: boolean | null
+          logo_url?: string | null
+          name: string
+          partner_type: string
+          sectors?: string[] | null
+          slug: string
+          updated_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          active_programs_count?: number | null
+          claimed_at?: string | null
+          claimed_by?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          description?: string | null
+          governorate?: string | null
+          id?: string
+          is_published?: boolean | null
+          is_verified?: boolean | null
+          logo_url?: string | null
+          name?: string
+          partner_type?: string
+          sectors?: string[] | null
+          slug?: string
+          updated_at?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       formation_completions: {
         Row: {
           access_level: string
@@ -3068,6 +3131,35 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      partner_followers: {
+        Row: {
+          created_at: string | null
+          id: string
+          partner_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          partner_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          partner_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_followers_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "ecosystem_partners"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       peer_reviews: {
         Row: {
