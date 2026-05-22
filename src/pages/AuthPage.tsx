@@ -99,9 +99,14 @@ const AuthPage = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm(true)) return;
+    if (!acceptTerms || !acceptDataProcessing) {
+      setConsentError("Vous devez accepter les CGU, la politique de confidentialité et le traitement de vos données pour créer un compte.");
+      return;
+    }
+    setConsentError(null);
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: email.trim(), password,
         options: { emailRedirectTo: `${window.location.origin}/`, data: { full_name: name.trim() } },
       });
@@ -112,6 +117,20 @@ const AuthPage = () => {
           toast({ title: t("common.error"), description: error.message, variant: "destructive" });
         }
       } else {
+        // Record explicit consents
+        const userId = data.user?.id;
+        if (userId) {
+          const now = new Date().toISOString();
+          const ua = navigator.userAgent;
+          await supabase.from("user_consents").upsert(
+            [
+              { user_id: userId, consent_type: "terms", granted: true, version: "1.0", granted_at: now, user_agent: ua },
+              { user_id: userId, consent_type: "privacy", granted: true, version: "1.0", granted_at: now, user_agent: ua },
+              { user_id: userId, consent_type: "data_processing", granted: true, version: "1.0", granted_at: now, user_agent: ua },
+            ],
+            { onConflict: "user_id,consent_type" },
+          );
+        }
         toast({ title: t("auth.accountCreated"), description: t("auth.accountCreatedDesc") });
         setActiveTab("login");
       }
