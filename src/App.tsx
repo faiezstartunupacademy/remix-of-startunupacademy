@@ -62,6 +62,8 @@ import FundingApplicationsPage from "./pages/FundingApplicationsPage";
 import CommunityFeedPage from "./pages/CommunityFeedPage";
 import EventsPage from "./pages/EventsPage";
 import CofounderMatchingPage from "./pages/CofounderMatchingPage";
+import BottomNav from "./components/BottomNav";
+import LanguageSync from "./components/LanguageSync";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -70,9 +72,11 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <LanguageSync />
         <WelcomeVideoModal />
         <CookieConsentBanner />
         <Routes>
+
           <Route path="/" element={<Index />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/auth" element={<AdminAuthPage />} />
@@ -129,9 +133,11 @@ const App = () => (
           <Route path="/cofounders" element={<CofounderMatchingPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <BottomNav />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
 
 export default App;
+
