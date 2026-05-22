@@ -190,80 +190,34 @@ const Header = () => {
 
 
         {/* Right Actions */}
-        <div className="hidden lg:flex items-center gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-full h-11 px-4 gap-2 text-muted-foreground"
-            onClick={() => setSearchOpen(true)}
-          >
+        <div className="hidden lg:flex items-center gap-1.5 shrink-0">
+          <Button variant="ghost" size="icon" className="rounded-full h-9 w-9" onClick={() => setSearchOpen(true)} title="Recherche (⌘K)">
             <Search className="h-4 w-4" />
-            <span className="text-sm">{t("nav.search")}</span>
-            <kbd className="hidden xl:inline-flex h-5 items-center gap-0.5 rounded border bg-muted px-1.5 text-[10px] font-medium text-muted-foreground">
-              ⌘K
-            </kbd>
           </Button>
           <NotificationBell />
+          <LanguageSwitcher />
+          <Button variant="ghost" size="icon" onClick={toggleDarkMode} className="rounded-full h-9 w-9">
+            {isDark ? <Sun className="h-4 w-4 text-amber-500" /> : <Moon className="h-4 w-4" />}
+          </Button>
           {user ? (
             <>
-              <LanguageSwitcher />
               <MfaSetup />
-              <span className="text-sm text-muted-foreground truncate max-w-[120px]">{user.email}</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="rounded-full h-11 px-4 hover:bg-destructive/10 text-destructive"
-                onClick={signOut}
-              >
-                <LogIn className="mr-2 h-4 w-4" />
-                {t("nav.logout")}
+              <Button variant="ghost" size="sm" className="rounded-full h-9 px-3 text-destructive" onClick={signOut} title={user.email || ""}>
+                <LogIn className="h-4 w-4" />
               </Button>
             </>
           ) : (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="rounded-full h-11 px-4 hover:bg-primary/10"
-              asChild
-            >
-              <Link to="/auth">
-                <LogIn className="mr-2 h-4 w-4" />
-                {t("nav.login")}
-              </Link>
+            <Button variant="default" size="sm" className="rounded-full h-9 px-4" asChild>
+              <Link to="/auth"><LogIn className="mr-1.5 h-4 w-4" />{t("nav.login")}</Link>
             </Button>
           )}
           {isAdmin && (
-            <Button
-              variant="default"
-              size="sm"
-              className="rounded-full h-11 px-5 bg-red-600 hover:bg-red-700 text-white font-bold shadow-lg shadow-red-500/25 animate-pulse-slow border-0"
-              asChild
-            >
-              <Link to="/admin">
-                <Shield className="mr-2 h-4 w-4" />
-                Admin
-              </Link>
+            <Button variant="default" size="sm" className="rounded-full h-9 px-3 bg-red-600 hover:bg-red-700 text-white font-semibold border-0" asChild>
+              <Link to="/admin"><Shield className="h-4 w-4" /></Link>
             </Button>
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleDarkMode}
-            className="rounded-full h-11 w-11 hover:bg-primary/10"
-          >
-            <AnimatePresence mode="wait">
-              {isDark ? (
-                <motion.div key="sun" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                  <Sun className="h-5 w-5 text-amber-500" />
-                </motion.div>
-              ) : (
-                <motion.div key="moon" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.2 }}>
-                  <Moon className="h-5 w-5" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </Button>
         </div>
+
 
         {/* Mobile Menu Button */}
         <div className="flex items-center gap-3 lg:hidden">
