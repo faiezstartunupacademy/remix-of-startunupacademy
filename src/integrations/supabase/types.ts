@@ -3107,6 +3107,7 @@ export type Database = {
           onboarding_completed: boolean
           onboarding_step: number
           phone: string | null
+          preferred_language: string
           problem_statement: string | null
           program_name: string | null
           role_type: Database["public"]["Enums"]["user_role_type"] | null
@@ -3115,6 +3116,7 @@ export type Database = {
           startup_stage: string | null
           team_size: number | null
           updated_at: string | null
+          use_eastern_numerals: boolean
           user_id: string
           wilaya: string | null
         }
@@ -3129,6 +3131,7 @@ export type Database = {
           onboarding_completed?: boolean
           onboarding_step?: number
           phone?: string | null
+          preferred_language?: string
           problem_statement?: string | null
           program_name?: string | null
           role_type?: Database["public"]["Enums"]["user_role_type"] | null
@@ -3137,6 +3140,7 @@ export type Database = {
           startup_stage?: string | null
           team_size?: number | null
           updated_at?: string | null
+          use_eastern_numerals?: boolean
           user_id: string
           wilaya?: string | null
         }
@@ -3151,6 +3155,7 @@ export type Database = {
           onboarding_completed?: boolean
           onboarding_step?: number
           phone?: string | null
+          preferred_language?: string
           problem_statement?: string | null
           program_name?: string | null
           role_type?: Database["public"]["Enums"]["user_role_type"] | null
@@ -3159,6 +3164,7 @@ export type Database = {
           startup_stage?: string | null
           team_size?: number | null
           updated_at?: string | null
+          use_eastern_numerals?: boolean
           user_id?: string
           wilaya?: string | null
         }
