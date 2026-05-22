@@ -124,6 +124,9 @@ const App = () => (
           <Route path="/mentor-dashboard" element={<MentorDashboard />} />
           <Route path="/financement" element={<FundingPage />} />
           <Route path="/candidatures" element={<FundingApplicationsPage />} />
+          <Route path="/feed" element={<CommunityFeedPage />} />
+          <Route path="/evenements" element={<EventsPage />} />
+          <Route path="/cofounders" element={<CofounderMatchingPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
