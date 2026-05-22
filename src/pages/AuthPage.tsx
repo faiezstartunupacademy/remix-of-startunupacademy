@@ -23,9 +23,14 @@ const AuthPage = () => {
   const emailSchema = z.string().trim().email({ message: t("auth.invalidEmail") }).max(255);
   const passwordSchema = z.string().min(8, { message: t("auth.passwordMinLength") }).max(128).regex(/[A-Z]/, { message: "Au moins une majuscule requise" }).regex(/[0-9]/, { message: "Au moins un chiffre requis" }).regex(/[^A-Za-z0-9]/, { message: "Au moins un caractère spécial requis" });
 
+  const passwordSchema = z.string().min(10, { message: "Minimum 10 caractères" }).max(128).regex(/[A-Z]/, { message: "Au moins une majuscule requise" }).regex(/[0-9]/, { message: "Au moins un chiffre requis" }).regex(/[^A-Za-z0-9]/, { message: "Au moins un caractère spécial requis" });
+
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptDataProcessing, setAcceptDataProcessing] = useState(false);
+  const [consentError, setConsentError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
