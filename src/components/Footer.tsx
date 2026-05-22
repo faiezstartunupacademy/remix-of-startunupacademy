@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Mail, MapPin, Phone, Linkedin, Twitter, Youtube, Instagram } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import logoStartunup from "@/assets/logo_startunup_new.png";
+import TrustBadge from "@/components/legal/TrustBadge";
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -60,11 +61,16 @@ const Footer = () => {
         </div>
 
         <div className="mt-16 pt-8 border-t border-border flex flex-col gap-4">
+          <div className="flex justify-center">
+            <TrustBadge />
+          </div>
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-muted-foreground">{t("footer.rights")}</p>
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <Link to="/mentions-legales" className="hover:text-primary transition-colors">{t("footer.legal")}</Link>
-              <Link to="/confidentialite" className="hover:text-primary transition-colors">{t("footer.privacy")}</Link>
+            <div className="flex items-center flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground">
+              <Link to="/legal/terms" className="hover:text-primary transition-colors">CGU</Link>
+              <Link to="/legal/privacy" className="hover:text-primary transition-colors">Confidentialité</Link>
+              <Link to="/legal/cookies" className="hover:text-primary transition-colors">Cookies</Link>
+              <Link to="/profil/consentement" className="hover:text-primary transition-colors">Mon consentement</Link>
             </div>
           </div>
           <div className="text-center pt-4 border-t border-border/50">

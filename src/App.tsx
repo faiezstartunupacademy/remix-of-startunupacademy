@@ -46,6 +46,9 @@ import AIBusinessPage from "./pages/AIBusinessPage";
 import MarketplacePage from "./pages/MarketplacePage";
 import StartupDetailPage from "./pages/StartupDetailPage";
 import StartupPrivateSpace from "./pages/StartupPrivateSpace";
+import LegalPage from "./pages/LegalPage";
+import MyConsentPage from "./pages/MyConsentPage";
+import CookieConsentBanner from "./components/legal/CookieConsentBanner";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -55,6 +58,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <WelcomeVideoModal />
+        <CookieConsentBanner />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/admin" element={<AdminDashboard />} />
@@ -95,6 +99,8 @@ const App = () => (
           <Route path="/strategic-console/:projectId" element={<StrategicConsolePage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/legal/:slug" element={<LegalPage />} />
+          <Route path="/profil/consentement" element={<MyConsentPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

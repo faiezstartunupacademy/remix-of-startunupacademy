@@ -14,15 +14,22 @@ import logoStartunup from "@/assets/logo_startunup_new.png";
 import { z } from "zod";
 import MfaVerification from "@/components/MfaVerification";
 import { useTranslation } from "react-i18next";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Link } from "react-router-dom";
+import PasswordStrengthMeter from "@/components/legal/PasswordStrengthMeter";
 
 const AuthPage = () => {
   const { t } = useTranslation();
   const emailSchema = z.string().trim().email({ message: t("auth.invalidEmail") }).max(255);
-  const passwordSchema = z.string().min(8, { message: t("auth.passwordMinLength") }).max(128).regex(/[A-Z]/, { message: "Au moins une majuscule requise" }).regex(/[0-9]/, { message: "Au moins un chiffre requis" }).regex(/[^A-Za-z0-9]/, { message: "Au moins un caractère spécial requis" });
+  const passwordSchema = z.string().min(10, { message: "Minimum 10 caractères" }).max(128).regex(/[A-Z]/, { message: "Au moins une majuscule requise" }).regex(/[0-9]/, { message: "Au moins un chiffre requis" }).regex(/[^A-Za-z0-9]/, { message: "Au moins un caractère spécial requis" });
+
 
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptDataProcessing, setAcceptDataProcessing] = useState(false);
+  const [consentError, setConsentError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -92,9 +99,14 @@ const AuthPage = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm(true)) return;
+    if (!acceptTerms || !acceptDataProcessing) {
+      setConsentError("Vous devez accepter les CGU, la politique de confidentialité et le traitement de vos données pour créer un compte.");
+      return;
+    }
+    setConsentError(null);
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: email.trim(), password,
         options: { emailRedirectTo: `${window.location.origin}/`, data: { full_name: name.trim() } },
       });
@@ -105,6 +117,20 @@ const AuthPage = () => {
           toast({ title: t("common.error"), description: error.message, variant: "destructive" });
         }
       } else {
+        // Record explicit consents
+        const userId = data.user?.id;
+        if (userId) {
+          const now = new Date().toISOString();
+          const ua = navigator.userAgent;
+          await supabase.from("user_consents").upsert(
+            [
+              { user_id: userId, consent_type: "terms", granted: true, version: "1.0", granted_at: now, user_agent: ua },
+              { user_id: userId, consent_type: "privacy", granted: true, version: "1.0", granted_at: now, user_agent: ua },
+              { user_id: userId, consent_type: "data_processing", granted: true, version: "1.0", granted_at: now, user_agent: ua },
+            ],
+            { onConflict: "user_id,consent_type" },
+          );
+        }
         toast({ title: t("auth.accountCreated"), description: t("auth.accountCreatedDesc") });
         setActiveTab("login");
       }
@@ -277,8 +303,29 @@ const AuthPage = () => {
                           </button>
                         </div>
                         {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+                        <PasswordStrengthMeter password={password} className="mt-2" />
                       </div>
-                      <Button type="submit" className="w-full" disabled={isLoading}>
+
+                      <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+                        <label className="flex items-start gap-2 cursor-pointer">
+                          <Checkbox checked={acceptTerms} onCheckedChange={(v) => setAcceptTerms(v === true)} className="mt-0.5" />
+                          <span className="text-xs text-muted-foreground leading-relaxed">
+                            J'accepte les{" "}
+                            <Link to="/legal/terms" target="_blank" className="underline text-primary">CGU</Link>{" "}
+                            et la{" "}
+                            <Link to="/legal/privacy" target="_blank" className="underline text-primary">Politique de confidentialité</Link>.
+                          </span>
+                        </label>
+                        <label className="flex items-start gap-2 cursor-pointer">
+                          <Checkbox checked={acceptDataProcessing} onCheckedChange={(v) => setAcceptDataProcessing(v === true)} className="mt-0.5" />
+                          <span className="text-xs text-muted-foreground leading-relaxed">
+                            Je consens au traitement de mes données personnelles conformément à la loi tunisienne n°2004-63 (INPDP) et au RGPD.
+                          </span>
+                        </label>
+                        {consentError && <p className="text-xs text-destructive">{consentError}</p>}
+                      </div>
+
+                      <Button type="submit" className="w-full" disabled={isLoading || !acceptTerms || !acceptDataProcessing}>
                         {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : (<>{t("auth.createAccount")}<ArrowRight className="ml-2 h-4 w-4" /></>)}
                       </Button>
                     </form>
