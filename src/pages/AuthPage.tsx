@@ -41,14 +41,21 @@ const AuthPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const routeAfterAuth = async (userId: string) => {
+    const { data: prof } = await supabase.from("profiles").select("onboarding_completed, role_type").eq("user_id", userId).maybeSingle();
+    if (!prof || !prof.onboarding_completed) navigate("/onboarding");
+    else if (prof.role_type === "startuper") navigate("/mission-control");
+    else navigate("/");
+  };
+
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) navigate("/");
+      if (session) routeAfterAuth(session.user.id);
     };
     checkAuth();
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) navigate("/");
+      if (session) routeAfterAuth(session.user.id);
     });
     return () => subscription.unsubscribe();
   }, [navigate]);
