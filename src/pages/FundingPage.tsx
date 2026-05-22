@@ -130,12 +130,14 @@ export default function FundingPage() {
           </div>
         </motion.div>
 
-        {profile.stage && (
-          <Card className="p-4 bg-primary/5 border-primary/20 flex items-center gap-3">
+        {(profile.stage || profile.wilaya) && (
+          <Card className="p-4 bg-primary/5 border-primary/20 flex items-center gap-3 flex-wrap">
             <Sparkles className="h-5 w-5 text-primary" />
             <p className="text-sm">
-              Matching basé sur votre projet — Stage: <Badge variant="outline">{profile.stage}</Badge>
+              Matching basé sur votre profil
+              {profile.stage && <> — Stage: <Badge variant="outline">{profile.stage}</Badge></>}
               {profile.sector && <> · Secteur: <Badge variant="outline">{profile.sector}</Badge></>}
+              {profile.wilaya && <> · Région: <Badge variant="outline">{profile.wilaya}</Badge></>}
             </p>
           </Card>
         )}
