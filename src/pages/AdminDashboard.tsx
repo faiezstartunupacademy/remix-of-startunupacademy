@@ -35,6 +35,9 @@ import AdminOverviewDashboard from "@/components/admin/AdminOverviewDashboard";
 import logoStartunup from "@/assets/logo_startunup_new.png";
 import StrategicAccessManager from "@/components/admin/StrategicAccessManager";
 import AccountsManager from "@/components/admin/AccountsManager";
+import FundingProgramsManager from "@/components/admin/FundingProgramsManager";
+import ApplicationsPipeline from "@/components/admin/ApplicationsPipeline";
+import CohortAnalytics from "@/components/admin/CohortAnalytics";
 
 interface UserProfile {
   id: string;
