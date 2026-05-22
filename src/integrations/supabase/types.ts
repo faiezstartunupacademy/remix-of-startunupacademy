@@ -3283,6 +3283,75 @@ export type Database = {
         }
         Relationships: []
       }
+      startup_legal_compliance: {
+        Row: {
+          admin_notes: string | null
+          bank_account_pro: boolean
+          cnss_declared: boolean
+          created_at: string
+          id: string
+          legal_form: string
+          patente_obtained: boolean
+          rne_date: string | null
+          rne_number: string | null
+          rne_registered: boolean
+          startup_act_application_date: string | null
+          startup_act_certificate_path: string | null
+          startup_act_labeled: boolean
+          startup_act_verified: boolean
+          startup_act_verified_at: string | null
+          startup_act_verified_by: string | null
+          startup_id: string | null
+          tribunal_greffe: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          bank_account_pro?: boolean
+          cnss_declared?: boolean
+          created_at?: string
+          id?: string
+          legal_form?: string
+          patente_obtained?: boolean
+          rne_date?: string | null
+          rne_number?: string | null
+          rne_registered?: boolean
+          startup_act_application_date?: string | null
+          startup_act_certificate_path?: string | null
+          startup_act_labeled?: boolean
+          startup_act_verified?: boolean
+          startup_act_verified_at?: string | null
+          startup_act_verified_by?: string | null
+          startup_id?: string | null
+          tribunal_greffe?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          bank_account_pro?: boolean
+          cnss_declared?: boolean
+          created_at?: string
+          id?: string
+          legal_form?: string
+          patente_obtained?: boolean
+          rne_date?: string | null
+          rne_number?: string | null
+          rne_registered?: boolean
+          startup_act_application_date?: string | null
+          startup_act_certificate_path?: string | null
+          startup_act_labeled?: boolean
+          startup_act_verified?: boolean
+          startup_act_verified_at?: string | null
+          startup_act_verified_by?: string | null
+          startup_id?: string | null
+          tribunal_greffe?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       startup_private_documents: {
         Row: {
           category: string | null
