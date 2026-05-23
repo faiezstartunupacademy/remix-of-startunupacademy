@@ -27,6 +27,14 @@ import { fr } from "date-fns/locale";
 const CATEGORIES = [
   { value: "general", label: "Général", icon: "💬" },
   { value: "formation", label: "Formation", icon: "📚" },
+  { value: "strategique", label: "Pôle Stratégique", icon: "🧭" },
+];
+
+const FILTER_TABS = [
+  { value: "all", label: "Toutes les discussions", icon: "🗂️" },
+  { value: "formation", label: "Formations", icon: "📚" },
+  { value: "strategique", label: "Pôle Stratégique", icon: "🧭" },
+  { value: "general", label: "Général", icon: "💬" },
 ];
 
 type Thread = {
@@ -44,6 +52,10 @@ type Thread = {
   trainer_name: string | null;
   trainer_email: string | null;
   meet_link: string | null;
+  min_participants?: number | null;
+  max_participants?: number | null;
+  objectives?: string | null;
+  is_strategic?: boolean | null;
 };
 
 type Post = {
