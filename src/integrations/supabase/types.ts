@@ -637,61 +637,79 @@ export type Database = {
       ecosystem_partners: {
         Row: {
           active_programs_count: number | null
+          address: string | null
           claimed_at: string | null
           claimed_by: string | null
           contact_email: string | null
           contact_phone: string | null
           created_at: string | null
           description: string | null
+          founded_year: number | null
           governorate: string | null
           id: string
           is_published: boolean | null
           is_verified: boolean | null
+          latitude: number | null
           logo_url: string | null
+          longitude: number | null
           name: string
           partner_type: string
+          programs_offered: string[] | null
           sectors: string[] | null
           slug: string
+          team_size_range: string | null
           updated_at: string | null
           website: string | null
         }
         Insert: {
           active_programs_count?: number | null
+          address?: string | null
           claimed_at?: string | null
           claimed_by?: string | null
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string | null
           description?: string | null
+          founded_year?: number | null
           governorate?: string | null
           id?: string
           is_published?: boolean | null
           is_verified?: boolean | null
+          latitude?: number | null
           logo_url?: string | null
+          longitude?: number | null
           name: string
           partner_type: string
+          programs_offered?: string[] | null
           sectors?: string[] | null
           slug: string
+          team_size_range?: string | null
           updated_at?: string | null
           website?: string | null
         }
         Update: {
           active_programs_count?: number | null
+          address?: string | null
           claimed_at?: string | null
           claimed_by?: string | null
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string | null
           description?: string | null
+          founded_year?: number | null
           governorate?: string | null
           id?: string
           is_published?: boolean | null
           is_verified?: boolean | null
+          latitude?: number | null
           logo_url?: string | null
+          longitude?: number | null
           name?: string
           partner_type?: string
+          programs_offered?: string[] | null
           sectors?: string[] | null
           slug?: string
+          team_size_range?: string | null
           updated_at?: string | null
           website?: string | null
         }
