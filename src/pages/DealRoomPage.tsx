@@ -297,6 +297,10 @@ export default function DealRoomPage() {
           )}
         </main>
       </div>
+        </TabsContent>
+      </Tabs>
+
+
 
       {/* Access log modal */}
       <Dialog open={showAccessLog} onOpenChange={setShowAccessLog}>
