@@ -128,7 +128,7 @@ const MissionControl = () => {
       funding: apps?.length || 0,
       dealroom: deals?.length || 0,
       community: posts?.length || 0,
-      market: marketReports?.length || 0,
+      market: 0,
     });
     setLoading(false);
   }, []);
