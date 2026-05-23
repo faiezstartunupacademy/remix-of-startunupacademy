@@ -504,11 +504,72 @@ export type Database = {
           },
         ]
       }
+      deal_room_deals: {
+        Row: {
+          amount_raised_tnd: number
+          amount_target_tnd: number
+          created_at: string
+          deadline: string | null
+          deck_url: string | null
+          description: string | null
+          equity_offered: number | null
+          id: string
+          is_public: boolean
+          nda_required: boolean
+          pipeline_stage: string
+          round_type: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+          valuation_tnd: number | null
+        }
+        Insert: {
+          amount_raised_tnd?: number
+          amount_target_tnd?: number
+          created_at?: string
+          deadline?: string | null
+          deck_url?: string | null
+          description?: string | null
+          equity_offered?: number | null
+          id?: string
+          is_public?: boolean
+          nda_required?: boolean
+          pipeline_stage?: string
+          round_type?: string
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+          valuation_tnd?: number | null
+        }
+        Update: {
+          amount_raised_tnd?: number
+          amount_target_tnd?: number
+          created_at?: string
+          deadline?: string | null
+          deck_url?: string | null
+          description?: string | null
+          equity_offered?: number | null
+          id?: string
+          is_public?: boolean
+          nda_required?: boolean
+          pipeline_stage?: string
+          round_type?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          valuation_tnd?: number | null
+        }
+        Relationships: []
+      }
       deal_room_documents: {
         Row: {
           allow_download: boolean
           category: string
           created_at: string
+          deal_id: string | null
           expires_at: string | null
           file_path: string
           file_size: number | null
@@ -527,6 +588,7 @@ export type Database = {
           allow_download?: boolean
           category: string
           created_at?: string
+          deal_id?: string | null
           expires_at?: string | null
           file_path: string
           file_size?: number | null
@@ -545,6 +607,7 @@ export type Database = {
           allow_download?: boolean
           category?: string
           created_at?: string
+          deal_id?: string | null
           expires_at?: string | null
           file_path?: string
           file_size?: number | null
@@ -559,7 +622,59 @@ export type Database = {
           visibility?: string
           watermark_enabled?: boolean
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "deal_room_documents_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deal_room_deals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      deal_room_investor_interests: {
+        Row: {
+          created_at: string
+          deal_id: string
+          id: string
+          investor_user_id: string
+          nda_signed_at: string | null
+          notes: string | null
+          status: string
+          ticket_size_tnd: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deal_id: string
+          id?: string
+          investor_user_id: string
+          nda_signed_at?: string | null
+          notes?: string | null
+          status?: string
+          ticket_size_tnd?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deal_id?: string
+          id?: string
+          investor_user_id?: string
+          nda_signed_at?: string | null
+          notes?: string | null
+          status?: string
+          ticket_size_tnd?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deal_room_investor_interests_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deal_room_deals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       deal_room_nda_acceptances: {
         Row: {
