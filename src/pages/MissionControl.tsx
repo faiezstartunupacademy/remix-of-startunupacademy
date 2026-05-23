@@ -88,7 +88,6 @@ const MissionControl = () => {
       { data: apps },
       { data: deals },
       { data: posts },
-      { data: marketReports },
     ] = await Promise.all([
       supabase.from("formation_participants").select("id").eq("user_id", uid),
       supabase.from("mentoring_sessions").select("*").eq("user_id", uid).order("scheduled_at", { ascending: true }).limit(5),
@@ -100,7 +99,6 @@ const MissionControl = () => {
       supabase.from("funding_applications").select("id").eq("user_id", uid),
       supabase.from("deal_room_deals").select("id").eq("user_id", uid),
       supabase.from("community_posts").select("id").eq("user_id", uid),
-      supabase.from("market_intelligence_reports").select("id").eq("user_id", uid).limit(1),
     ]);
 
     const profFields = ["startup_name", "startup_sector", "startup_stage", "wilaya", "problem_statement"];
