@@ -891,14 +891,25 @@ const ForumPage = () => {
               </motion.div>
             ) : (
               <>
-                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                  <Select value={filterCategory} onValueChange={setFilterCategory}>
-                    <SelectTrigger className="w-48"><SelectValue placeholder="Catégorie" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Toutes</SelectItem>
-                      {CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.icon} {c.label}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-wrap gap-2 p-1.5 bg-muted/40 rounded-xl border">
+                    {FILTER_TABS.map(t => (
+                      <button
+                        key={t.value}
+                        onClick={() => setFilterCategory(t.value)}
+                        className={cn(
+                          "flex-1 min-w-[140px] px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-1.5",
+                          filterCategory === t.value
+                            ? "bg-background shadow-sm text-foreground ring-1 ring-primary/30"
+                            : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                        )}
+                      >
+                        <span>{t.icon}</span>
+                        <span>{t.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex justify-end">
                   <Dialog open={isCreating} onOpenChange={setIsCreating}>
                     <DialogTrigger asChild>
                       <Button className="gap-2"><Plus className="h-4 w-4" />Nouvelle discussion</Button>
