@@ -1984,6 +1984,54 @@ export type Database = {
         }
         Relationships: []
       }
+      market_intelligence_reports: {
+        Row: {
+          created_at: string
+          id: string
+          inputs: Json
+          linked_strategic_action: string | null
+          report_type: string
+          result_data: Json | null
+          result_markdown: string | null
+          score: number | null
+          sector: string | null
+          source: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          inputs?: Json
+          linked_strategic_action?: string | null
+          report_type: string
+          result_data?: Json | null
+          result_markdown?: string | null
+          score?: number | null
+          sector?: string | null
+          source?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          inputs?: Json
+          linked_strategic_action?: string | null
+          report_type?: string
+          result_data?: Json | null
+          result_markdown?: string | null
+          score?: number | null
+          sector?: string | null
+          source?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       marketplace_bookmarks: {
         Row: {
           created_at: string
