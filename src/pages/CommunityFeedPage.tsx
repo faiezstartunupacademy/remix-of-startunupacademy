@@ -9,13 +9,22 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Heart, MessageCircle, Send, Link2, Sparkles, Users } from "lucide-react";
+import { Loader2, Heart, MessageCircle, Send, Link2, Sparkles, Users, Flame, Clock, Star } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import CommunitySidebar from "@/components/community/CommunitySidebar";
 import { Link } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
+
+const renderContent = (text: string) => {
+  const parts = text.split(/(#[\p{L}0-9_]+)/giu);
+  return parts.map((p, i) => p.startsWith("#")
+    ? <span key={i} className="text-primary font-medium hover:underline cursor-pointer">{p}</span>
+    : <span key={i}>{p}</span>);
+};
 
 interface Post {
   id: string; user_id: string; content: string; category: string;
@@ -44,6 +53,7 @@ const CommunityFeedPage = () => {
   const [linkUrl, setLinkUrl] = useState("");
   const [posting, setPosting] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [sortMode, setSortMode] = useState<"trending" | "recent" | "favorites">("recent");
   const [openComments, setOpenComments] = useState<string | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -125,12 +135,22 @@ const CommunityFeedPage = () => {
     openCommentsFor(postId);
   };
 
-  const filteredPosts = filter === "all" ? posts : posts.filter(p => p.category === filter);
+  const nowMs = Date.now();
+  const trendingScore = (p: Post) => {
+    const ageH = Math.max(1, (nowMs - new Date(p.created_at).getTime()) / 3_600_000);
+    return (p.likes_count * 2 + p.comments_count * 3 + 1) / Math.pow(ageH + 2, 1.3);
+  };
+  const byCategory = filter === "all" ? posts : posts.filter(p => p.category === filter);
+  const filteredPosts = (() => {
+    if (sortMode === "favorites") return byCategory.filter(p => p.liked);
+    if (sortMode === "trending") return [...byCategory].sort((a, b) => trendingScore(b) - trendingScore(a));
+    return byCategory;
+  })();
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container py-8 max-w-3xl">
+      <main className="container py-8 max-w-7xl grid lg:grid-cols-[1fr_300px] gap-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="mb-6">
             <h1 className="text-3xl font-bold flex items-center gap-2"><Users className="h-7 w-7 text-primary" /> Communauté</h1>
@@ -155,6 +175,14 @@ const CommunityFeedPage = () => {
               </CardContent>
             </Card>
           )}
+
+          <Tabs value={sortMode} onValueChange={(v) => setSortMode(v as any)} className="mb-4">
+            <TabsList>
+              <TabsTrigger value="trending"><Flame className="h-3.5 w-3.5 mr-1" />Tendances</TabsTrigger>
+              <TabsTrigger value="recent"><Clock className="h-3.5 w-3.5 mr-1" />Récent</TabsTrigger>
+              <TabsTrigger value="favorites"><Star className="h-3.5 w-3.5 mr-1" />Mes favoris</TabsTrigger>
+            </TabsList>
+          </Tabs>
 
           <div className="flex gap-2 flex-wrap mb-4">
             <Button size="sm" variant={filter === "all" ? "default" : "outline"} onClick={() => setFilter("all")}>Tous</Button>
@@ -190,7 +218,7 @@ const CommunityFeedPage = () => {
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-3">
-                        <p className="whitespace-pre-wrap text-sm">{p.content}</p>
+                        <p className="whitespace-pre-wrap text-sm">{renderContent(p.content)}</p>
                         {p.link_url && (
                           <a href={p.link_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary text-sm hover:underline">
                             <Link2 className="h-3 w-3" /> {p.link_url.slice(0, 60)}...
@@ -234,6 +262,7 @@ const CommunityFeedPage = () => {
             <Button asChild variant="outline"><Link to="/cofounders">🤝 Trouver un co-fondateur</Link></Button>
           </div>
         </motion.div>
+        <div className="hidden lg:block"><CommunitySidebar /></div>
       </main>
       <Footer />
     </div>
