@@ -33,7 +33,7 @@ const MarketIntelligencePage = () => {
   const [newSource, setNewSource] = useState({ type: "competitor" as const, url: "", content: "" });
   const [analysisResult, setAnalysisResult] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [mainTab, setMainTab] = useState<"market" | "bi">("market");
+  const [mainTab, setMainTab] = useState<"market" | "bi" | "tools">("market");
   const [biProjectId, setBiProjectId] = useState("");
   const [mvpProjects, setMvpProjects] = useState<MvpProject[]>([]);
   const [loadingProjects, setLoadingProjects] = useState(false);
