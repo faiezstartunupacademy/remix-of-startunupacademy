@@ -1017,45 +1017,47 @@ const ForumPage = () => {
                   <div className="space-y-3">
                     {threads.map((t, i) => (
                       <motion.div key={t.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-                        <Card className="cursor-pointer hover:shadow-md transition-all hover:border-primary/30" onClick={() => setSelectedThread(t)}>
-                          <CardContent className="pt-4 pb-4 flex items-center gap-4">
-                            <div className="text-2xl">{CATEGORIES.find(c => c.value === t.category)?.icon || "💬"}</div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                {t.is_pinned && <Badge variant="destructive" className="text-[10px] px-1.5">📌</Badge>}
-                                <h3 className="font-semibold text-sm truncate">{t.title}</h3>
-                                {t.category === "formation" && <EvalButton onClick={() => setActiveTab("evaluation")} />}
-                                {t.category === "formation" && t.scheduled_date && (
-                                  <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px]">
-                                    <CalendarDays className="h-3 w-3 mr-1" />
-                                    {format(new Date(t.scheduled_date), "dd MMM", { locale: fr })}
-                                  </Badge>
-                                )}
-                                {t.meet_link && (
-                                  <Badge variant="outline" className="text-[10px] text-emerald-600 border-emerald-300">
-                                    <Video className="h-3 w-3 mr-1" />Meet
-                                  </Badge>
-                                )}
+                        <Card className={cn("cursor-pointer hover:shadow-md transition-all hover:border-primary/30", t.is_strategic && "border-l-4 border-l-violet-500")} onClick={() => setSelectedThread(t)}>
+                          <CardContent className="pt-4 pb-4">
+                            <div className="flex items-start gap-4">
+                              <div className="text-2xl">{CATEGORIES.find(c => c.value === t.category)?.icon || "💬"}</div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                  {t.is_pinned && <Badge variant="destructive" className="text-[10px] px-1.5">📌</Badge>}
+                                  <h3 className="font-semibold text-sm truncate">{t.title}</h3>
+                                  {(t.is_strategic || t.category === "strategique") && <StrategiqueBadge />}
+                                  {t.category === "formation" && <EvalButton onClick={() => setActiveTab("evaluation")} />}
+                                  {t.category === "formation" && t.scheduled_date && (
+                                    <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px]">
+                                      <CalendarDays className="h-3 w-3 mr-1" />
+                                      {format(new Date(t.scheduled_date), "dd MMM", { locale: fr })}
+                                    </Badge>
+                                  )}
+                                  {t.meet_link && (
+                                    <Badge variant="outline" className="text-[10px] text-emerald-600 border-emerald-300">
+                                      <Video className="h-3 w-3 mr-1" />Meet
+                                    </Badge>
+                                  )}
+                                </div>
+                                <p className="text-xs text-muted-foreground line-clamp-1">{t.content}</p>
+                                <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                                  <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" />{formatDate(t.created_at)}</span>
+                                  <span className="text-xs text-muted-foreground flex items-center gap-1"><MessageCircle className="h-3 w-3" />{t.replies_count} réponses</span>
+                                </div>
+                                {t.category === "formation" && <FicheFormation t={t} />}
                               </div>
-                              <p className="text-xs text-muted-foreground line-clamp-1">{t.content}</p>
-                              <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-                                {t.trainer_name && (
-                                  <span className="text-xs text-muted-foreground flex items-center gap-1"><UserCircle className="h-3 w-3" />{t.trainer_name}</span>
+                              <div className="flex flex-col items-end gap-2 shrink-0">
+                                {t.category === "formation" && t.scheduled_date && (
+                                  <>
+                                    <ParticipationButton thread={t} />
+                                    <Button variant="outline" size="sm" className="gap-1 text-xs" onClick={(e) => { e.stopPropagation(); exportParticipantsCSV(t); }}>
+                                      <Download className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </>
                                 )}
-                                <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" />{formatDate(t.created_at)}</span>
-                                <span className="text-xs text-muted-foreground flex items-center gap-1"><MessageCircle className="h-3 w-3" />{t.replies_count} réponses</span>
-                                {t.duration_text && <span className="text-xs text-muted-foreground">⏱ {t.duration_text}</span>}
+                                <ChevronRight className="h-5 w-5 text-muted-foreground" />
                               </div>
                             </div>
-                            {t.category === "formation" && t.scheduled_date && (
-                              <>
-                                <ParticipationButton thread={t} />
-                                <Button variant="outline" size="sm" className="gap-1 text-xs" onClick={(e) => { e.stopPropagation(); exportParticipantsCSV(t); }}>
-                                  <Download className="h-3.5 w-3.5" />
-                                </Button>
-                              </>
-                            )}
-                            <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
                           </CardContent>
                         </Card>
                       </motion.div>
