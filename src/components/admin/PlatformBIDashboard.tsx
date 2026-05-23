@@ -26,10 +26,10 @@ export default function PlatformBIDashboard() {
 
   async function load() {
     setLoading(true);
-    const [{ data: profiles }, { count: userCount }, { count: appCount }, { count: dealCount }] = await Promise.all([
-      supabase.from("profiles").select("startup_sector, startup_stage, wilaya, startup_goals").not("startup_name", "is", null),
+    const [{ data: profiles }, { count: userCount }, { data: apps, count: appCount }, { count: dealCount }] = await Promise.all([
+      supabase.from("profiles").select("startup_sector, startup_stage, wilaya, user_id").not("startup_name", "is", null),
       supabase.from("profiles").select("*", { count: "exact", head: true }),
-      supabase.from("funding_applications").select("*", { count: "exact", head: true }),
+      supabase.from("funding_applications").select("user_id, status, amount_requested_tnd", { count: "exact" }),
       supabase.from("deal_room_deals").select("*", { count: "exact", head: true }),
     ]);
 
@@ -37,21 +37,25 @@ export default function PlatformBIDashboard() {
     const stageMap: Record<string, number> = {};
     const wilayaMap: Record<string, number> = {};
     const heatMap: Record<string, Record<string, number>> = {};
-    const goalsSet = new Set<string>();
     const sectorsSet = new Set<string>();
+    const sectorByUser: Record<string, string> = {};
 
     (profiles || []).forEach((p: any) => {
       if (p.startup_sector) { sectorMap[p.startup_sector] = (sectorMap[p.startup_sector] || 0) + 1; sectorsSet.add(p.startup_sector); }
       if (p.startup_stage) stageMap[p.startup_stage] = (stageMap[p.startup_stage] || 0) + 1;
       if (p.wilaya) wilayaMap[p.wilaya] = (wilayaMap[p.wilaya] || 0) + 1;
-      const goals = Array.isArray(p.startup_goals) ? p.startup_goals : [];
-      goals.forEach((g: string) => {
-        goalsSet.add(g);
-        if (p.startup_sector) {
-          heatMap[p.startup_sector] = heatMap[p.startup_sector] || {};
-          heatMap[p.startup_sector][g] = (heatMap[p.startup_sector][g] || 0) + 1;
-        }
-      });
+      if (p.user_id && p.startup_sector) sectorByUser[p.user_id] = p.startup_sector;
+    });
+
+    const goalsSet = new Set<string>();
+    (apps || []).forEach((a: any) => {
+      const sector = sectorByUser[a.user_id];
+      const status = a.status || "draft";
+      goalsSet.add(status);
+      if (sector) {
+        heatMap[sector] = heatMap[sector] || {};
+        heatMap[sector][status] = (heatMap[sector][status] || 0) + 1;
+      }
     });
 
     const goalsList = Array.from(goalsSet);
