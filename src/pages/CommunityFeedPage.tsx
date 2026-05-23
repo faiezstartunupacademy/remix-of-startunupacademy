@@ -135,12 +135,22 @@ const CommunityFeedPage = () => {
     openCommentsFor(postId);
   };
 
-  const filteredPosts = filter === "all" ? posts : posts.filter(p => p.category === filter);
+  const nowMs = Date.now();
+  const trendingScore = (p: Post) => {
+    const ageH = Math.max(1, (nowMs - new Date(p.created_at).getTime()) / 3_600_000);
+    return (p.likes_count * 2 + p.comments_count * 3 + 1) / Math.pow(ageH + 2, 1.3);
+  };
+  const byCategory = filter === "all" ? posts : posts.filter(p => p.category === filter);
+  const filteredPosts = (() => {
+    if (sortMode === "favorites") return byCategory.filter(p => p.liked);
+    if (sortMode === "trending") return [...byCategory].sort((a, b) => trendingScore(b) - trendingScore(a));
+    return byCategory;
+  })();
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="container py-8 max-w-3xl">
+      <main className="container py-8 max-w-7xl grid lg:grid-cols-[1fr_300px] gap-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="mb-6">
             <h1 className="text-3xl font-bold flex items-center gap-2"><Users className="h-7 w-7 text-primary" /> Communauté</h1>
