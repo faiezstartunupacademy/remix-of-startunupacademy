@@ -120,29 +120,41 @@ const ForumPage = () => {
     const loadThreads = async () => {
       setLoading(true);
       const { data } = await supabase.rpc("get_safe_forum_threads" as any);
-      let filtered = (data as Thread[]) || [];
-      if (filterCategory !== "all") filtered = filtered.filter(t => t.category === filterCategory);
-      if (filtered.length) {
-        setThreads(filtered);
-        // Load participant counts for formation threads
-        const formationIds = (data as Thread[]).filter(t => t.category === "formation" && t.scheduled_date).map(t => t.id);
-        if (formationIds.length > 0) {
-          const { data: posts } = await supabase
-            .from("forum_posts")
-            .select("thread_id")
-            .in("thread_id", formationIds)
-            .like("content", "%Participation confirmée%");
-          if (posts) {
-            const counts: Record<string, number> = {};
-            posts.forEach(p => { counts[p.thread_id] = (counts[p.thread_id] || 0) + 1; });
-            setParticipantCounts(counts);
-          }
+      const all = (data as Thread[]) || [];
+      const filtered = filterCategory === "all" ? all : all.filter(t => t.category === filterCategory);
+      setThreads(filtered);
+      // Load participant counts for formation threads
+      const formationIds = all.filter(t => t.category === "formation" && t.scheduled_date).map(t => t.id);
+      if (formationIds.length > 0) {
+        const { data: ps } = await supabase
+          .from("forum_posts")
+          .select("thread_id")
+          .in("thread_id", formationIds)
+          .like("content", "%Participation confirmée%");
+        if (ps) {
+          const counts: Record<string, number> = {};
+          ps.forEach(p => { counts[p.thread_id] = (counts[p.thread_id] || 0) + 1; });
+          setParticipantCounts(counts);
         }
       }
       setLoading(false);
     };
     loadThreads();
   }, [user, filterCategory]);
+
+  // Realtime: live participant counter on training inscriptions
+  useEffect(() => {
+    const channel = supabase
+      .channel("forum-participants")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "forum_posts" }, (payload: any) => {
+        const row = payload.new;
+        if (row?.content && typeof row.content === "string" && row.content.includes("Participation confirmée")) {
+          setParticipantCounts(prev => ({ ...prev, [row.thread_id]: (prev[row.thread_id] || 0) + 1 }));
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
 
   // Pre-fill participation form with user info
   useEffect(() => {
