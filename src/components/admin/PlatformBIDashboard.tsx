@@ -163,8 +163,8 @@ export default function PlatformBIDashboard() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base flex items-center gap-2"><Flame className="w-4 h-4 text-orange-500" /> Heatmap besoins × secteur</CardTitle>
-            <CardDescription>Combien de startups demandent chaque type d'aide par secteur</CardDescription>
+            <CardTitle className="text-base flex items-center gap-2"><Flame className="w-4 h-4 text-orange-500" /> Heatmap candidatures financement × secteur</CardTitle>
+            <CardDescription>Volume de candidatures par statut et par secteur</CardDescription>
           </CardHeader>
           <CardContent>
             {data.sectorsList.length === 0 || data.goalsList.length === 0 ? (
