@@ -18,9 +18,9 @@ import { JOURNEY_STAGES, totalMaxPoints, type JourneyStage } from "@/data/journe
 import StageStepper from "@/components/journey/StageStepper";
 import MaturityGauge from "@/components/journey/MaturityGauge";
 
-const APP_STATUSES = ["draft", "submitted", "review", "interview", "accepted", "rejected"] as const;
+const APP_STATUSES = ["shortlist", "draft", "submitted", "review", "interview", "accepted", "rejected"] as const;
 const APP_LABEL: Record<string, string> = {
-  draft: "Brouillon", submitted: "Soumise", review: "En revue",
+  shortlist: "Shortlist", draft: "Brouillon", submitted: "Soumise", review: "En revue",
   interview: "Entretien", accepted: "Acceptée", rejected: "Refusée",
 };
 
@@ -91,7 +91,9 @@ export default function RoadmapPage() {
     setLeaderboard(rows);
   }
   async function loadApps(uid: string) {
-    const { data } = await (supabase as any).from("funding_applications").select("id,status,submitted_at,programs:program_id(name,organization)").eq("user_id", uid).order("submitted_at", { ascending: false }).limit(10);
+    const { data } = await (supabase as any).from("funding_applications")
+      .select("id,status,submission_date,custom_program_name,program:program_id(name,organization)")
+      .eq("user_id", uid).order("created_at", { ascending: false }).limit(10);
     setApplications(data || []);
   }
   async function loadValidations(uid: string) {
