@@ -8,11 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Upload, FileText, Trash2, Link2, Eye, Shield, Download, Lock, Copy } from "lucide-react";
 import { format } from "date-fns";
+import DealsPipeline from "@/components/deal-room/DealsPipeline";
+import InvestorInterests from "@/components/deal-room/InvestorInterests";
 
 const CATEGORIES = [
   { id: "financials", label: "📊 Financials", desc: "Business plan, projections, cap table" },
