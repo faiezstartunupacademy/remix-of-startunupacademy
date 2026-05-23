@@ -8,11 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Upload, FileText, Trash2, Link2, Eye, Shield, Download, Lock, Copy } from "lucide-react";
 import { format } from "date-fns";
+import DealsPipeline from "@/components/deal-room/DealsPipeline";
+import InvestorInterests from "@/components/deal-room/InvestorInterests";
 
 const CATEGORIES = [
   { id: "financials", label: "📊 Financials", desc: "Business plan, projections, cap table" },
@@ -165,6 +167,22 @@ export default function DealRoomPage() {
         </div>
       </header>
 
+      <Tabs defaultValue="documents" className="px-6 pt-4">
+        <TabsList>
+          <TabsTrigger value="documents">📁 Documents</TabsTrigger>
+          <TabsTrigger value="pipeline">📊 Deals & Pipeline</TabsTrigger>
+          <TabsTrigger value="investors">💼 Investisseurs</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="pipeline" className="mt-4">
+          {userId && <DealsPipeline userId={userId} />}
+        </TabsContent>
+
+        <TabsContent value="investors" className="mt-4">
+          {userId && <InvestorInterests userId={userId} />}
+        </TabsContent>
+
+        <TabsContent value="documents" className="mt-4">
       <div className="flex">
         <aside className="w-64 border-r border-border min-h-[calc(100vh-89px)] p-4 space-y-1">
           {CATEGORIES.map(c => {
@@ -279,6 +297,10 @@ export default function DealRoomPage() {
           )}
         </main>
       </div>
+        </TabsContent>
+      </Tabs>
+
+
 
       {/* Access log modal */}
       <Dialog open={showAccessLog} onOpenChange={setShowAccessLog}>
