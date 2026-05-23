@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { Map, FileText, GraduationCap, Users, Calendar, Wallet, Network, Settings, Bell, Sparkles, ArrowRight, TrendingUp, BookOpen, LogOut } from "lucide-react";
+import { Map, FileText, GraduationCap, Users, Calendar, Wallet, Network, Settings, Sparkles, ArrowRight, TrendingUp, BookOpen, LogOut, Target, Layers, Activity, Flame, Briefcase, LineChart, ShieldCheck } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -11,15 +11,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, SidebarHeader } from "@/components/ui/sidebar";
 
 const NAV = [
-  { title: "Mon Parcours", icon: Map, url: "/mission-control" },
+  { title: "Mon Parcours", icon: Map, url: "/roadmap" },
   { title: "Mon Dossier", icon: FileText, url: "/profil/donnees" },
   { title: "Mes Programmes", icon: GraduationCap, url: "/formations" },
   { title: "Mon Équipe", icon: Users, url: "/pole-strategique" },
-  { title: "Sessions Mentorat", icon: Calendar, url: "/mission-control" },
-  { title: "Financement & Aides", icon: Wallet, url: "/communaute/invest" },
-  { title: "Réseau Alumni", icon: Network, url: "/communaute" },
+  { title: "Mentorat", icon: Calendar, url: "/mentors" },
+  { title: "Financement", icon: Wallet, url: "/financement" },
+  { title: "Deal Room", icon: Briefcase, url: "/deal-room" },
+  { title: "Communauté", icon: Network, url: "/communaute" },
+  { title: "Market Intel", icon: LineChart, url: "/market-intelligence" },
   { title: "Paramètres", icon: Settings, url: "/profil/consentement" },
 ];
+
+const ALL_MODULES = [
+  { id: "parcours", title: "Mon Parcours", url: "/roadmap", icon: Map, color: "text-blue-600" },
+  { id: "programs", title: "Formations", url: "/formations", icon: GraduationCap, color: "text-violet-600" },
+  { id: "strategic", title: "Pôle Stratégique", url: "/pole-strategique", icon: Layers, color: "text-fuchsia-600" },
+  { id: "mentoring", title: "Mentorat", url: "/mentors", icon: Users, color: "text-amber-600" },
+  { id: "funding", title: "Financement", url: "/financement", icon: Wallet, color: "text-emerald-600" },
+  { id: "dealroom", title: "Deal Room", url: "/deal-room", icon: Briefcase, color: "text-rose-600" },
+  { id: "community", title: "Communauté", url: "/communaute", icon: Network, color: "text-sky-600" },
+  { id: "market", title: "Market Intel", url: "/market-intelligence", icon: LineChart, color: "text-orange-600" },
+] as const;
 
 const RESOURCES_BY_STAGE: Record<string, Array<{ title: string; url: string }>> = {
   "Idée": [
@@ -45,13 +58,82 @@ type Profile = {
   role_type: string | null; onboarding_completed: boolean;
 };
 
+type ModuleCounts = {
+  parcours: number; programs: number; strategic: number; mentoring: number;
+  funding: number; dealroom: number; community: number; market: number;
+};
+
 const MissionControl = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [scores, setScores] = useState({ profile: 0, programs: 0, mentoring: 0, milestones: 0, documents: 0 });
   const [sessions, setSessions] = useState<any[]>([]);
   const [milestones, setMilestones] = useState<any[]>([]);
+  const [journeyDone, setJourneyDone] = useState(0);
+  const [streak, setStreak] = useState<{ current: number; longest: number; points: number } | null>(null);
+  const [badges, setBadges] = useState<any[]>([]);
+  const [moduleCounts, setModuleCounts] = useState<ModuleCounts>({ parcours: 0, programs: 0, strategic: 0, mentoring: 0, funding: 0, dealroom: 0, community: 0, market: 0 });
   const [loading, setLoading] = useState(true);
+
+  const loadAll = useCallback(async (uid: string, prof: Profile) => {
+    const [
+      { data: parts },
+      { data: sess },
+      { data: mils },
+      { data: docs },
+      { data: journey },
+      { data: strk },
+      { data: bdg },
+      { data: apps },
+      { data: deals },
+      { data: posts },
+      { data: marketReports },
+    ] = await Promise.all([
+      supabase.from("formation_participants").select("id").eq("user_id", uid),
+      supabase.from("mentoring_sessions").select("*").eq("user_id", uid).order("scheduled_at", { ascending: true }).limit(5),
+      supabase.from("incubation_milestones").select("*").eq("user_id", uid),
+      supabase.from("startup_documents").select("id").eq("user_id", uid),
+      supabase.from("startup_journey_progress").select("id, completed").eq("user_id", uid),
+      supabase.from("journey_streaks").select("*").eq("user_id", uid).maybeSingle(),
+      supabase.from("journey_badges").select("*").eq("user_id", uid),
+      supabase.from("funding_applications").select("id").eq("user_id", uid),
+      supabase.from("deal_room_deals").select("id").eq("user_id", uid),
+      supabase.from("community_posts").select("id").eq("user_id", uid),
+      supabase.from("market_intelligence_reports").select("id").eq("user_id", uid).limit(1),
+    ]);
+
+    const profFields = ["startup_name", "startup_sector", "startup_stage", "wilaya", "problem_statement"];
+    const filled = profFields.filter(k => (prof as any)[k]).length;
+    const profileScore = (filled / profFields.length) * 100;
+    const completedMils = (mils || []).filter((m: any) => m.status === "completed").length;
+    const completedSess = (sess || []).filter((s: any) => s.status === "completed").length;
+    const journeyCompleted = (journey || []).filter((j: any) => j.completed).length;
+
+    setScores({
+      profile: profileScore,
+      programs: Math.min(100, (parts?.length || 0) * 50),
+      mentoring: Math.min(100, completedSess * 25),
+      milestones: Math.min(100, completedMils * 20),
+      documents: Math.min(100, (docs?.length || 0) * 20),
+    });
+    setSessions(sess || []);
+    setMilestones(mils || []);
+    setJourneyDone(journeyCompleted);
+    setStreak(strk ? { current: strk.current_streak || 0, longest: strk.longest_streak || 0, points: strk.total_points || 0 } : { current: 0, longest: 0, points: 0 });
+    setBadges(bdg || []);
+    setModuleCounts({
+      parcours: journeyCompleted,
+      programs: parts?.length || 0,
+      strategic: completedMils,
+      mentoring: sess?.length || 0,
+      funding: apps?.length || 0,
+      dealroom: deals?.length || 0,
+      community: posts?.length || 0,
+      market: marketReports?.length || 0,
+    });
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -60,52 +142,60 @@ const MissionControl = () => {
       const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
       if (!prof || !prof.onboarding_completed) { navigate("/onboarding"); return; }
       setProfile(prof as Profile);
-
-      const [{ data: parts }, { data: sess }, { data: mils }, { data: docs }] = await Promise.all([
-        supabase.from("formation_participants").select("id").eq("user_id", user.id),
-        supabase.from("mentoring_sessions").select("*").eq("user_id", user.id).order("scheduled_at", { ascending: true }).limit(5),
-        supabase.from("incubation_milestones").select("*").eq("user_id", user.id),
-        supabase.from("startup_documents").select("id").eq("user_id", user.id),
-      ]);
-
-      const profFields = ["startup_name", "startup_sector", "startup_stage", "wilaya", "problem_statement"];
-      const filled = profFields.filter(k => (prof as any)[k]).length;
-      const profileScore = (filled / profFields.length) * 100;
-
-      const completedMils = (mils || []).filter((m: any) => m.status === "completed").length;
-      const completedSess = (sess || []).filter((s: any) => s.status === "completed").length;
-
-      setScores({
-        profile: profileScore,
-        programs: Math.min(100, (parts?.length || 0) * 50),
-        mentoring: Math.min(100, completedSess * 25),
-        milestones: Math.min(100, completedMils * 20),
-        documents: Math.min(100, (docs?.length || 0) * 20),
-      });
-      setSessions(sess || []);
-      setMilestones(mils || []);
-      setLoading(false);
+      setUserId(user.id);
+      await loadAll(user.id, prof as Profile);
     })();
-  }, [navigate]);
+  }, [navigate, loadAll]);
+
+  // Realtime: any change in user data refreshes KPIs
+  useEffect(() => {
+    if (!userId || !profile) return;
+    const reload = () => loadAll(userId, profile);
+    const channel = supabase
+      .channel("mission-control-rt")
+      .on("postgres_changes", { event: "*", schema: "public", table: "startup_journey_progress", filter: `user_id=eq.${userId}` }, reload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "incubation_milestones", filter: `user_id=eq.${userId}` }, reload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "mentoring_sessions", filter: `user_id=eq.${userId}` }, reload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "funding_applications", filter: `user_id=eq.${userId}` }, reload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "deal_room_deals", filter: `user_id=eq.${userId}` }, reload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "journey_streaks", filter: `user_id=eq.${userId}` }, reload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "journey_badges", filter: `user_id=eq.${userId}` }, reload)
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [userId, profile, loadAll]);
 
   const healthScore = useMemo(() => Math.round((scores.profile + scores.programs + scores.mentoring + scores.milestones + scores.documents) / 5), [scores]);
+  const connectedModules = useMemo(() => Object.values(moduleCounts).filter(c => c > 0).length, [moduleCounts]);
+  const goalsReached = journeyDone + milestones.filter(m => m.status === "completed").length + badges.length;
 
-  const nextStep = useMemo(() => {
-    if (scores.profile < 100) return { title: "Compléter votre profil startup", desc: "Ajoutez les informations manquantes pour personnaliser votre parcours.", cta: "Compléter", url: "/onboarding" };
-    if (scores.programs === 0) return { title: "Rejoindre votre première formation", desc: "Renforcez vos compétences avec nos modules dédiés.", cta: "Voir les formations", url: "/formations" };
-    if (scores.milestones === 0) return { title: "Démarrer votre projet d'incubation", desc: "Lancez la première étape de votre parcours startup.", cta: "Pôle stratégique", url: "/pole-strategique" };
-    if (scores.documents === 0) return { title: "Charger vos premiers documents", desc: "Constituez votre dossier startup (pitch, BP, etc).", cta: "Mon dossier", url: "/profil/donnees" };
-    if (scores.mentoring < 50) return { title: "Planifier une session de mentorat", desc: "Échangez avec un expert pour accélérer votre projet.", cta: "Planifier", url: "/communaute" };
-    return { title: "Vous êtes au top 🚀", desc: "Continuez à valider vos étapes pour rester en forme.", cta: "Voir mon parcours", url: "/pole-strategique" };
-  }, [scores]);
+  const recommendedActions = useMemo(() => {
+    const acts: Array<{ icon: any; title: string; desc: string; url: string; priority: "high" | "medium" | "low" }> = [];
+    if (scores.profile < 100) acts.push({ icon: FileText, title: "Compléter votre profil startup", desc: "Personnalisez vos recommandations.", url: "/onboarding", priority: "high" });
+    if (moduleCounts.strategic === 0) acts.push({ icon: Layers, title: "Démarrer le Pôle Stratégique", desc: "Validez votre première étape d'incubation.", url: "/pole-strategique", priority: "high" });
+    if (moduleCounts.programs === 0) acts.push({ icon: GraduationCap, title: "Suivre une formation", desc: "Renforcez vos compétences clés.", url: "/formations", priority: "medium" });
+    if (moduleCounts.mentoring === 0) acts.push({ icon: Users, title: "Planifier une session mentorat", desc: "Échangez avec un expert.", url: "/mentors", priority: "medium" });
+    if (moduleCounts.funding === 0) acts.push({ icon: Wallet, title: "Postuler à un programme de financement", desc: "Découvrez les appels ouverts en TN.", url: "/financement", priority: "medium" });
+    if (moduleCounts.dealroom === 0 && (profile?.startup_stage === "MVP" || profile?.startup_stage === "Lancée")) {
+      acts.push({ icon: Briefcase, title: "Préparer votre Deal Room", desc: "Structurez votre levée et pipeline investisseurs.", url: "/deal-room", priority: "low" });
+    }
+    if (moduleCounts.market === 0) acts.push({ icon: LineChart, title: "Générer un rapport Market Intel", desc: "Obtenez vos insights de marché.", url: "/market-intelligence", priority: "low" });
+    if (acts.length === 0) acts.push({ icon: Sparkles, title: "Vous êtes au top 🚀", desc: "Continuez à valider vos étapes.", url: "/roadmap", priority: "low" });
+    return acts.slice(0, 4);
+  }, [scores, moduleCounts, profile]);
 
   const resources = RESOURCES_BY_STAGE[profile?.startup_stage || "Idée"] || [];
-
   const gaugeData = [{ name: "score", value: healthScore, fill: healthScore >= 75 ? "hsl(var(--primary))" : healthScore >= 50 ? "hsl(var(--accent))" : "hsl(var(--destructive))" }];
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center bg-background"><div className="animate-pulse text-muted-foreground">Chargement du cockpit…</div></div>;
   }
+
+  const kpis = [
+    { label: "Goals atteints", value: goalsReached, icon: Target, sub: `${badges.length} badge(s)`, color: "text-emerald-600 bg-emerald-500/10" },
+    { label: "Modules connectés", value: `${connectedModules}/${ALL_MODULES.length}`, icon: Layers, sub: "modules actifs", color: "text-violet-600 bg-violet-500/10" },
+    { label: "Taux d'avancement", value: `${healthScore}%`, icon: Activity, sub: "santé globale", color: "text-blue-600 bg-blue-500/10" },
+    { label: "Série quotidienne", value: streak?.current ?? 0, icon: Flame, sub: `${streak?.points ?? 0} pts · record ${streak?.longest ?? 0}`, color: "text-orange-600 bg-orange-500/10" },
+  ];
 
   return (
     <SidebarProvider>
@@ -145,20 +235,77 @@ const MissionControl = () => {
         <div className="flex-1 flex flex-col min-w-0">
           <header className="h-14 flex items-center border-b px-4 gap-3 sticky top-0 bg-background/95 backdrop-blur z-10">
             <SidebarTrigger />
-            <div className="flex-1">
-              <h1 className="font-semibold">Bienvenue, {profile?.full_name || "Founder"} 👋</h1>
-              <p className="text-xs text-muted-foreground">{profile?.startup_name} · {profile?.startup_sector} · {profile?.wilaya}</p>
+            <div className="flex-1 min-w-0">
+              <h1 className="font-semibold truncate">Bienvenue, {profile?.full_name || "Founder"} 👋</h1>
+              <p className="text-xs text-muted-foreground truncate">{profile?.startup_name} · {profile?.startup_sector} · {profile?.wilaya}</p>
             </div>
-            <Badge variant="outline" className="hidden md:flex">{profile?.startup_stage}</Badge>
+            <Badge className="hidden sm:flex bg-primary/15 text-primary border-primary/30 gap-1">
+              <Sparkles className="h-3 w-3" /> Stade : {profile?.startup_stage || "—"}
+            </Badge>
+            <Badge variant="outline" className="hidden md:flex gap-1 text-xs">
+              <ShieldCheck className="h-3 w-3 text-emerald-600" /> Temps réel
+            </Badge>
           </header>
 
           <main className="flex-1 p-4 md:p-6 space-y-6 max-w-7xl w-full mx-auto">
+            {/* KPI strip */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {kpis.map((k, i) => (
+                <motion.div key={k.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+                  <Card className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide">{k.label}</p>
+                        <p className="text-2xl font-bold mt-1">{k.value}</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5">{k.sub}</p>
+                      </div>
+                      <div className={`h-9 w-9 rounded-lg flex items-center justify-center ${k.color}`}>
+                        <k.icon className="h-5 w-5" />
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Active modules */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-base"><Layers className="h-4 w-4 text-primary" /> Modules actifs</CardTitle>
+                <CardDescription>Cliquez sur un module pour accéder à votre espace. Les compteurs se mettent à jour en temps réel.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {ALL_MODULES.map(m => {
+                    const count = moduleCounts[m.id as keyof ModuleCounts];
+                    const active = count > 0;
+                    return (
+                      <Link key={m.id} to={m.url} className={`group rounded-lg border p-3 transition hover:border-primary hover:shadow-sm ${active ? "bg-card" : "bg-muted/30 border-dashed"}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <m.icon className={`h-5 w-5 ${active ? m.color : "text-muted-foreground"}`} />
+                          {active ? (
+                            <Badge variant="secondary" className="text-[10px] h-5">{count}</Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-[10px] h-5">Inactif</Badge>
+                          )}
+                        </div>
+                        <p className="text-sm font-medium">{m.title}</p>
+                        <p className="text-[11px] text-muted-foreground mt-0.5 group-hover:text-primary transition">
+                          {active ? "Continuer →" : "Activer →"}
+                        </p>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Health Score */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
               <Card className="overflow-hidden border-primary/20">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2"><TrendingUp className="h-5 w-5 text-primary" /> Ma Startup Health Score</CardTitle>
-                  <CardDescription>Un score global de la santé de votre projet, mis à jour en temps réel.</CardDescription>
+                  <CardDescription>Score global mis à jour en temps réel à chaque action.</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid md:grid-cols-3 gap-6 items-center">
@@ -170,7 +317,7 @@ const MissionControl = () => {
                         </RadialBarChart>
                       </ResponsiveContainer>
                       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                        <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", delay: 0.3 }} className="text-5xl font-bold">{healthScore}</motion.span>
+                        <motion.span key={healthScore} initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring" }} className="text-5xl font-bold">{healthScore}</motion.span>
                         <span className="text-sm text-muted-foreground">/100</span>
                       </div>
                     </div>
@@ -196,16 +343,27 @@ const MissionControl = () => {
             </motion.div>
 
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Next Step */}
+              {/* Recommended actions */}
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
                 <Card className="h-full bg-gradient-to-br from-primary/10 to-accent/10 border-primary/30">
                   <CardHeader>
-                    <Badge className="w-fit mb-2 bg-primary">Prochaine étape</Badge>
-                    <CardTitle>{nextStep.title}</CardTitle>
-                    <CardDescription>{nextStep.desc}</CardDescription>
+                    <Badge className="w-fit mb-2 bg-primary">Actions recommandées</Badge>
+                    <CardTitle>Prochaines étapes pour vous</CardTitle>
+                    <CardDescription>Personnalisé selon votre stade « {profile?.startup_stage} » et votre activité.</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <Button onClick={() => navigate(nextStep.url)} className="gap-2">{nextStep.cta} <ArrowRight className="h-4 w-4" /></Button>
+                  <CardContent className="space-y-2">
+                    {recommendedActions.map((a, idx) => (
+                      <button key={idx} onClick={() => navigate(a.url)} className="w-full text-left flex items-center gap-3 p-2.5 rounded-md hover:bg-background/60 transition group">
+                        <div className={`h-9 w-9 rounded-md flex items-center justify-center shrink-0 ${a.priority === "high" ? "bg-destructive/15 text-destructive" : a.priority === "medium" ? "bg-amber-500/15 text-amber-700 dark:text-amber-300" : "bg-muted text-muted-foreground"}`}>
+                          <a.icon className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm">{a.title}</p>
+                          <p className="text-xs text-muted-foreground truncate">{a.desc}</p>
+                        </div>
+                        <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition" />
+                      </button>
+                    ))}
                   </CardContent>
                 </Card>
               </motion.div>
@@ -214,20 +372,28 @@ const MissionControl = () => {
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
                 <Card className="h-full">
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><Calendar className="h-5 w-5 text-accent" /> Sessions de mentorat à venir</CardTitle>
+                    <CardTitle className="flex items-center gap-2"><Calendar className="h-5 w-5 text-accent" /> Prochaines sessions</CardTitle>
+                    <CardDescription>Mentorat et rendez-vous à venir</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {sessions.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">Aucune session planifiée.</p>
+                      <div className="text-center py-6">
+                        <Calendar className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                        <p className="text-sm text-muted-foreground mb-3">Aucune session planifiée.</p>
+                        <Button size="sm" variant="outline" onClick={() => navigate("/mentors")}>Planifier maintenant</Button>
+                      </div>
                     ) : (
                       <ul className="space-y-2">
-                        {sessions.slice(0, 3).map(s => (
-                          <li key={s.id} className="flex justify-between items-center text-sm p-2 rounded-md bg-muted/30">
-                            <div>
-                              <p className="font-medium">{s.topic || "Session"}</p>
-                              <p className="text-xs text-muted-foreground">{s.mentor_name}</p>
+                        {sessions.slice(0, 4).map(s => (
+                          <li key={s.id} className="flex justify-between items-center text-sm p-2.5 rounded-md bg-muted/30">
+                            <div className="min-w-0 flex-1">
+                              <p className="font-medium truncate">{s.topic || "Session"}</p>
+                              <p className="text-xs text-muted-foreground truncate">{s.mentor_name || "Mentor"}</p>
                             </div>
-                            <span className="text-xs">{new Date(s.scheduled_at).toLocaleDateString("fr-FR")}</span>
+                            <div className="text-right shrink-0 ml-2">
+                              <p className="text-xs font-medium">{new Date(s.scheduled_at).toLocaleDateString("fr-FR")}</p>
+                              <p className="text-[10px] text-muted-foreground">{new Date(s.scheduled_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</p>
+                            </div>
                           </li>
                         ))}
                       </ul>
