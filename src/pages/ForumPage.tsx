@@ -363,29 +363,73 @@ const ForumPage = () => {
     .filter(t => new Date(t.scheduled_date!) >= new Date())
     .sort((a, b) => new Date(a.scheduled_date!).getTime() - new Date(b.scheduled_date!).getTime());
 
-  // Participation confirmation button component
+  // Participation confirmation button component with real-time seat counter
   const ParticipationButton = ({ thread, size = "sm" }: { thread: Thread; size?: "sm" | "default" }) => {
     const count = participantCounts[thread.id] || 0;
+    const max = thread.max_participants || 0;
+    const isFull = max > 0 && count >= max;
+    const remaining = max > 0 ? Math.max(0, max - count) : null;
     return (
       <div className="flex items-center gap-2">
-        {count > 0 && (
-          <Badge variant="secondary" className="gap-1 text-xs">
-            <Users className="h-3 w-3" />
-            {count} inscrit{count > 1 ? "s" : ""}
+        <Badge variant={isFull ? "destructive" : "secondary"} className="gap-1 text-xs">
+          <Users className="h-3 w-3" />
+          {max > 0 ? `${count}/${max} places` : `${count} inscrit${count > 1 ? "s" : ""}`}
+        </Badge>
+        {remaining !== null && remaining > 0 && remaining <= 3 && (
+          <Badge className="text-[10px] bg-amber-500/15 text-amber-700 border-amber-300">
+            🔥 {remaining} restante{remaining > 1 ? "s" : ""}
           </Badge>
         )}
         <Button
           variant="default"
           size={size}
-          className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
+          disabled={isFull}
+          className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white disabled:bg-muted disabled:text-muted-foreground"
           onClick={(e) => { e.stopPropagation(); setParticipationThread(thread); }}
         >
           <UserPlus className="h-3.5 w-3.5" />
-          Participer
+          {isFull ? "Complet" : "S'inscrire"}
         </Button>
       </div>
     );
   };
+
+  // Strategic pole badge
+  const StrategiqueBadge = () => (
+    <Badge className="bg-violet-500/15 text-violet-700 border-violet-300 text-[10px] gap-1">
+      <Sparkles className="h-3 w-3" /> Pôle Stratégique
+    </Badge>
+  );
+
+  // Fiche formation summary chip row
+  const FicheFormation = ({ t }: { t: Thread }) => (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3 text-xs">
+      {t.duration_text && (
+        <div className="flex items-center gap-1.5 p-2 rounded-md bg-muted/40">
+          <Clock className="h-3.5 w-3.5 text-primary" />
+          <div><span className="block text-muted-foreground">Durée</span><span className="font-medium">{t.duration_text}</span></div>
+        </div>
+      )}
+      {(t.min_participants || t.max_participants) && (
+        <div className="flex items-center gap-1.5 p-2 rounded-md bg-muted/40">
+          <Users className="h-3.5 w-3.5 text-primary" />
+          <div><span className="block text-muted-foreground">Participants</span><span className="font-medium">min {t.min_participants ?? "—"} / max {t.max_participants ?? "—"}</span></div>
+        </div>
+      )}
+      {t.trainer_name && (
+        <div className="flex items-center gap-1.5 p-2 rounded-md bg-muted/40">
+          <UserCircle className="h-3.5 w-3.5 text-primary" />
+          <div><span className="block text-muted-foreground">Formateur</span><span className="font-medium truncate">{t.trainer_name}</span></div>
+        </div>
+      )}
+      {t.objectives && (
+        <div className="flex items-center gap-1.5 p-2 rounded-md bg-muted/40 col-span-2 md:col-span-1">
+          <Target className="h-3.5 w-3.5 text-primary" />
+          <div className="min-w-0"><span className="block text-muted-foreground">Objectifs</span><span className="font-medium line-clamp-1">{t.objectives}</span></div>
+        </div>
+      )}
+    </div>
+  );
 
   // Evaluation button component
   const EvalButton = ({ onClick }: { onClick: () => void }) => (
