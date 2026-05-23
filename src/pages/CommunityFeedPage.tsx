@@ -218,7 +218,7 @@ const CommunityFeedPage = () => {
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-3">
-                        <p className="whitespace-pre-wrap text-sm">{p.content}</p>
+                        <p className="whitespace-pre-wrap text-sm">{renderContent(p.content)}</p>
                         {p.link_url && (
                           <a href={p.link_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary text-sm hover:underline">
                             <Link2 className="h-3 w-3" /> {p.link_url.slice(0, 60)}...
