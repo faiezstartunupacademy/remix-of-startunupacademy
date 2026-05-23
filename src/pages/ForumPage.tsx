@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, Send, Plus, ArrowLeft, MessageCircle, Clock, User, Hash, ChevronRight, Loader2, CalendarDays, BookOpen, Video, Mail, UserCircle, ExternalLink, GraduationCap, ClipboardCheck, UserPlus, CheckCircle, Star, Users, Download } from "lucide-react";
+import { MessageSquare, Send, Plus, ArrowLeft, MessageCircle, Clock, User, Hash, ChevronRight, Loader2, CalendarDays, BookOpen, Video, Mail, UserCircle, ExternalLink, GraduationCap, ClipboardCheck, UserPlus, CheckCircle, Star, Users, Download, Sparkles, Target } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
