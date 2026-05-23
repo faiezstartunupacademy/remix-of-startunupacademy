@@ -176,6 +176,14 @@ const CommunityFeedPage = () => {
             </Card>
           )}
 
+          <Tabs value={sortMode} onValueChange={(v) => setSortMode(v as any)} className="mb-4">
+            <TabsList>
+              <TabsTrigger value="trending"><Flame className="h-3.5 w-3.5 mr-1" />Tendances</TabsTrigger>
+              <TabsTrigger value="recent"><Clock className="h-3.5 w-3.5 mr-1" />Récent</TabsTrigger>
+              <TabsTrigger value="favorites"><Star className="h-3.5 w-3.5 mr-1" />Mes favoris</TabsTrigger>
+            </TabsList>
+          </Tabs>
+
           <div className="flex gap-2 flex-wrap mb-4">
             <Button size="sm" variant={filter === "all" ? "default" : "outline"} onClick={() => setFilter("all")}>Tous</Button>
             {CATEGORIES.map(c => (
