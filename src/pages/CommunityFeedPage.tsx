@@ -53,6 +53,7 @@ const CommunityFeedPage = () => {
   const [linkUrl, setLinkUrl] = useState("");
   const [posting, setPosting] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [sortMode, setSortMode] = useState<"trending" | "recent" | "favorites">("recent");
   const [openComments, setOpenComments] = useState<string | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
