@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, Send, Plus, ArrowLeft, MessageCircle, Clock, User, Hash, ChevronRight, Loader2, CalendarDays, BookOpen, Video, Mail, UserCircle, ExternalLink, GraduationCap, ClipboardCheck, UserPlus, CheckCircle, Star, Users, Download } from "lucide-react";
+import { MessageSquare, Send, Plus, ArrowLeft, MessageCircle, Clock, User, Hash, ChevronRight, Loader2, CalendarDays, BookOpen, Video, Mail, UserCircle, ExternalLink, GraduationCap, ClipboardCheck, UserPlus, CheckCircle, Star, Users, Download, Sparkles, Target } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,14 @@ import { fr } from "date-fns/locale";
 const CATEGORIES = [
   { value: "general", label: "Général", icon: "💬" },
   { value: "formation", label: "Formation", icon: "📚" },
+  { value: "strategique", label: "Pôle Stratégique", icon: "🧭" },
+];
+
+const FILTER_TABS = [
+  { value: "all", label: "Toutes les discussions", icon: "🗂️" },
+  { value: "formation", label: "Formations", icon: "📚" },
+  { value: "strategique", label: "Pôle Stratégique", icon: "🧭" },
+  { value: "general", label: "Général", icon: "💬" },
 ];
 
 type Thread = {
@@ -44,6 +52,10 @@ type Thread = {
   trainer_name: string | null;
   trainer_email: string | null;
   meet_link: string | null;
+  min_participants?: number | null;
+  max_participants?: number | null;
+  objectives?: string | null;
+  is_strategic?: boolean | null;
 };
 
 type Post = {
@@ -78,6 +90,10 @@ const ForumPage = () => {
   const [formationDate, setFormationDate] = useState<Date>();
   const [formationDuration, setFormationDuration] = useState("");
   const [formationPlan, setFormationPlan] = useState("");
+  const [formationObjectives, setFormationObjectives] = useState("");
+  const [formationMinParticipants, setFormationMinParticipants] = useState<string>("");
+  const [formationMaxParticipants, setFormationMaxParticipants] = useState<string>("");
+  const [formationIsStrategic, setFormationIsStrategic] = useState(false);
   const [trainerName, setTrainerName] = useState("");
   const [trainerEmail, setTrainerEmail] = useState("");
   const [meetLink, setMeetLink] = useState("");
@@ -104,29 +120,41 @@ const ForumPage = () => {
     const loadThreads = async () => {
       setLoading(true);
       const { data } = await supabase.rpc("get_safe_forum_threads" as any);
-      let filtered = (data as Thread[]) || [];
-      if (filterCategory !== "all") filtered = filtered.filter(t => t.category === filterCategory);
-      if (filtered.length) {
-        setThreads(filtered);
-        // Load participant counts for formation threads
-        const formationIds = (data as Thread[]).filter(t => t.category === "formation" && t.scheduled_date).map(t => t.id);
-        if (formationIds.length > 0) {
-          const { data: posts } = await supabase
-            .from("forum_posts")
-            .select("thread_id")
-            .in("thread_id", formationIds)
-            .like("content", "%Participation confirmée%");
-          if (posts) {
-            const counts: Record<string, number> = {};
-            posts.forEach(p => { counts[p.thread_id] = (counts[p.thread_id] || 0) + 1; });
-            setParticipantCounts(counts);
-          }
+      const all = (data as Thread[]) || [];
+      const filtered = filterCategory === "all" ? all : all.filter(t => t.category === filterCategory);
+      setThreads(filtered);
+      // Load participant counts for formation threads
+      const formationIds = all.filter(t => t.category === "formation" && t.scheduled_date).map(t => t.id);
+      if (formationIds.length > 0) {
+        const { data: ps } = await supabase
+          .from("forum_posts")
+          .select("thread_id")
+          .in("thread_id", formationIds)
+          .like("content", "%Participation confirmée%");
+        if (ps) {
+          const counts: Record<string, number> = {};
+          ps.forEach(p => { counts[p.thread_id] = (counts[p.thread_id] || 0) + 1; });
+          setParticipantCounts(counts);
         }
       }
       setLoading(false);
     };
     loadThreads();
   }, [user, filterCategory]);
+
+  // Realtime: live participant counter on training inscriptions
+  useEffect(() => {
+    const channel = supabase
+      .channel("forum-participants")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "forum_posts" }, (payload: any) => {
+        const row = payload.new;
+        if (row?.content && typeof row.content === "string" && row.content.includes("Participation confirmée")) {
+          setParticipantCounts(prev => ({ ...prev, [row.thread_id]: (prev[row.thread_id] || 0) + 1 }));
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, []);
 
   // Pre-fill participation form with user info
   useEffect(() => {
@@ -187,7 +215,13 @@ const ForumPage = () => {
       if (formationDate) insertData.scheduled_date = formationDate.toISOString();
       if (formationDuration.trim()) insertData.duration_text = formationDuration.trim();
       if (formationPlan.trim()) insertData.formation_plan = formationPlan.trim();
+      if (formationObjectives.trim()) insertData.objectives = formationObjectives.trim();
+      if (formationMinParticipants) insertData.min_participants = parseInt(formationMinParticipants) || null;
+      if (formationMaxParticipants) insertData.max_participants = parseInt(formationMaxParticipants) || null;
+      insertData.is_strategic = formationIsStrategic;
       insertData.meet_link = meetLink.trim() || generateMeetLink();
+    } else if (newThread.category === "strategique") {
+      insertData.is_strategic = true;
     }
     const { data: threadData, error } = await supabase.from("forum_threads").insert(insertData).select("id, title, category").single();
     if (error) {
@@ -213,6 +247,10 @@ const ForumPage = () => {
       setFormationDate(undefined);
       setFormationDuration("");
       setFormationPlan("");
+      setFormationObjectives("");
+      setFormationMinParticipants("");
+      setFormationMaxParticipants("");
+      setFormationIsStrategic(false);
       setTrainerName("");
       setTrainerEmail("");
       setMeetLink("");
@@ -325,29 +363,73 @@ const ForumPage = () => {
     .filter(t => new Date(t.scheduled_date!) >= new Date())
     .sort((a, b) => new Date(a.scheduled_date!).getTime() - new Date(b.scheduled_date!).getTime());
 
-  // Participation confirmation button component
+  // Participation confirmation button component with real-time seat counter
   const ParticipationButton = ({ thread, size = "sm" }: { thread: Thread; size?: "sm" | "default" }) => {
     const count = participantCounts[thread.id] || 0;
+    const max = thread.max_participants || 0;
+    const isFull = max > 0 && count >= max;
+    const remaining = max > 0 ? Math.max(0, max - count) : null;
     return (
       <div className="flex items-center gap-2">
-        {count > 0 && (
-          <Badge variant="secondary" className="gap-1 text-xs">
-            <Users className="h-3 w-3" />
-            {count} inscrit{count > 1 ? "s" : ""}
+        <Badge variant={isFull ? "destructive" : "secondary"} className="gap-1 text-xs">
+          <Users className="h-3 w-3" />
+          {max > 0 ? `${count}/${max} places` : `${count} inscrit${count > 1 ? "s" : ""}`}
+        </Badge>
+        {remaining !== null && remaining > 0 && remaining <= 3 && (
+          <Badge className="text-[10px] bg-amber-500/15 text-amber-700 border-amber-300">
+            🔥 {remaining} restante{remaining > 1 ? "s" : ""}
           </Badge>
         )}
         <Button
           variant="default"
           size={size}
-          className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white"
+          disabled={isFull}
+          className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white disabled:bg-muted disabled:text-muted-foreground"
           onClick={(e) => { e.stopPropagation(); setParticipationThread(thread); }}
         >
           <UserPlus className="h-3.5 w-3.5" />
-          Participer
+          {isFull ? "Complet" : "S'inscrire"}
         </Button>
       </div>
     );
   };
+
+  // Strategic pole badge
+  const StrategiqueBadge = () => (
+    <Badge className="bg-violet-500/15 text-violet-700 border-violet-300 text-[10px] gap-1">
+      <Sparkles className="h-3 w-3" /> Pôle Stratégique
+    </Badge>
+  );
+
+  // Fiche formation summary chip row
+  const FicheFormation = ({ t }: { t: Thread }) => (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3 text-xs">
+      {t.duration_text && (
+        <div className="flex items-center gap-1.5 p-2 rounded-md bg-muted/40">
+          <Clock className="h-3.5 w-3.5 text-primary" />
+          <div><span className="block text-muted-foreground">Durée</span><span className="font-medium">{t.duration_text}</span></div>
+        </div>
+      )}
+      {(t.min_participants || t.max_participants) && (
+        <div className="flex items-center gap-1.5 p-2 rounded-md bg-muted/40">
+          <Users className="h-3.5 w-3.5 text-primary" />
+          <div><span className="block text-muted-foreground">Participants</span><span className="font-medium">min {t.min_participants ?? "—"} / max {t.max_participants ?? "—"}</span></div>
+        </div>
+      )}
+      {t.trainer_name && (
+        <div className="flex items-center gap-1.5 p-2 rounded-md bg-muted/40">
+          <UserCircle className="h-3.5 w-3.5 text-primary" />
+          <div><span className="block text-muted-foreground">Formateur</span><span className="font-medium truncate">{t.trainer_name}</span></div>
+        </div>
+      )}
+      {t.objectives && (
+        <div className="flex items-center gap-1.5 p-2 rounded-md bg-muted/40 col-span-2 md:col-span-1">
+          <Target className="h-3.5 w-3.5 text-primary" />
+          <div className="min-w-0"><span className="block text-muted-foreground">Objectifs</span><span className="font-medium line-clamp-1">{t.objectives}</span></div>
+        </div>
+      )}
+    </div>
+  );
 
   // Evaluation button component
   const EvalButton = ({ onClick }: { onClick: () => void }) => (
@@ -407,11 +489,11 @@ const ForumPage = () => {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
               <MessageSquare className="h-4 w-4" />
-              Espace Communautaire
+              Espace Forum &amp; Communauté – Pôle Stratégique
             </div>
-            <h1 className="text-3xl font-bold mb-2">Forum Communautaire STARTUNUP</h1>
+            <h1 className="text-3xl font-bold mb-2">Espace Forum &amp; Communauté – Pôle Stratégique</h1>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Découvrez les formations programmées et rejoignez notre communauté d'entrepreneurs.
+              Formations, discussions et collaboration en temps réel, branchées au Pôle Stratégique.
             </p>
           </motion.div>
 
@@ -519,7 +601,7 @@ const ForumPage = () => {
             <div>
               <div className="flex items-center gap-2">
                 <MessageSquare className="h-6 w-6 text-primary" />
-                <h1 className="text-2xl font-bold">Forum Communautaire</h1>
+                <h1 className="text-xl md:text-2xl font-bold">Espace Forum &amp; Communauté – Pôle Stratégique</h1>
               </div>
               <p className="text-xs text-muted-foreground ml-8">Formations, discussions et collaboration en temps réel</p>
             </div>
@@ -730,9 +812,17 @@ const ForumPage = () => {
                     </div>
                     <CardTitle className="flex items-center gap-3 flex-wrap">
                       {selectedThread.title}
+                      {(selectedThread.is_strategic || selectedThread.category === "strategique") && <StrategiqueBadge />}
                       {selectedThread.category === "formation" && <EvalButton onClick={() => setActiveTab("evaluation")} />}
                     </CardTitle>
                     <p className="text-sm text-muted-foreground mt-2">{selectedThread.content}</p>
+                    {selectedThread.category === "formation" && <FicheFormation t={selectedThread} />}
+                    {selectedThread.objectives && (
+                      <div className="mt-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
+                        <h4 className="text-xs font-semibold mb-1 flex items-center gap-2 text-primary"><Target className="h-3.5 w-3.5" />Objectifs pédagogiques</h4>
+                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">{selectedThread.objectives}</p>
+                      </div>
+                    )}
 
                     {selectedThread.trainer_name && (
                       <div className="mt-3 flex items-center gap-4 text-sm">
@@ -809,14 +899,25 @@ const ForumPage = () => {
               </motion.div>
             ) : (
               <>
-                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                  <Select value={filterCategory} onValueChange={setFilterCategory}>
-                    <SelectTrigger className="w-48"><SelectValue placeholder="Catégorie" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Toutes</SelectItem>
-                      {CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.icon} {c.label}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-wrap gap-2 p-1.5 bg-muted/40 rounded-xl border">
+                    {FILTER_TABS.map(t => (
+                      <button
+                        key={t.value}
+                        onClick={() => setFilterCategory(t.value)}
+                        className={cn(
+                          "flex-1 min-w-[140px] px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-1.5",
+                          filterCategory === t.value
+                            ? "bg-background shadow-sm text-foreground ring-1 ring-primary/30"
+                            : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                        )}
+                      >
+                        <span>{t.icon}</span>
+                        <span>{t.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex justify-end">
                   <Dialog open={isCreating} onOpenChange={setIsCreating}>
                     <DialogTrigger asChild>
                       <Button className="gap-2"><Plus className="h-4 w-4" />Nouvelle discussion</Button>
@@ -869,14 +970,33 @@ const ForumPage = () => {
                                 </PopoverContent>
                               </Popover>
                             </div>
-                            <div className="space-y-2">
-                              <Label>Durée</Label>
-                              <Input placeholder="Ex: 2 heures, 3 jours..." value={formationDuration} onChange={e => setFormationDuration(e.target.value)} />
+                            <div className="grid grid-cols-3 gap-3">
+                              <div className="space-y-2">
+                                <Label>Durée</Label>
+                                <Input placeholder="Ex: 2h, 3 jours" value={formationDuration} onChange={e => setFormationDuration(e.target.value)} />
+                              </div>
+                              <div className="space-y-2">
+                                <Label>Min. participants</Label>
+                                <Input type="number" min={1} placeholder="5" value={formationMinParticipants} onChange={e => setFormationMinParticipants(e.target.value)} />
+                              </div>
+                              <div className="space-y-2">
+                                <Label>Max. participants</Label>
+                                <Input type="number" min={1} placeholder="20" value={formationMaxParticipants} onChange={e => setFormationMaxParticipants(e.target.value)} />
+                              </div>
                             </div>
                             <div className="space-y-2">
-                              <Label>Plan de la formation</Label>
+                              <Label className="flex items-center gap-1.5"><Target className="h-3.5 w-3.5" />Objectifs pédagogiques</Label>
+                              <Textarea placeholder="À l'issue, les participants seront capables de..." value={formationObjectives} onChange={e => setFormationObjectives(e.target.value)} rows={2} maxLength={1500} />
+                            </div>
+                            <div className="space-y-2">
+                              <Label>Plan / modules</Label>
                               <Textarea placeholder="Module 1: Introduction&#10;Module 2: ..." value={formationPlan} onChange={e => setFormationPlan(e.target.value)} rows={4} maxLength={5000} />
                             </div>
+                            <label className="flex items-center gap-2 p-3 rounded-lg border bg-violet-500/5 cursor-pointer">
+                              <input type="checkbox" checked={formationIsStrategic} onChange={e => setFormationIsStrategic(e.target.checked)} className="h-4 w-4 accent-violet-600" />
+                              <Sparkles className="h-4 w-4 text-violet-600" />
+                              <span className="text-sm">Marquer cette formation comme liée au <strong>Pôle Stratégique</strong></span>
+                            </label>
                             <div className="space-y-2">
                               <Label className="flex items-center gap-1.5"><Video className="h-3.5 w-3.5" />Lien Meet / Zoom (optionnel)</Label>
                               <Input placeholder="https://meet.google.com/... (auto-généré si vide)" value={meetLink} onChange={e => setMeetLink(e.target.value)} />
@@ -891,6 +1011,7 @@ const ForumPage = () => {
                       </div>
                     </DialogContent>
                   </Dialog>
+                  </div>
                 </div>
 
                 {loading ? (
@@ -904,45 +1025,47 @@ const ForumPage = () => {
                   <div className="space-y-3">
                     {threads.map((t, i) => (
                       <motion.div key={t.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-                        <Card className="cursor-pointer hover:shadow-md transition-all hover:border-primary/30" onClick={() => setSelectedThread(t)}>
-                          <CardContent className="pt-4 pb-4 flex items-center gap-4">
-                            <div className="text-2xl">{CATEGORIES.find(c => c.value === t.category)?.icon || "💬"}</div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                {t.is_pinned && <Badge variant="destructive" className="text-[10px] px-1.5">📌</Badge>}
-                                <h3 className="font-semibold text-sm truncate">{t.title}</h3>
-                                {t.category === "formation" && <EvalButton onClick={() => setActiveTab("evaluation")} />}
-                                {t.category === "formation" && t.scheduled_date && (
-                                  <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px]">
-                                    <CalendarDays className="h-3 w-3 mr-1" />
-                                    {format(new Date(t.scheduled_date), "dd MMM", { locale: fr })}
-                                  </Badge>
-                                )}
-                                {t.meet_link && (
-                                  <Badge variant="outline" className="text-[10px] text-emerald-600 border-emerald-300">
-                                    <Video className="h-3 w-3 mr-1" />Meet
-                                  </Badge>
-                                )}
+                        <Card className={cn("cursor-pointer hover:shadow-md transition-all hover:border-primary/30", t.is_strategic && "border-l-4 border-l-violet-500")} onClick={() => setSelectedThread(t)}>
+                          <CardContent className="pt-4 pb-4">
+                            <div className="flex items-start gap-4">
+                              <div className="text-2xl">{CATEGORIES.find(c => c.value === t.category)?.icon || "💬"}</div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                  {t.is_pinned && <Badge variant="destructive" className="text-[10px] px-1.5">📌</Badge>}
+                                  <h3 className="font-semibold text-sm truncate">{t.title}</h3>
+                                  {(t.is_strategic || t.category === "strategique") && <StrategiqueBadge />}
+                                  {t.category === "formation" && <EvalButton onClick={() => setActiveTab("evaluation")} />}
+                                  {t.category === "formation" && t.scheduled_date && (
+                                    <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px]">
+                                      <CalendarDays className="h-3 w-3 mr-1" />
+                                      {format(new Date(t.scheduled_date), "dd MMM", { locale: fr })}
+                                    </Badge>
+                                  )}
+                                  {t.meet_link && (
+                                    <Badge variant="outline" className="text-[10px] text-emerald-600 border-emerald-300">
+                                      <Video className="h-3 w-3 mr-1" />Meet
+                                    </Badge>
+                                  )}
+                                </div>
+                                <p className="text-xs text-muted-foreground line-clamp-1">{t.content}</p>
+                                <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                                  <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" />{formatDate(t.created_at)}</span>
+                                  <span className="text-xs text-muted-foreground flex items-center gap-1"><MessageCircle className="h-3 w-3" />{t.replies_count} réponses</span>
+                                </div>
+                                {t.category === "formation" && <FicheFormation t={t} />}
                               </div>
-                              <p className="text-xs text-muted-foreground line-clamp-1">{t.content}</p>
-                              <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-                                {t.trainer_name && (
-                                  <span className="text-xs text-muted-foreground flex items-center gap-1"><UserCircle className="h-3 w-3" />{t.trainer_name}</span>
+                              <div className="flex flex-col items-end gap-2 shrink-0">
+                                {t.category === "formation" && t.scheduled_date && (
+                                  <>
+                                    <ParticipationButton thread={t} />
+                                    <Button variant="outline" size="sm" className="gap-1 text-xs" onClick={(e) => { e.stopPropagation(); exportParticipantsCSV(t); }}>
+                                      <Download className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </>
                                 )}
-                                <span className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="h-3 w-3" />{formatDate(t.created_at)}</span>
-                                <span className="text-xs text-muted-foreground flex items-center gap-1"><MessageCircle className="h-3 w-3" />{t.replies_count} réponses</span>
-                                {t.duration_text && <span className="text-xs text-muted-foreground">⏱ {t.duration_text}</span>}
+                                <ChevronRight className="h-5 w-5 text-muted-foreground" />
                               </div>
                             </div>
-                            {t.category === "formation" && t.scheduled_date && (
-                              <>
-                                <ParticipationButton thread={t} />
-                                <Button variant="outline" size="sm" className="gap-1 text-xs" onClick={(e) => { e.stopPropagation(); exportParticipantsCSV(t); }}>
-                                  <Download className="h-3.5 w-3.5" />
-                                </Button>
-                              </>
-                            )}
-                            <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
                           </CardContent>
                         </Card>
                       </motion.div>
