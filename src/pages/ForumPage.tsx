@@ -601,7 +601,7 @@ const ForumPage = () => {
             <div>
               <div className="flex items-center gap-2">
                 <MessageSquare className="h-6 w-6 text-primary" />
-                <h1 className="text-2xl font-bold">Forum Communautaire</h1>
+                <h1 className="text-xl md:text-2xl font-bold">Espace Forum &amp; Communauté – Pôle Stratégique</h1>
               </div>
               <p className="text-xs text-muted-foreground ml-8">Formations, discussions et collaboration en temps réel</p>
             </div>
