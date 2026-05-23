@@ -984,6 +984,7 @@ const ForumPage = () => {
                       </div>
                     </DialogContent>
                   </Dialog>
+                  </div>
                 </div>
 
                 {loading ? (
