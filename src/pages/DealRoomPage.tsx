@@ -167,6 +167,22 @@ export default function DealRoomPage() {
         </div>
       </header>
 
+      <Tabs defaultValue="documents" className="px-6 pt-4">
+        <TabsList>
+          <TabsTrigger value="documents">📁 Documents</TabsTrigger>
+          <TabsTrigger value="pipeline">📊 Deals & Pipeline</TabsTrigger>
+          <TabsTrigger value="investors">💼 Investisseurs</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="pipeline" className="mt-4">
+          {userId && <DealsPipeline userId={userId} />}
+        </TabsContent>
+
+        <TabsContent value="investors" className="mt-4">
+          {userId && <InvestorInterests userId={userId} />}
+        </TabsContent>
+
+        <TabsContent value="documents" className="mt-4">
       <div className="flex">
         <aside className="w-64 border-r border-border min-h-[calc(100vh-89px)] p-4 space-y-1">
           {CATEGORIES.map(c => {
