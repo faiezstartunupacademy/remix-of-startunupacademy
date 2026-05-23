@@ -354,8 +354,8 @@ export default function RoadmapPage() {
                 {applications.slice(0, 5).map((a: any) => (
                   <li key={a.id} className="flex items-center justify-between text-sm p-2 rounded border">
                     <div className="min-w-0">
-                      <div className="font-medium truncate">{a.programs?.name || "Programme"}</div>
-                      <div className="text-xs text-muted-foreground truncate">{a.programs?.organization}</div>
+                      <div className="font-medium truncate">{a.program?.name || a.custom_program_name || "Programme"}</div>
+                      <div className="text-xs text-muted-foreground truncate">{a.program?.organization || (a.submission_date ? `Soumise le ${a.submission_date}` : "")}</div>
                     </div>
                     <Badge variant={a.status === "accepted" ? "default" : a.status === "rejected" ? "destructive" : "secondary"}>
                       {APP_LABEL[a.status] || a.status}
