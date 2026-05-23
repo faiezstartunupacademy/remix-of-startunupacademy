@@ -308,7 +308,16 @@ const AdminDashboard = () => {
                 <Briefcase className="h-4 w-4" />
                 <span className="hidden lg:inline">Partenaires</span>
               </TabsTrigger>
+              <TabsTrigger value="bi" className="flex items-center gap-2">
+                <LineChartIcon className="h-4 w-4" />
+                <span className="hidden lg:inline">BI</span>
+              </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="bi">
+              <PlatformBIDashboard />
+            </TabsContent>
+
 
             <TabsContent value="cohort">
               <CohortAnalytics />
