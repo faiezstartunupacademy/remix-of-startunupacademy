@@ -14,6 +14,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 import { BusinessIntelligenceDashboard } from "@/components/strategic/BusinessIntelligenceDashboard";
+import MarketToolsPanel from "@/components/market-intel/MarketToolsPanel";
+import { Wrench } from "lucide-react";
 
 type DataSource = {
   id: string;
