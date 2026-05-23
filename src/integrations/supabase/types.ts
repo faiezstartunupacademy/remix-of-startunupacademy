@@ -1599,6 +1599,129 @@ export type Database = {
           },
         ]
       }
+      journey_badges: {
+        Row: {
+          badge_code: string
+          earned_at: string
+          icon: string | null
+          id: string
+          label: string
+          phase_id: number | null
+          user_id: string
+        }
+        Insert: {
+          badge_code: string
+          earned_at?: string
+          icon?: string | null
+          id?: string
+          label: string
+          phase_id?: number | null
+          user_id: string
+        }
+        Update: {
+          badge_code?: string
+          earned_at?: string
+          icon?: string | null
+          id?: string
+          label?: string
+          phase_id?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      journey_leaderboard_optin: {
+        Row: {
+          display_name: string | null
+          is_anonymous: boolean
+          is_optin: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          display_name?: string | null
+          is_anonymous?: boolean
+          is_optin?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          display_name?: string | null
+          is_anonymous?: boolean
+          is_optin?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      journey_stage_validations: {
+        Row: {
+          coach_id: string | null
+          coach_notes: string | null
+          created_at: string
+          evidence_notes: string | null
+          id: string
+          phase_id: number
+          requested_at: string
+          reviewed_at: string | null
+          self_assessment_score: number | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          coach_id?: string | null
+          coach_notes?: string | null
+          created_at?: string
+          evidence_notes?: string | null
+          id?: string
+          phase_id: number
+          requested_at?: string
+          reviewed_at?: string | null
+          self_assessment_score?: number | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          coach_id?: string | null
+          coach_notes?: string | null
+          created_at?: string
+          evidence_notes?: string | null
+          id?: string
+          phase_id?: number
+          requested_at?: string
+          reviewed_at?: string | null
+          self_assessment_score?: number | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      journey_streaks: {
+        Row: {
+          current_streak: number
+          last_activity_date: string | null
+          longest_streak: number
+          total_points: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          current_streak?: number
+          last_activity_date?: string | null
+          longest_streak?: number
+          total_points?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          current_streak?: number
+          last_activity_date?: string | null
+          longest_streak?: number
+          total_points?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       knowledge_base_tests: {
         Row: {
           applicable_sectors: string[] | null
