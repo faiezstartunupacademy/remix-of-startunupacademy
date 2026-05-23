@@ -3860,7 +3860,11 @@ export type Database = {
           formation_plan: string
           id: string
           is_pinned: boolean
+          is_strategic: boolean
+          max_participants: number
           meet_link: string
+          min_participants: number
+          objectives: string
           replies_count: number
           scheduled_date: string
           title: string
