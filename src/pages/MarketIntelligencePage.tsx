@@ -14,6 +14,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 import { BusinessIntelligenceDashboard } from "@/components/strategic/BusinessIntelligenceDashboard";
+import MarketToolsPanel from "@/components/market-intel/MarketToolsPanel";
+import { Wrench } from "lucide-react";
 
 type DataSource = {
   id: string;
@@ -31,7 +33,7 @@ const MarketIntelligencePage = () => {
   const [newSource, setNewSource] = useState({ type: "competitor" as const, url: "", content: "" });
   const [analysisResult, setAnalysisResult] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [mainTab, setMainTab] = useState<"market" | "bi">("market");
+  const [mainTab, setMainTab] = useState<"market" | "bi" | "tools">("market");
   const [biProjectId, setBiProjectId] = useState("");
   const [mvpProjects, setMvpProjects] = useState<MvpProject[]>([]);
   const [loadingProjects, setLoadingProjects] = useState(false);
@@ -196,14 +198,21 @@ const MarketIntelligencePage = () => {
 
           {/* Main Tab Switch: Market Intelligence vs BI */}
           <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as any)} className="mb-8">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+            <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3">
               <TabsTrigger value="market" className="gap-2">
                 <Target className="h-4 w-4" /> Market Intelligence
+              </TabsTrigger>
+              <TabsTrigger value="tools" className="gap-2">
+                <Wrench className="h-4 w-4" /> Outils Lab
               </TabsTrigger>
               <TabsTrigger value="bi" className="gap-2">
                 <BarChart3 className="h-4 w-4" /> Business Intelligence
               </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="tools" className="mt-6">
+              <MarketToolsPanel />
+            </TabsContent>
 
             <TabsContent value="market" className="mt-6">
               {/* Phase Navigation */}
