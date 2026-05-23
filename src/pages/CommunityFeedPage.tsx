@@ -9,13 +9,22 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Heart, MessageCircle, Send, Link2, Sparkles, Users } from "lucide-react";
+import { Loader2, Heart, MessageCircle, Send, Link2, Sparkles, Users, Flame, Clock, Star } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import CommunitySidebar from "@/components/community/CommunitySidebar";
 import { Link } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
+
+const renderContent = (text: string) => {
+  const parts = text.split(/(#[\p{L}0-9_]+)/giu);
+  return parts.map((p, i) => p.startsWith("#")
+    ? <span key={i} className="text-primary font-medium hover:underline cursor-pointer">{p}</span>
+    : <span key={i}>{p}</span>);
+};
 
 interface Post {
   id: string; user_id: string; content: string; category: string;
