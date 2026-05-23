@@ -90,6 +90,10 @@ const ForumPage = () => {
   const [formationDate, setFormationDate] = useState<Date>();
   const [formationDuration, setFormationDuration] = useState("");
   const [formationPlan, setFormationPlan] = useState("");
+  const [formationObjectives, setFormationObjectives] = useState("");
+  const [formationMinParticipants, setFormationMinParticipants] = useState<string>("");
+  const [formationMaxParticipants, setFormationMaxParticipants] = useState<string>("");
+  const [formationIsStrategic, setFormationIsStrategic] = useState(false);
   const [trainerName, setTrainerName] = useState("");
   const [trainerEmail, setTrainerEmail] = useState("");
   const [meetLink, setMeetLink] = useState("");
