@@ -962,14 +962,33 @@ const ForumPage = () => {
                                 </PopoverContent>
                               </Popover>
                             </div>
-                            <div className="space-y-2">
-                              <Label>Durée</Label>
-                              <Input placeholder="Ex: 2 heures, 3 jours..." value={formationDuration} onChange={e => setFormationDuration(e.target.value)} />
+                            <div className="grid grid-cols-3 gap-3">
+                              <div className="space-y-2">
+                                <Label>Durée</Label>
+                                <Input placeholder="Ex: 2h, 3 jours" value={formationDuration} onChange={e => setFormationDuration(e.target.value)} />
+                              </div>
+                              <div className="space-y-2">
+                                <Label>Min. participants</Label>
+                                <Input type="number" min={1} placeholder="5" value={formationMinParticipants} onChange={e => setFormationMinParticipants(e.target.value)} />
+                              </div>
+                              <div className="space-y-2">
+                                <Label>Max. participants</Label>
+                                <Input type="number" min={1} placeholder="20" value={formationMaxParticipants} onChange={e => setFormationMaxParticipants(e.target.value)} />
+                              </div>
                             </div>
                             <div className="space-y-2">
-                              <Label>Plan de la formation</Label>
+                              <Label className="flex items-center gap-1.5"><Target className="h-3.5 w-3.5" />Objectifs pédagogiques</Label>
+                              <Textarea placeholder="À l'issue, les participants seront capables de..." value={formationObjectives} onChange={e => setFormationObjectives(e.target.value)} rows={2} maxLength={1500} />
+                            </div>
+                            <div className="space-y-2">
+                              <Label>Plan / modules</Label>
                               <Textarea placeholder="Module 1: Introduction&#10;Module 2: ..." value={formationPlan} onChange={e => setFormationPlan(e.target.value)} rows={4} maxLength={5000} />
                             </div>
+                            <label className="flex items-center gap-2 p-3 rounded-lg border bg-violet-500/5 cursor-pointer">
+                              <input type="checkbox" checked={formationIsStrategic} onChange={e => setFormationIsStrategic(e.target.checked)} className="h-4 w-4 accent-violet-600" />
+                              <Sparkles className="h-4 w-4 text-violet-600" />
+                              <span className="text-sm">Marquer cette formation comme liée au <strong>Pôle Stratégique</strong></span>
+                            </label>
                             <div className="space-y-2">
                               <Label className="flex items-center gap-1.5"><Video className="h-3.5 w-3.5" />Lien Meet / Zoom (optionnel)</Label>
                               <Input placeholder="https://meet.google.com/... (auto-généré si vide)" value={meetLink} onChange={e => setMeetLink(e.target.value)} />
