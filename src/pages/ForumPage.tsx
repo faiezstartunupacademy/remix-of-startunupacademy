@@ -203,7 +203,13 @@ const ForumPage = () => {
       if (formationDate) insertData.scheduled_date = formationDate.toISOString();
       if (formationDuration.trim()) insertData.duration_text = formationDuration.trim();
       if (formationPlan.trim()) insertData.formation_plan = formationPlan.trim();
+      if (formationObjectives.trim()) insertData.objectives = formationObjectives.trim();
+      if (formationMinParticipants) insertData.min_participants = parseInt(formationMinParticipants) || null;
+      if (formationMaxParticipants) insertData.max_participants = parseInt(formationMaxParticipants) || null;
+      insertData.is_strategic = formationIsStrategic;
       insertData.meet_link = meetLink.trim() || generateMeetLink();
+    } else if (newThread.category === "strategique") {
+      insertData.is_strategic = true;
     }
     const { data: threadData, error } = await supabase.from("forum_threads").insert(insertData).select("id, title, category").single();
     if (error) {
@@ -229,6 +235,10 @@ const ForumPage = () => {
       setFormationDate(undefined);
       setFormationDuration("");
       setFormationPlan("");
+      setFormationObjectives("");
+      setFormationMinParticipants("");
+      setFormationMaxParticipants("");
+      setFormationIsStrategic(false);
       setTrainerName("");
       setTrainerEmail("");
       setMeetLink("");
