@@ -262,6 +262,7 @@ const CommunityFeedPage = () => {
             <Button asChild variant="outline"><Link to="/cofounders">🤝 Trouver un co-fondateur</Link></Button>
           </div>
         </motion.div>
+        <div className="hidden lg:block"><CommunitySidebar /></div>
       </main>
       <Footer />
     </div>
