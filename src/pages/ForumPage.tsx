@@ -812,9 +812,17 @@ const ForumPage = () => {
                     </div>
                     <CardTitle className="flex items-center gap-3 flex-wrap">
                       {selectedThread.title}
+                      {(selectedThread.is_strategic || selectedThread.category === "strategique") && <StrategiqueBadge />}
                       {selectedThread.category === "formation" && <EvalButton onClick={() => setActiveTab("evaluation")} />}
                     </CardTitle>
                     <p className="text-sm text-muted-foreground mt-2">{selectedThread.content}</p>
+                    {selectedThread.category === "formation" && <FicheFormation t={selectedThread} />}
+                    {selectedThread.objectives && (
+                      <div className="mt-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
+                        <h4 className="text-xs font-semibold mb-1 flex items-center gap-2 text-primary"><Target className="h-3.5 w-3.5" />Objectifs pédagogiques</h4>
+                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">{selectedThread.objectives}</p>
+                      </div>
+                    )}
 
                     {selectedThread.trainer_name && (
                       <div className="mt-3 flex items-center gap-4 text-sm">
