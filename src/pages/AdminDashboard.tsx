@@ -41,6 +41,8 @@ import CohortAnalytics from "@/components/admin/CohortAnalytics";
 import LegalVerificationPanel from "@/components/admin/LegalVerificationPanel";
 import RegionalEquityDashboard from "@/components/admin/RegionalEquityDashboard";
 import PartnersAdminManager from "@/components/admin/PartnersAdminManager";
+import PlatformBIDashboard from "@/components/admin/PlatformBIDashboard";
+import { LineChart as LineChartIcon } from "lucide-react";
 
 
 interface UserProfile {
