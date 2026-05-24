@@ -57,6 +57,7 @@ import DealRoomPage from "./pages/DealRoomPage";
 import MentorsPage from "./pages/MentorsPage";
 import MentorProfilePage from "./pages/MentorProfilePage";
 import MentorDashboard from "./pages/MentorDashboard";
+import CoachDashboard from "./pages/CoachDashboard";
 import FundingPage from "./pages/FundingPage";
 import FundingApplicationsPage from "./pages/FundingApplicationsPage";
 import CommunityFeedPage from "./pages/CommunityFeedPage";
@@ -130,6 +131,7 @@ const App = () => (
           <Route path="/mentors" element={<MentorsPage />} />
           <Route path="/mentors/:id" element={<MentorProfilePage />} />
           <Route path="/mentor-dashboard" element={<MentorDashboard />} />
+          <Route path="/coach-dashboard" element={<CoachDashboard />} />
           <Route path="/financement" element={<FundingPage />} />
           <Route path="/candidatures" element={<FundingApplicationsPage />} />
           <Route path="/feed" element={<CommunityFeedPage />} />
