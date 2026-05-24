@@ -178,7 +178,6 @@ const OnboardingPage = () => {
       role_type: v.role,
       onboarding_completed: true,
       onboarding_step: STEPS.length,
-      mission_control_activated: true,
       onboarding_goals: v.goals,
       connected_modules: v.modules,
     };
