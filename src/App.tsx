@@ -58,6 +58,7 @@ import MentorsPage from "./pages/MentorsPage";
 import MentorProfilePage from "./pages/MentorProfilePage";
 import MentorDashboard from "./pages/MentorDashboard";
 import CoachDashboard from "./pages/CoachDashboard";
+import NotificationsPage from "./pages/NotificationsPage";
 import FundingPage from "./pages/FundingPage";
 import FundingApplicationsPage from "./pages/FundingApplicationsPage";
 import CommunityFeedPage from "./pages/CommunityFeedPage";
