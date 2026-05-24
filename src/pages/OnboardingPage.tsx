@@ -146,6 +146,10 @@ const OnboardingPage = () => {
           return;
         }
       }
+      // Auto-créer un profil minimal pour permettre l'accès immédiat à Mission Control
+      if (!prof) {
+        await supabase.from("profiles").insert({ user_id: user.id, full_name: user.email?.split("@")[0] ?? "Founder" });
+      }
       setBootLoading(false);
     })();
   }, [navigate, setValue, editMode]);
