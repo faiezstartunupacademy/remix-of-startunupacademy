@@ -409,15 +409,26 @@ const OnboardingPage = () => {
           </AnimatePresence>
 
           {/* Nav buttons */}
-          <div className="flex justify-between mt-6 backdrop-blur-md bg-background/80 rounded-2xl p-3 border border-border/40">
+          <div className="flex flex-wrap items-center justify-between gap-2 mt-6 backdrop-blur-md bg-background/80 rounded-2xl p-3 border border-border/40">
             <Button variant="ghost" onClick={prev} disabled={step === 1} className="gap-2"><ArrowLeft className="h-4 w-4" /> Retour</Button>
-            {step < STEPS.length ? (
-              <Button onClick={next} className="gap-2" disabled={step === 1 && !role}>Continuer <ArrowRight className="h-4 w-4" /></Button>
-            ) : (
-              <Button onClick={handleSubmit(onSubmit)} disabled={loading} className="gap-2 bg-gradient-to-r from-primary to-accent">
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Activer Mission Control <Sparkles className="h-4 w-4" /></>}
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate("/mission-control")}
+                className="gap-2"
+                title="Accéder à Mission Control sans terminer l'onboarding"
+              >
+                <Sparkles className="h-4 w-4" /> Aller à Mission Control
               </Button>
-            )}
+              {step < STEPS.length ? (
+                <Button onClick={next} className="gap-2" disabled={step === 1 && !role}>Continuer <ArrowRight className="h-4 w-4" /></Button>
+              ) : (
+                <Button onClick={handleSubmit(onSubmit)} disabled={loading} className="gap-2 bg-gradient-to-r from-primary to-accent">
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Activer Mission Control <Sparkles className="h-4 w-4" /></>}
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>
