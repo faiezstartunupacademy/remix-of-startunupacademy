@@ -20,6 +20,7 @@ type Notification = {
 
 const NotificationBell = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
 
@@ -28,14 +29,27 @@ const NotificationBell = () => {
     loadNotifications();
 
     const channel = supabase
-      .channel("notifications")
+      .channel(`notifications-${user.id}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
-        (payload) => setNotifications(prev => [payload.new as Notification, ...prev])
+        (payload) => {
+          const n = payload.new as Notification;
+          setNotifications(prev => [n, ...prev]);
+          toast(n.title, {
+            description: n.message,
+            action: n.link ? { label: "Voir", onClick: () => navigate(n.link!) } : undefined,
+          });
+        }
+      )
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+        (payload) => {
+          const n = payload.new as Notification;
+          setNotifications(prev => prev.map(x => x.id === n.id ? n : x));
+        }
       )
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [user]);
+  }, [user, navigate]);
 
   const loadNotifications = async () => {
     if (!user) return;
