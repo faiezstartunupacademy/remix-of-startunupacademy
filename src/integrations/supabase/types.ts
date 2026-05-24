@@ -4150,6 +4150,16 @@ export type Database = {
       }
     }
     Functions: {
+      create_notification: {
+        Args: {
+          _link?: string
+          _message: string
+          _title: string
+          _type: string
+          _user_id: string
+        }
+        Returns: undefined
+      }
       get_quiz_questions_safe: {
         Args: { p_formation_id: string }
         Returns: Json
