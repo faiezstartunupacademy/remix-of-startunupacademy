@@ -3511,6 +3511,7 @@ export type Database = {
           id: string
           investment_thesis: string | null
           onboarding_completed: boolean
+          onboarding_goals: Json | null
           onboarding_step: number
           phone: string | null
           preferred_language: string
@@ -3536,6 +3537,7 @@ export type Database = {
           id?: string
           investment_thesis?: string | null
           onboarding_completed?: boolean
+          onboarding_goals?: Json | null
           onboarding_step?: number
           phone?: string | null
           preferred_language?: string
@@ -3561,6 +3563,7 @@ export type Database = {
           id?: string
           investment_thesis?: string | null
           onboarding_completed?: boolean
+          onboarding_goals?: Json | null
           onboarding_step?: number
           phone?: string | null
           preferred_language?: string
