@@ -138,6 +138,11 @@ const NotificationBell = () => {
             ))
           )}
         </ScrollArea>
+        <div className="border-t p-2 text-center">
+          <Link to="/notifications" onClick={() => setOpen(false)} className="text-xs text-primary hover:underline">
+            Voir toutes les notifications
+          </Link>
+        </div>
       </PopoverContent>
     </Popover>
   );
