@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS connected_modules JSONB DEFAULT '[]'::jsonb;
