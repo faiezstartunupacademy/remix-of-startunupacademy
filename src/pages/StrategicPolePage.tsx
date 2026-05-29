@@ -666,6 +666,19 @@ const StrategicPolePage = () => {
                                 }`} />
                               ))}
                             </div>
+                            <div className="mt-3 flex justify-end" onClick={e => e.stopPropagation()}>
+                              <ProjectAnalysisCard
+                                projectId={project.id}
+                                projectName={project.name}
+                                sector={project.sector}
+                                description={(project as any).description}
+                                startupStage={project.startup_stage}
+                                hasIdea={project.has_idea}
+                                messages={[]}
+                                userId={user.id}
+                              />
+                            </div>
+
                           </CardContent>
                         </Card>
                       </motion.div>
