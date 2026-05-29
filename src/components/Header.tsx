@@ -108,27 +108,44 @@ const Header = () => {
                 <Rocket className="h-4 w-4 mr-1.5" /> Construire
               </NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="grid w-[420px] gap-2 p-4">
-                  {[
-                    { to: "/pole-strategique", icon: "🎯", title: "Pôle Stratégique", desc: "Validation MVP, incubation 7 étapes" },
-                    { to: "/roadmap", icon: "🗺️", title: "Mon Parcours", desc: "Roadmap gamifié 5 phases" },
-                    { to: "/mission-control", icon: "🚀", title: "Mission Control", desc: "Dashboard startup, health score" },
-                    { to: "/deal-room", icon: "🔐", title: "Deal Room", desc: "Documents sécurisés, INPDP" },
-                    { to: "/lean-canvas-lab", icon: "📋", title: "Lean Canvas Lab", desc: "Atelier interactif" },
-                    { to: "/market-intelligence", icon: "📊", title: "Market Intelligence", desc: "Analyse marché Tunisie" },
-                    { to: "/financement", icon: "💰", title: "Financement", desc: "Smart Capital, Flat6Labs, VC TN" },
-                    { to: "/candidatures", icon: "📥", title: "Mes Candidatures", desc: "Kanban pipeline" },
-                  ].map(it => (
-                    <li key={it.to}>
-                      <NavigationMenuLink asChild>
-                        <Link to={it.to} className="flex items-center gap-3 rounded-xl p-3 hover:bg-muted transition">
-                          <span className="text-2xl">{it.icon}</span>
-                          <div><div className="text-sm font-semibold">{it.title}</div><p className="text-xs text-muted-foreground">{it.desc}</p></div>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                  ))}
-                </ul>
+                <div className="w-[460px] p-4 space-y-4">
+                  <ul className="grid gap-2">
+                    {[
+                      { to: "/pole-strategique", icon: "🎯", title: "Pôle Stratégique", desc: "Validation MVP, incubation 7 étapes" },
+                      { to: "/lean-canvas-lab", icon: "📋", title: "Lean Canvas Lab", desc: "Atelier interactif" },
+                    ].map(it => (
+                      <li key={it.to}>
+                        <NavigationMenuLink asChild>
+                          <Link to={it.to} className="flex items-center gap-3 rounded-xl p-3 hover:bg-muted transition">
+                            <span className="text-2xl">{it.icon}</span>
+                            <div><div className="text-sm font-semibold">{it.title}</div><p className="text-xs text-muted-foreground">{it.desc}</p></div>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    ))}
+                  </ul>
+                  <div>
+                    <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider px-3 mb-2">📈 Market</p>
+                    <ul className="grid gap-2">
+                      {[
+                        { to: "/market-intelligence", icon: "📊", title: "Market Intelligence", desc: "Analyse marché Tunisie" },
+                        { to: "/marketplace", icon: "🛍️", title: "Marketplace", desc: "Startups du programme" },
+                        { to: "/deal-room", icon: "🔐", title: "Deal Room", desc: "Documents sécurisés, INPDP" },
+                        { to: "/financement", icon: "💰", title: "Financement", desc: "Smart Capital, Flat6Labs, VC TN" },
+                        { to: "/candidatures", icon: "📥", title: "Mes Candidatures", desc: "Kanban pipeline" },
+                      ].map(it => (
+                        <li key={it.to}>
+                          <NavigationMenuLink asChild>
+                            <Link to={it.to} className="flex items-center gap-3 rounded-xl p-3 hover:bg-muted transition">
+                              <span className="text-2xl">{it.icon}</span>
+                              <div><div className="text-sm font-semibold">{it.title}</div><p className="text-xs text-muted-foreground">{it.desc}</p></div>
+                            </Link>
+                          </NavigationMenuLink>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
               </NavigationMenuContent>
             </NavigationMenuItem>
 
@@ -144,8 +161,6 @@ const Header = () => {
                     { to: "/mentors", icon: "👥", title: "Mentors", desc: "Annuaire & booking" },
                     { to: "/evenements", icon: "📅", title: "Événements", desc: "Pitch days, meetups" },
                     { to: "/cofounders", icon: "🤝", title: "Co-founders", desc: "Matching binôme" },
-                    { to: "/communaute/forum", icon: "🗨️", title: "Forum", desc: "Discussions" },
-                    { to: "/marketplace", icon: "🛍️", title: "Marketplace", desc: "Startups du programme" },
                     { to: "/ecosysteme", icon: "🌐", title: "Écosystème TN", desc: "Acteurs Tunisie" },
                     { to: "/annuaire", icon: "🤝", title: "Annuaire Partenaires", desc: "Accélérateurs, VC, institutions" },
                     { to: "/communaute/devenir-formateur", icon: "🎓", title: "Devenir Formateur STARTUNUP", desc: "Animez une formation (15+) → accès Pôle Stratégique" },
@@ -170,8 +185,10 @@ const Header = () => {
                   <Brain className="h-4 w-4 mr-1.5" /> Mon Compte
                 </NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <ul className="grid w-[320px] gap-2 p-4">
+                  <ul className="grid w-[340px] gap-2 p-4">
                     {[
+                      { to: "/mission-control", icon: "🚀", title: "Mission Control", desc: "Dashboard startup, health score" },
+                      { to: "/roadmap", icon: "🗺️", title: "Mon Parcours", desc: "Roadmap gamifié 5 phases" },
                       { to: "/mentor-dashboard", icon: "🎓", title: "Espace Mentor" },
                       { to: "/profil/donnees", icon: "🛡️", title: "Mes Données (RGPD)" },
                       { to: "/profil/consentement", icon: "✅", title: "Mon Consentement" },
@@ -181,7 +198,10 @@ const Header = () => {
                         <NavigationMenuLink asChild>
                           <Link to={it.to} className="flex items-center gap-3 rounded-xl p-3 hover:bg-muted transition">
                             <span className="text-xl">{it.icon}</span>
-                            <span className="text-sm font-medium">{it.title}</span>
+                            <div>
+                              <div className="text-sm font-semibold">{it.title}</div>
+                              {it.desc && <p className="text-xs text-muted-foreground">{it.desc}</p>}
+                            </div>
                           </Link>
                         </NavigationMenuLink>
                       </li>
@@ -190,6 +210,7 @@ const Header = () => {
                 </NavigationMenuContent>
               </NavigationMenuItem>
             )}
+
           </NavigationMenuList>
         </NavigationMenu>
 
