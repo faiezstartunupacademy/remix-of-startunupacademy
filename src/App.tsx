@@ -69,6 +69,7 @@ import BottomNav from "./components/BottomNav";
 import LanguageSync from "./components/LanguageSync";
 import InstallPwaPrompt from "./components/InstallPwaPrompt";
 import PartnersDirectoryPage from "./pages/PartnersDirectoryPage";
+import DevenirFormateurPage from "./pages/DevenirFormateurPage";
 
 const queryClient = new QueryClient();
 
