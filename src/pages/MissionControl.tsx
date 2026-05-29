@@ -138,6 +138,31 @@ const MissionControl = () => {
       community: posts?.length || 0,
       market: 0,
     });
+
+    // Strategic Pole eligibility based on trainer-animated sessions
+    const { data: trainerSess } = await supabase
+      .from("trainer_animated_sessions" as any)
+      .select("*")
+      .eq("trainer_user_id", uid)
+      .order("scheduled_date", { ascending: false });
+    const list = (trainerSess || []) as any[];
+    if (list.length === 0) {
+      setStrategicEligibility({ status: "none" });
+    } else {
+      const validated = list.find(s => s.status === "validated");
+      const rejected = list.find(s => s.status === "rejected");
+      const pending = list.find(s => s.status === "planned" || s.status === "completed");
+      if (validated) {
+        setStrategicEligibility({ status: "validated", title: validated.title, theme: validated.theme, participants: validated.participants_count, date: validated.validated_at || validated.scheduled_date });
+      } else if (pending) {
+        setStrategicEligibility({ status: "pending", title: pending.title, theme: pending.theme, participants: pending.participants_count, date: pending.scheduled_date });
+      } else if (rejected) {
+        setStrategicEligibility({ status: "rejected", title: rejected.title, theme: rejected.theme, reason: rejected.admin_notes, participants: rejected.participants_count, date: rejected.scheduled_date });
+      } else {
+        setStrategicEligibility({ status: "none" });
+      }
+    }
+
     setLoading(false);
   }, []);
 
