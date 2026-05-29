@@ -4079,6 +4079,60 @@ export type Database = {
           },
         ]
       }
+      trainer_animated_sessions: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          description: string | null
+          duration_hours: number | null
+          evaluation_avg: number | null
+          id: string
+          participants_count: number
+          resources_url: string | null
+          scheduled_date: string
+          status: string
+          theme: string
+          title: string
+          trainer_user_id: string
+          updated_at: string
+          validated_at: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          description?: string | null
+          duration_hours?: number | null
+          evaluation_avg?: number | null
+          id?: string
+          participants_count?: number
+          resources_url?: string | null
+          scheduled_date: string
+          status?: string
+          theme: string
+          title: string
+          trainer_user_id: string
+          updated_at?: string
+          validated_at?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          description?: string | null
+          duration_hours?: number | null
+          evaluation_avg?: number | null
+          id?: string
+          participants_count?: number
+          resources_url?: string | null
+          scheduled_date?: string
+          status?: string
+          theme?: string
+          title?: string
+          trainer_user_id?: string
+          updated_at?: string
+          validated_at?: string | null
+        }
+        Relationships: []
+      }
       user_consents: {
         Row: {
           consent_type: string

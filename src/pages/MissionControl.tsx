@@ -271,6 +271,41 @@ const MissionControl = () => {
               ))}
             </div>
 
+            {/* Quick access strip — Forum & Communauté / Pôle Stratégique Formations / Mes Programmes */}
+            <div className="grid md:grid-cols-3 gap-3">
+              <Link to="/communaute/forum" className="group rounded-xl border-2 border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 to-teal-500/5 p-4 hover:shadow-md transition">
+                <div className="flex items-center gap-3">
+                  <div className="h-11 w-11 rounded-lg bg-emerald-500/15 flex items-center justify-center"><Users className="h-5 w-5 text-emerald-600" /></div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm">Forum & Communauté</p>
+                    <p className="text-[11px] text-muted-foreground truncate">Discussions, formations & collab temps réel</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:translate-x-0.5 group-hover:text-primary transition" />
+                </div>
+              </Link>
+              <Link to="/communaute/devenir-formateur" className="group rounded-xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-purple-500/5 p-4 hover:shadow-md transition">
+                <div className="flex items-center gap-3">
+                  <div className="h-11 w-11 rounded-lg bg-primary/15 flex items-center justify-center"><GraduationCap className="h-5 w-5 text-primary" /></div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm">Pôle Stratégique — Formations</p>
+                    <p className="text-[11px] text-muted-foreground truncate">Animer une formation pour débloquer l'accès</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:translate-x-0.5 group-hover:text-primary transition" />
+                </div>
+              </Link>
+              <Link to="/formations" className="group rounded-xl border-2 border-violet-500/30 bg-gradient-to-br from-violet-500/10 to-indigo-500/5 p-4 hover:shadow-md transition">
+                <div className="flex items-center gap-3">
+                  <div className="h-11 w-11 rounded-lg bg-violet-500/15 flex items-center justify-center"><GraduationCap className="h-5 w-5 text-violet-600" /></div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm">Mes Programmes</p>
+                    <p className="text-[11px] text-muted-foreground truncate">Catalogue des formations & parcours</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:translate-x-0.5 group-hover:text-primary transition" />
+                </div>
+              </Link>
+            </div>
+
+
             {/* Active modules */}
             <Card>
               <CardHeader className="pb-3">

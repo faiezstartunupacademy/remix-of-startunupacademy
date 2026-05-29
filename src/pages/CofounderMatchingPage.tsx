@@ -25,7 +25,70 @@ interface CofounderProfile {
   anonymous_first_contact: boolean; is_active: boolean;
 }
 
-const ROLES = ["CTO", "CMO", "CFO", "COO", "CPO", "Sales Lead", "Designer", "Growth", "Tech Lead"];
+// Postes C-Suite & C-Chief — triés par criticité au stade early/scaling startup,
+// puis par complémentarité fonctionnelle (Tech ↔ Business ↔ People ↔ Risk).
+const ROLES = [
+  // Cœur fondateur — indispensables
+  "CEO — Chief Executive Officer",
+  "CTO — Chief Technology Officer",
+  "COO — Chief Operating Officer",
+  "CFO — Chief Financial Officer",
+  "CPO — Chief Product Officer",
+  // Croissance & marché
+  "CMO — Chief Marketing Officer",
+  "CRO — Chief Revenue Officer",
+  "CGO — Chief Growth Officer",
+  "CBDO — Chief Business Development Officer",
+  "CCO — Chief Commercial Officer",
+  "CSO — Chief Sales Officer",
+  // Tech, produit & data
+  "CIO — Chief Information Officer",
+  "CDO — Chief Data Officer",
+  "CAIO — Chief AI Officer",
+  "CDIO — Chief Digital & Innovation Officer",
+  "CINO — Chief Innovation Officer",
+  "CXO — Chief Experience Officer",
+  "CDesO — Chief Design Officer",
+  // People, culture & talents
+  "CHRO — Chief Human Resources Officer",
+  "CPeopleO — Chief People Officer",
+  "CTalO — Chief Talent Officer",
+  "CCultureO — Chief Culture Officer",
+  "CDIO — Chief Diversity & Inclusion Officer",
+  // Risque, conformité & juridique
+  "CISO — Chief Information Security Officer",
+  "CSO — Chief Security Officer",
+  "CRO — Chief Risk Officer",
+  "CCO — Chief Compliance Officer",
+  "CLO — Chief Legal Officer / General Counsel",
+  "CPO — Chief Privacy Officer",
+  // Stratégie, impact & écosystème
+  "CSO — Chief Strategy Officer",
+  "CSusO — Chief Sustainability Officer",
+  "CImpactO — Chief Impact Officer",
+  "CPartO — Chief Partnerships Officer",
+  "CEcoO — Chief Ecosystem Officer",
+  "CCO — Chief Communications Officer",
+  "CBO — Chief Brand Officer",
+  // Opérations spécialisées
+  "CCO — Chief Customer Officer",
+  "CSCO — Chief Supply Chain Officer",
+  "CMO — Chief Manufacturing Officer",
+  "CKO — Chief Knowledge Officer",
+  "CLO — Chief Learning Officer",
+  // C-CHIEF (cadre STARTUNUP)
+  "C-CHIEF — Chief Holistic Integrator of Entrepreneurial Forces",
+  // Rôles opérationnels seniors (non-C-level)
+  "VP Engineering",
+  "VP Product",
+  "VP Sales",
+  "VP Marketing",
+  "Head of Growth",
+  "Head of Design",
+  "Tech Lead",
+  "Sales Lead",
+  "Designer",
+];
 const COMMITMENTS = [{ id: "full_time", label: "Temps plein" }, { id: "part_time", label: "Temps partiel" }, { id: "side", label: "Side project" }];
 const SECTORS = ["Fintech", "AgriTech", "HealthTech", "EdTech", "E-commerce", "SaaS", "GreenTech", "Mobilité", "Tourisme", "Autre"];
 
@@ -62,7 +125,7 @@ const CofounderMatchingPage = () => {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<Partial<CofounderProfile>>({
-    headline: "", bio: "", role_seeking: "CTO", present_role: "", sector: "", location: "",
+    headline: "", bio: "", role_seeking: ROLES[1], present_role: "", sector: "", location: "",
     skills_have: [], skills_need: [], commitment: "full_time", anonymous_first_contact: true, is_active: true,
   });
 
@@ -144,7 +207,7 @@ const CofounderMatchingPage = () => {
                       </Select>
                     </div>
                     <div><Label>Je cherche *</Label>
-                      <Select value={form.role_seeking || "CTO"} onValueChange={(v) => setForm({ ...form, role_seeking: v })}>
+                      <Select value={form.role_seeking || ROLES[1]} onValueChange={(v) => setForm({ ...form, role_seeking: v })}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>{ROLES.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
                       </Select>
