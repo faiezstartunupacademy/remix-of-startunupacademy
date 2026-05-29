@@ -158,9 +158,8 @@ const Header = () => {
                 <ul className="grid w-[420px] gap-2 p-4">
                   {[
                     { to: "/communaute/devenir-formateur", icon: "🎓", title: "Devenir Formateur STARTUNUP", desc: "Animez une formation (15+) → accès Pôle Stratégique" },
-                    { to: "/mentor-dashboard", icon: "🎓", title: "Espace Mentor", desc: "Dashboard mentor, sessions, notes" },
+                    { to: "/mentors", icon: "🎓", title: "Mentor", desc: "Annuaire mentors, booking & dashboard" },
                     { to: "/feed", icon: "✨", title: "Feed", desc: "Wins, questions, ressources" },
-                    { to: "/mentors", icon: "👥", title: "Mentors", desc: "Annuaire & booking" },
                     { to: "/evenements", icon: "📅", title: "Événements", desc: "Pitch days, meetups" },
                     { to: "/cofounders", icon: "🤝", title: "Co-founders", desc: "Matching binôme" },
                     { to: "/ecosysteme", icon: "🌐", title: "Écosystème TN", desc: "Acteurs Tunisie" },
