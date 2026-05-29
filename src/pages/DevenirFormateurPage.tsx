@@ -271,6 +271,28 @@ const DevenirFormateurPage = () => {
             )}
           </TabsContent>
 
+          <TabsContent value="forum">
+            <Card>
+              <CardHeader className="flex-row items-center justify-between gap-3 space-y-0">
+                <div>
+                  <CardTitle className="flex items-center gap-2"><MessageSquare className="h-5 w-5 text-primary" /> Forum & Communauté</CardTitle>
+                  <CardDescription>Discussions, formations programmées et collaboration en temps réel avec la communauté STARTUNUP.</CardDescription>
+                </div>
+                <Button size="sm" variant="outline" asChild className="gap-1.5 shrink-0">
+                  <a href="/communaute/forum" target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /> Ouvrir en plein écran</a>
+                </Button>
+              </CardHeader>
+              <CardContent className="p-0">
+                <iframe
+                  src="/communaute/forum"
+                  title="Forum & Communauté STARTUNUP"
+                  className="w-full rounded-b-lg border-t"
+                  style={{ height: "78vh", minHeight: 600 }}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="profile">
             <TrainerRegistrationForm />
           </TabsContent>
