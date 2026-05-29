@@ -303,26 +303,84 @@ const DevenirFormateurPage = () => {
           </TabsContent>
 
           <TabsContent value="forum">
-            <Card>
-              <CardHeader className="flex-row items-center justify-between gap-3 space-y-0">
-                <div>
-                  <CardTitle className="flex items-center gap-2"><MessageSquare className="h-5 w-5 text-primary" /> Forum & Communauté</CardTitle>
-                  <CardDescription>Discussions, formations programmées et collaboration en temps réel avec la communauté STARTUNUP.</CardDescription>
-                </div>
-                <Button size="sm" variant="outline" asChild className="gap-1.5 shrink-0">
-                  <a href="/communaute/forum" target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /> Ouvrir en plein écran</a>
-                </Button>
-              </CardHeader>
-              <CardContent className="p-0">
-                <iframe
-                  src="/communaute/forum"
-                  title="Forum & Communauté STARTUNUP"
-                  className="w-full rounded-b-lg border-t"
-                  style={{ height: "78vh", minHeight: 600 }}
-                />
-              </CardContent>
-            </Card>
+            <div className="grid lg:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2"><CalendarRange className="h-5 w-5 text-primary" /> Calendrier des formations</CardTitle>
+                  <CardDescription>Sélectionnez une date pour voir les formations programmées par la communauté.</CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-col items-center">
+                  <Calendar
+                    mode="single"
+                    selected={calendarDate}
+                    onSelect={setCalendarDate}
+                    modifiers={{ scheduled: scheduledDates }}
+                    modifiersClassNames={{ scheduled: "bg-primary/15 text-primary font-semibold rounded-md" }}
+                    className="rounded-md border"
+                  />
+                  <div className="w-full mt-4 space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      {calendarDate ? calendarDate.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }) : "Aucune date sélectionnée"}
+                    </p>
+                    {selectedDateFormations.length === 0 ? (
+                      <p className="text-sm text-muted-foreground italic">Aucune formation ce jour.</p>
+                    ) : (
+                      selectedDateFormations.map(t => (
+                        <div key={t.id} className="p-2 rounded-md border bg-muted/30 text-sm">
+                          <p className="font-medium line-clamp-1">{t.title}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(t.scheduled_date).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
+                            {t.trainer_name && <> · {t.trainer_name}</>}
+                          </p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /> Prochaines formations</CardTitle>
+                  <CardDescription>Les {upcomingFormations.length} prochaines sessions programmées par la communauté STARTUNUP.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {upcomingFormations.length === 0 ? (
+                    <div className="py-10 text-center text-muted-foreground">
+                      <CalendarDays className="h-10 w-10 mx-auto mb-3 opacity-40" />
+                      Aucune formation à venir pour le moment.
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {upcomingFormations.map(t => (
+                        <div key={t.id} className="p-3 rounded-lg border hover:border-primary/40 hover:bg-muted/30 transition">
+                          <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
+                            <h4 className="font-semibold text-sm line-clamp-1">{t.title}</h4>
+                            {t.is_strategic && (
+                              <Badge className="bg-violet-500/15 text-violet-700 border-violet-300 text-[10px] gap-1">
+                                <Sparkles className="h-3 w-3" /> Stratégique
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground flex items-center gap-1.5 flex-wrap">
+                            <CalendarDays className="h-3 w-3" /> {fmtDateTime(t.scheduled_date)}
+                            {t.duration_text && <><span>·</span><Clock className="h-3 w-3" /> {t.duration_text}</>}
+                            {t.trainer_name && <><span>·</span> {t.trainer_name}</>}
+                          </p>
+                          {t.meet_link && (
+                            <Button size="sm" variant="outline" asChild className="mt-2 gap-1.5 h-7 text-xs">
+                              <a href={t.meet_link} target="_blank" rel="noreferrer"><Video className="h-3 w-3" /> Lien Meet</a>
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
+
 
           <TabsContent value="profile">
             <TrainerRegistrationForm />
