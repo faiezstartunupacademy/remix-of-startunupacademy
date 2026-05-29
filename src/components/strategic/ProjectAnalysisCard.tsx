@@ -44,7 +44,7 @@ const ProjectAnalysisCard = ({ projectId, projectName, sector, description, star
     setGenerating(true);
     try {
       // Fetch founder/team
-      const { data: profile } = await supabase.from("profiles").select("full_name, role, bio").eq("user_id", userId).maybeSingle();
+      const { data: profile } = await supabase.from("profiles").select("full_name").eq("user_id", userId).maybeSingle();
       const { data: team } = await supabase.from("project_team_members" as any).select("name, role, email").eq("project_id", projectId);
 
       const bmPatterns = extractBMPatterns(messages);
