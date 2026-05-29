@@ -107,10 +107,12 @@ const App = () => (
           <Route path="/c-chief" element={<ProtectedFormation contentSlug="c-chief" contentName="C-CHIEF Leadership"><CChiefPage /></ProtectedFormation>} />
           <Route path="/formation/ai-business" element={<ProtectedFormation contentSlug="ai-business" contentName="AI Business"><AIBusinessPage /></ProtectedFormation>} />
           <Route path="/recherche" element={<SearchPage />} />
-          <Route path="/pole-strategique" element={<IncubationDashboard />} />
-          <Route path="/pole-strategique/new" element={<NewIncubationProject />} />
-          <Route path="/pole-strategique/:id" element={<IncubationProject />} />
-          <Route path="/pole-strategique/:projectId/test/:testId" element={<TestDetail />} />
+          <Route path="/pole-strategique" element={<StrategicAccessGate><IncubationDashboard /></StrategicAccessGate>} />
+          <Route path="/pole-strategique/new" element={<StrategicAccessGate><NewIncubationProject /></StrategicAccessGate>} />
+          <Route path="/pole-strategique/:id" element={<StrategicAccessGate><IncubationProject /></StrategicAccessGate>} />
+          <Route path="/pole-strategique/:projectId/test/:testId" element={<StrategicAccessGate><TestDetail /></StrategicAccessGate>} />
+          <Route path="/strategic-console/:projectId" element={<StrategicAccessGate><StrategicConsolePage /></StrategicAccessGate>} />
+          <Route path="/mvp-validator" element={<Navigate to="/pole-strategique" replace />} />
           <Route path="/communaute" element={<CommunityPage />} />
           <Route path="/communaute/invest" element={<InvestPage />} />
           <Route path="/communaute/forum" element={<ForumPage />} />
