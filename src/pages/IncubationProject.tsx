@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAIReport } from "@/hooks/useAIReport";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
+import ProjectAnalysisCard from "@/components/strategic/ProjectAnalysisCard";
 
 const STEP_EMOJIS = ["🔥", "⚖️", "📐", "👥", "⚠️", "📈", "🎯"];
 const STEP_NAMES = ["Disruption", "Réglementaire", "Running Lean", "MVP-Personas", "Risques", "Métriques", "Plan Tactique"];
