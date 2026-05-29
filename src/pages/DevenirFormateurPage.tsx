@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { GraduationCap, ShieldCheck, AlertTriangle, CalendarDays, Users, Link2, Loader2, Plus, CheckCircle2, Clock, XCircle, FileText, ArrowLeft } from "lucide-react";
+import { GraduationCap, ShieldCheck, AlertTriangle, CalendarDays, Users, Link2, Loader2, Plus, CheckCircle2, Clock, XCircle, FileText, ArrowLeft, MessageSquare, ExternalLink } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -135,10 +135,11 @@ const DevenirFormateurPage = () => {
         </Card>
 
         <Tabs defaultValue="declare" className="space-y-6">
-          <TabsList className="grid w-full md:w-[480px] grid-cols-3">
-            <TabsTrigger value="declare">Déclarer une formation</TabsTrigger>
+          <TabsList className="grid w-full md:w-[640px] grid-cols-2 md:grid-cols-4">
+            <TabsTrigger value="declare">Déclarer</TabsTrigger>
             <TabsTrigger value="sessions">Mes sessions ({sessions.length})</TabsTrigger>
-            <TabsTrigger value="profile">Profil formateur</TabsTrigger>
+            <TabsTrigger value="forum" className="gap-1.5"><MessageSquare className="h-3.5 w-3.5" /> Forum</TabsTrigger>
+            <TabsTrigger value="profile">Profil</TabsTrigger>
           </TabsList>
 
           <TabsContent value="declare">
@@ -268,6 +269,28 @@ const DevenirFormateurPage = () => {
                 })}
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="forum">
+            <Card>
+              <CardHeader className="flex-row items-center justify-between gap-3 space-y-0">
+                <div>
+                  <CardTitle className="flex items-center gap-2"><MessageSquare className="h-5 w-5 text-primary" /> Forum & Communauté</CardTitle>
+                  <CardDescription>Discussions, formations programmées et collaboration en temps réel avec la communauté STARTUNUP.</CardDescription>
+                </div>
+                <Button size="sm" variant="outline" asChild className="gap-1.5 shrink-0">
+                  <a href="/communaute/forum" target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /> Ouvrir en plein écran</a>
+                </Button>
+              </CardHeader>
+              <CardContent className="p-0">
+                <iframe
+                  src="/communaute/forum"
+                  title="Forum & Communauté STARTUNUP"
+                  className="w-full rounded-b-lg border-t"
+                  style={{ height: "78vh", minHeight: 600 }}
+                />
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="profile">
