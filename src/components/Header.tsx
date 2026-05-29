@@ -158,6 +158,7 @@ const Header = () => {
                 <ul className="grid w-[420px] gap-2 p-4">
                   {[
                     { to: "/communaute/devenir-formateur", icon: "🎓", title: "Devenir Formateur STARTUNUP", desc: "Animez une formation (15+) → accès Pôle Stratégique" },
+                    { to: "/mentor-dashboard", icon: "🎓", title: "Espace Mentor", desc: "Dashboard mentor, sessions, notes" },
                     { to: "/feed", icon: "✨", title: "Feed", desc: "Wins, questions, ressources" },
                     { to: "/mentors", icon: "👥", title: "Mentors", desc: "Annuaire & booking" },
                     { to: "/evenements", icon: "📅", title: "Événements", desc: "Pitch days, meetups" },
@@ -189,7 +190,6 @@ const Header = () => {
                     {[
                       { to: "/mission-control", icon: "🚀", title: "Mission Control", desc: "Dashboard startup, health score" },
                       { to: "/roadmap", icon: "🗺️", title: "Mon Parcours", desc: "Roadmap gamifié 5 phases" },
-                      { to: "/mentor-dashboard", icon: "🎓", title: "Espace Mentor" },
                       { to: "/profil/donnees", icon: "🛡️", title: "Mes Données (RGPD)" },
                       { to: "/profil/consentement", icon: "✅", title: "Mon Consentement" },
                       { to: "/onboarding", icon: "🧭", title: "Mon Profil" },
