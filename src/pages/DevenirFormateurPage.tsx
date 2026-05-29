@@ -240,9 +240,31 @@ const DevenirFormateurPage = () => {
                     <div className="space-y-2">
                       <Label>Date de la formation *</Label>
                       <Input type="date" required value={form.scheduled_date}
+                        min={minDateForInput}
                         onChange={e => setForm(f => ({ ...f, scheduled_date: e.target.value }))} />
+                      {nextAllowedForTheme && !themeConflict && form.theme && (
+                        <p className="text-xs text-muted-foreground">
+                          ⏱ Prochaine date autorisée pour « {form.theme} » : <b>{fmtDate(nextAllowedForTheme)}</b> (cooldown 15 j).
+                        </p>
+                      )}
                     </div>
                   </div>
+
+                  {themeConflict && (
+                    <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm flex gap-3">
+                      <AlertTriangle className="h-5 w-5 text-destructive shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <p className="font-semibold text-destructive">Délai de 15 jours non respecté</p>
+                        <p className="text-muted-foreground">
+                          Vous avez déjà déclaré une formation <b>« {form.theme} »</b> le <b>{fmtDate(themeConflict.conflictDate)}</b>.
+                          Pour préserver la qualité pédagogique, deux formations sur la même thématique doivent être espacées d'au moins 15 jours.
+                        </p>
+                        <p>
+                          ✅ Prochaine date autorisée : <b className="text-foreground">{fmtDate(themeConflict.nextAllowed)}</b>
+                        </p>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="space-y-2">
                     <Label>Titre de la formation *</Label>
