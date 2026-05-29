@@ -257,10 +257,6 @@ const CommunityFeedPage = () => {
             </div>
           )}
 
-          <div className="mt-8 grid sm:grid-cols-2 gap-3">
-            <Button asChild variant="outline"><Link to="/evenements">📅 Voir les événements</Link></Button>
-            <Button asChild variant="outline"><Link to="/cofounders">🤝 Trouver un co-fondateur</Link></Button>
-          </div>
         </motion.div>
         <div className="hidden lg:block"><CommunitySidebar /></div>
       </main>
