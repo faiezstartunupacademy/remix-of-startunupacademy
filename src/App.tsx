@@ -120,10 +120,8 @@ const App = () => (
           <Route path="/marketplace/:slug" element={<StartupDetailPage />} />
           <Route path="/startup-space/:id" element={<StartupPrivateSpace />} />
           <Route path="/knowledge" element={<KnowledgeBase />} />
-          <Route path="/mvp-validator" element={<Navigate to="/pole-strategique" replace />} />
           <Route path="/lean-canvas-lab" element={<LeanCanvasLabPage />} />
           <Route path="/market-intelligence" element={<MarketIntelligencePage />} />
-          <Route path="/strategic-console/:projectId" element={<StrategicConsolePage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/legal/:slug" element={<LegalPage />} />
