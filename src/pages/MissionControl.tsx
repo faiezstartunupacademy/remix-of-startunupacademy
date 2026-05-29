@@ -339,6 +339,53 @@ const MissionControl = () => {
               </Link>
             </div>
 
+            {/* Strategic Pole eligibility indicator */}
+            {(() => {
+              const e = strategicEligibility;
+              const cfg = {
+                none:      { label: "Non demandé",  cls: "border-muted bg-muted/30",                                  badge: "bg-muted text-muted-foreground",                                 icon: ShieldCheck, iconCls: "text-muted-foreground", desc: "Animez une formation (15+ participants) pour débloquer l'accès au Pôle Stratégique." },
+                pending:   { label: "En attente",   cls: "border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-yellow-500/5", badge: "bg-amber-500/15 text-amber-700 border-amber-500/30",   icon: Activity,    iconCls: "text-amber-600",         desc: "Votre formation est en cours d'examen par un administrateur." },
+                validated: { label: "Validé ✓",     cls: "border-emerald-500/40 bg-gradient-to-br from-emerald-500/10 to-teal-500/5", badge: "bg-emerald-500/15 text-emerald-700 border-emerald-500/30", icon: ShieldCheck, iconCls: "text-emerald-600",       desc: "Accès complet au Pôle Stratégique débloqué." },
+                rejected:  { label: "Refusé",       cls: "border-destructive/40 bg-gradient-to-br from-destructive/10 to-rose-500/5", badge: "bg-destructive/15 text-destructive border-destructive/30", icon: ShieldCheck, iconCls: "text-destructive",       desc: "Votre dernière demande n'a pas été validée." },
+              }[e.status];
+              const Icon = cfg.icon;
+              return (
+                <Card className={`border-2 ${cfg.cls}`}>
+                  <CardContent className="p-4 flex items-start gap-4 flex-wrap">
+                    <div className="h-11 w-11 rounded-lg bg-background flex items-center justify-center shrink-0">
+                      <Icon className={`h-5 w-5 ${cfg.iconCls}`} />
+                    </div>
+                    <div className="flex-1 min-w-[220px]">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-semibold text-sm">Éligibilité Pôle Stratégique</p>
+                        <Badge variant="outline" className={`text-[11px] ${cfg.badge}`}>{cfg.label}</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {e.title ? <span><b>{e.title}</b>{e.theme && <> · {e.theme}</>}{typeof e.participants === "number" && <> · {e.participants} participant·e·s</>}</span> : cfg.desc}
+                      </p>
+                      {e.status === "rejected" && (
+                        <div className="mt-2 p-2 rounded-md bg-destructive/10 border border-destructive/20 text-xs">
+                          <b className="text-destructive">Raison du refus : </b>
+                          <span className="text-foreground/80">{e.reason || "Non précisée par l'administrateur."}</span>
+                        </div>
+                      )}
+                      {e.status === "pending" && (
+                        <p className="text-[11px] text-amber-700 mt-1.5">⏳ Décision habituellement rendue sous 48–72h.</p>
+                      )}
+                    </div>
+                    <Button asChild size="sm" variant={e.status === "validated" ? "default" : "outline"} className="shrink-0">
+                      <Link to={e.status === "validated" ? "/pole-strategique" : "/communaute/devenir-formateur"} className="gap-1">
+                        {e.status === "validated" ? "Accéder au Pôle" : e.status === "rejected" ? "Re-soumettre" : "Gérer mes formations"}
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })()}
+
+
+
 
             {/* Active modules */}
             <Card>
