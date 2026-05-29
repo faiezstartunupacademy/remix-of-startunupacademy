@@ -29,6 +29,7 @@ import IncubationSpace from "@/components/strategic/IncubationSpace";
 import ReportExport from "@/components/strategic/ReportExport";
 import BusinessPlanGenerator from "@/components/strategic/BusinessPlanGenerator";
 import InvestSpace from "@/components/strategic/InvestSpace";
+import ProjectAnalysisCard from "@/components/strategic/ProjectAnalysisCard";
 
 const PHASES = [
   { id: 1, name: "Disruption", icon: Zap, color: "from-violet-500 to-purple-600", bgLight: "bg-violet-500/10", textColor: "text-violet-600", description: "Identification de la disruption" },
