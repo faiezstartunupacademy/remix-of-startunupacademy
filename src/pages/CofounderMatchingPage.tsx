@@ -125,7 +125,7 @@ const CofounderMatchingPage = () => {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<Partial<CofounderProfile>>({
-    headline: "", bio: "", role_seeking: ROLES[1], present_role: "", sector: "", location: "",
+    headline: "", bio: "", role_seeking: ROLES[0], present_role: ROLES[0], sector: "", location: "",
     skills_have: [], skills_need: [], commitment: "full_time", anonymous_first_contact: true, is_active: true,
   });
 
