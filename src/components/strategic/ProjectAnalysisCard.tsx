@@ -98,7 +98,7 @@ const ProjectAnalysisCard = ({ projectId, projectName, sector, description, star
       doc.setTextColor(79, 70, 229);
       doc.text("2. Fondateur & équipe", 14, y);
       const teamRows: string[][] = [];
-      if (profile) teamRows.push([profile.full_name || "—", "Fondateur", profile.email || "—"]);
+      if (profile) teamRows.push([profile.full_name || "—", "Fondateur", "—"]);
       ((team as any[]) || []).forEach(m => teamRows.push([m.name || "—", m.role || "—", m.email || "—"]));
       if (teamRows.length === 0) teamRows.push(["—", "—", "—"]);
       autoTable(doc, {
