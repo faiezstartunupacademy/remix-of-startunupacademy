@@ -98,7 +98,40 @@ const DevenirFormateurPage = () => {
     [forumFormations]
   );
   const fmtDateTime = (d: string) => new Date(d).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  const fmtDate = (d: Date) => d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
 
+  // ── Cooldown 15 jours par thématique ─────────────────────────────────────
+  const COOLDOWN_DAYS = 15;
+  const themeConflict = useMemo(() => {
+    if (!form.theme || !form.scheduled_date) return null;
+    const target = new Date(form.scheduled_date);
+    if (isNaN(target.getTime())) return null;
+    const sameTheme = sessions.filter(
+      s => s.status !== "rejected" && s.theme.trim().toLowerCase() === form.theme.trim().toLowerCase()
+    );
+    const conflicting = sameTheme.find(s => {
+      const diffDays = Math.abs((target.getTime() - new Date(s.scheduled_date).getTime()) / 86_400_000);
+      return diffDays < COOLDOWN_DAYS;
+    });
+    if (!conflicting) return null;
+    const conflictDate = new Date(conflicting.scheduled_date);
+    const nextAllowed = new Date(conflictDate.getTime() + COOLDOWN_DAYS * 86_400_000);
+    return { conflicting, conflictDate, nextAllowed };
+  }, [form.theme, form.scheduled_date, sessions]);
+
+  const nextAllowedForTheme = useMemo(() => {
+    if (!form.theme) return null;
+    const sameTheme = sessions
+      .filter(s => s.status !== "rejected" && s.theme.trim().toLowerCase() === form.theme.trim().toLowerCase())
+      .sort((a, b) => new Date(b.scheduled_date).getTime() - new Date(a.scheduled_date).getTime());
+    if (!sameTheme.length) return null;
+    return new Date(new Date(sameTheme[0].scheduled_date).getTime() + COOLDOWN_DAYS * 86_400_000);
+  }, [form.theme, sessions]);
+
+  const minDateForInput = useMemo(() => {
+    if (!nextAllowedForTheme) return undefined;
+    return nextAllowedForTheme.toISOString().split("T")[0];
+  }, [nextAllowedForTheme]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,6 +139,13 @@ const DevenirFormateurPage = () => {
     if (!accepted) return toast({ title: "Acceptation requise", description: "Veuillez confirmer votre responsabilité éditoriale.", variant: "destructive" });
     if (!form.theme || !form.title || !form.scheduled_date) {
       return toast({ title: "Champs obligatoires manquants", variant: "destructive" });
+    }
+    if (themeConflict) {
+      return toast({
+        title: "⛔ Délai de 15 jours non respecté",
+        description: `Vous avez déjà une formation « ${form.theme} » le ${fmtDate(themeConflict.conflictDate)}. Prochaine date autorisée : ${fmtDate(themeConflict.nextAllowed)}.`,
+        variant: "destructive",
+      });
     }
     setSubmitting(true);
     const { error } = await supabase.from("trainer_animated_sessions" as any).insert({
@@ -119,7 +159,14 @@ const DevenirFormateurPage = () => {
       status: new Date(form.scheduled_date) <= new Date() ? "completed" : "planned",
     } as any);
     if (error) {
-      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+      const isCooldown = /intervalle de 15 jours|même thématique/i.test(error.message);
+      toast({
+        title: isCooldown ? "⛔ Délai de 15 jours non respecté" : "Erreur",
+        description: isCooldown && nextAllowedForTheme
+          ? `Deux formations sur la même thématique doivent être espacées d'au moins 15 jours. Prochaine date autorisée pour « ${form.theme} » : ${fmtDate(nextAllowedForTheme)}.`
+          : error.message,
+        variant: "destructive",
+      });
     } else {
       toast({ title: "✅ Formation déclarée", description: "En attente de validation par un administrateur." });
       setForm({ theme: "", title: "", description: "", scheduled_date: "", duration_hours: 2, participants_count: 0, resources_url: "" });
