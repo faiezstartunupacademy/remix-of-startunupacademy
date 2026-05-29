@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { GraduationCap, ShieldCheck, AlertTriangle, CalendarDays, Users, Link2, Loader2, Plus, CheckCircle2, Clock, XCircle, FileText, ArrowLeft } from "lucide-react";
+import { GraduationCap, ShieldCheck, AlertTriangle, CalendarDays, Users, Link2, Loader2, Plus, CheckCircle2, Clock, XCircle, FileText, ArrowLeft, MessageSquare, ExternalLink } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
