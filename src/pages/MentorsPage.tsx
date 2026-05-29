@@ -91,10 +91,82 @@ export default function MentorsPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold">👥 Annuaire des Mentors</h1>
-          <p className="text-muted-foreground">Trouvez le mentor qui boostera votre startup</p>
+        <div className="mb-6 flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h1 className="text-3xl font-bold">👥 Annuaire des Mentors</h1>
+            <p className="text-muted-foreground">Trouvez le mentor qui boostera votre startup</p>
+          </div>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button><Plus className="w-4 h-4 mr-1" /> Devenir mentor</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Ajouter / mettre à jour mon profil mentor</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm font-medium">Nom complet *</label>
+                    <Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} maxLength={120} required />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Pays (code ISO)</label>
+                    <Input value={form.country_code} onChange={(e) => setForm({ ...form, country_code: e.target.value })} maxLength={2} placeholder="TN" />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">LinkedIn</label>
+                    <Input value={form.linkedin_url} onChange={(e) => setForm({ ...form, linkedin_url: e.target.value })} placeholder="https://linkedin.com/in/..." />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Années d'expérience</label>
+                    <Input type="number" min={0} value={form.years_experience} onChange={(e) => setForm({ ...form, years_experience: Number(e.target.value) })} />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Tarif horaire (TND, optionnel)</label>
+                    <Input type="number" min={0} value={form.hourly_rate} onChange={(e) => setForm({ ...form, hourly_rate: e.target.value })} />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Bio</label>
+                  <Textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} maxLength={1000} rows={4} placeholder="Parcours, valeurs ajoutées, types de startups accompagnées..." />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Expertises</label>
+                  <div className="flex flex-wrap gap-2">
+                    {EXPERTISE.map(e => (
+                      <Badge key={e} variant={form.expertise_tags.includes(e) ? "default" : "outline"} className="cursor-pointer"
+                        onClick={() => setForm({ ...form, expertise_tags: form.expertise_tags.includes(e) ? form.expertise_tags.filter(x => x !== e) : [...form.expertise_tags, e] })}>{e}</Badge>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Langues</label>
+                  <div className="flex flex-wrap gap-2">
+                    {LANGUAGES.map(l => (
+                      <Badge key={l} variant={form.languages.includes(l) ? "default" : "outline"} className="cursor-pointer uppercase"
+                        onClick={() => setForm({ ...form, languages: form.languages.includes(l) ? form.languages.filter(x => x !== l) : [...form.languages, l] })}>{l}</Badge>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Secteurs</label>
+                  <div className="flex flex-wrap gap-2">
+                    {SECTORS.map(s => (
+                      <Badge key={s} variant={form.sectors.includes(s) ? "default" : "outline"} className="cursor-pointer"
+                        onClick={() => setForm({ ...form, sectors: form.sectors.includes(s) ? form.sectors.filter(x => x !== s) : [...form.sectors, s] })}>{s}</Badge>
+                    ))}
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setOpen(false)}>Annuler</Button>
+                  <Button type="submit" disabled={submitting}>{submitting ? "Publication..." : "Publier"}</Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
+
 
         <div className="grid lg:grid-cols-[280px_1fr] gap-6">
           {/* Sidebar filters */}
