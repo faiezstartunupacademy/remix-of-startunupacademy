@@ -29,6 +29,7 @@ import IncubationSpace from "@/components/strategic/IncubationSpace";
 import ReportExport from "@/components/strategic/ReportExport";
 import BusinessPlanGenerator from "@/components/strategic/BusinessPlanGenerator";
 import InvestSpace from "@/components/strategic/InvestSpace";
+import ProjectAnalysisCard from "@/components/strategic/ProjectAnalysisCard";
 
 const PHASES = [
   { id: 1, name: "Disruption", icon: Zap, color: "from-violet-500 to-purple-600", bgLight: "bg-violet-500/10", textColor: "text-violet-600", description: "Identification de la disruption" },
@@ -697,6 +698,16 @@ const StrategicPolePage = () => {
                   </div>
                   <div className="flex gap-2 flex-wrap">
                     {/* View mode toggles */}
+                    <ProjectAnalysisCard
+                      projectId={activeProject.id}
+                      projectName={activeProject.name}
+                      sector={activeProject.sector}
+                      description={activeProject.description}
+                      startupStage={activeProject.startup_stage}
+                      hasIdea={activeProject.has_idea}
+                      messages={messages}
+                      userId={user.id}
+                    />
                     {allPhasesComplete && (
                       <>
                         <Button
