@@ -135,10 +135,11 @@ const KnowledgeBase = () => {
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Base de <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Connaissances</span>
           </h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-6">
             Catalogue complet des tests MVP organisés par phase d'incubation.
             Chaque test contient un protocole détaillé, des métriques cibles et des outils recommandés.
           </p>
+          <KnowledgeBaseDownloadButton variant="default" size="default" />
         </motion.div>
 
         {/* Stats */}
