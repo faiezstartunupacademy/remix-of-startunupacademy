@@ -207,7 +207,7 @@ const CofounderMatchingPage = () => {
                       </Select>
                     </div>
                     <div><Label>Je cherche *</Label>
-                      <Select value={form.role_seeking || ROLES[1]} onValueChange={(v) => setForm({ ...form, role_seeking: v })}>
+                      <Select value={form.role_seeking || ROLES[0]} onValueChange={(v) => setForm({ ...form, role_seeking: v })}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>{ROLES.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
                       </Select>
