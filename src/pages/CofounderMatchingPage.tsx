@@ -125,7 +125,7 @@ const CofounderMatchingPage = () => {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<Partial<CofounderProfile>>({
-    headline: "", bio: "", role_seeking: ROLES[1], present_role: "", sector: "", location: "",
+    headline: "", bio: "", role_seeking: ROLES[0], present_role: ROLES[0], sector: "", location: "",
     skills_have: [], skills_need: [], commitment: "full_time", anonymous_first_contact: true, is_active: true,
   });
 
@@ -207,7 +207,7 @@ const CofounderMatchingPage = () => {
                       </Select>
                     </div>
                     <div><Label>Je cherche *</Label>
-                      <Select value={form.role_seeking || ROLES[1]} onValueChange={(v) => setForm({ ...form, role_seeking: v })}>
+                      <Select value={form.role_seeking || ROLES[0]} onValueChange={(v) => setForm({ ...form, role_seeking: v })}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>{ROLES.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
                       </Select>
