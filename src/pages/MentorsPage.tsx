@@ -2,12 +2,16 @@ import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
-import { Star, Search, Calendar } from "lucide-react";
+import { Star, Search, Calendar, Plus } from "lucide-react";
+import { toast } from "sonner";
 import Header from "@/components/Header";
+
 
 const EXPERTISE = ["Finance","Tech","Marketing","Legal","Export","Agri","Health","Education","SaaS","FinTech"];
 const LANGUAGES = ["fr","ar","en"];
