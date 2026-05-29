@@ -698,6 +698,16 @@ const StrategicPolePage = () => {
                   </div>
                   <div className="flex gap-2 flex-wrap">
                     {/* View mode toggles */}
+                    <ProjectAnalysisCard
+                      projectId={activeProject.id}
+                      projectName={activeProject.name}
+                      sector={activeProject.sector}
+                      description={activeProject.description}
+                      startupStage={activeProject.startup_stage}
+                      hasIdea={activeProject.has_idea}
+                      messages={messages}
+                      userId={user.id}
+                    />
                     {allPhasesComplete && (
                       <>
                         <Button
