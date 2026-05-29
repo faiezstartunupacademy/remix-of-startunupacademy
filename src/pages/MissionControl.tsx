@@ -196,6 +196,7 @@ const MissionControl = () => {
       .on("postgres_changes", { event: "*", schema: "public", table: "deal_room_deals", filter: `user_id=eq.${userId}` }, reload)
       .on("postgres_changes", { event: "*", schema: "public", table: "journey_streaks", filter: `user_id=eq.${userId}` }, reload)
       .on("postgres_changes", { event: "*", schema: "public", table: "journey_badges", filter: `user_id=eq.${userId}` }, reload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "trainer_animated_sessions", filter: `trainer_user_id=eq.${userId}` }, reload)
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [userId, profile, loadAll]);
