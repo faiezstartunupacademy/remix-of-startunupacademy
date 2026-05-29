@@ -2,12 +2,16 @@ import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Link } from "react-router-dom";
-import { Star, Search, Calendar } from "lucide-react";
+import { Star, Search, Calendar, Plus } from "lucide-react";
+import { toast } from "sonner";
 import Header from "@/components/Header";
+
 
 const EXPERTISE = ["Finance","Tech","Marketing","Legal","Export","Agri","Health","Education","SaaS","FinTech"];
 const LANGUAGES = ["fr","ar","en"];
@@ -27,13 +31,49 @@ export default function MentorsPage() {
   const [filterLang, setFilterLang] = useState<string[]>([]);
   const [filterSector, setFilterSector] = useState<string[]>([]);
   const [availableOnly, setAvailableOnly] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({
+    full_name: "", bio: "", linkedin_url: "", country_code: "TN",
+    years_experience: 0, hourly_rate: "", expertise_tags: [] as string[],
+    languages: ["fr"] as string[], sectors: [] as string[],
+  });
 
-  useEffect(() => {
-    supabase.from("mentors").select("*").eq("is_active", true).then(({ data }) => {
-      setMentors(data || []);
-      setLoading(false);
-    });
-  }, []);
+  async function loadMentors() {
+    const { data } = await supabase.from("mentors").select("*").eq("is_active", true);
+    setMentors(data || []);
+    setLoading(false);
+  }
+
+  useEffect(() => { loadMentors(); }, []);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { toast.error("Connectez-vous pour devenir mentor"); return; }
+    if (!form.full_name.trim() || form.full_name.length > 120) { toast.error("Nom requis (max 120)"); return; }
+    if (form.bio && form.bio.length > 1000) { toast.error("Bio trop longue (max 1000)"); return; }
+    setSubmitting(true);
+    const { error } = await supabase.from("mentors").upsert({
+      user_id: user.id,
+      full_name: form.full_name.trim(),
+      bio: form.bio.trim() || null,
+      linkedin_url: form.linkedin_url.trim() || null,
+      country_code: form.country_code.trim().toUpperCase() || "TN",
+      years_experience: Number(form.years_experience) || 0,
+      hourly_rate: form.hourly_rate ? Number(form.hourly_rate) : null,
+      expertise_tags: form.expertise_tags,
+      languages: form.languages,
+      sectors: form.sectors,
+      is_active: true,
+    }, { onConflict: "user_id" });
+    setSubmitting(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Profil mentor publié 🎉");
+    setOpen(false);
+    loadMentors();
+  }
+
 
   const filtered = useMemo(() => mentors.filter(m => {
     if (search && !m.full_name.toLowerCase().includes(search.toLowerCase())) return false;
@@ -51,10 +91,82 @@ export default function MentorsPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold">👥 Annuaire des Mentors</h1>
-          <p className="text-muted-foreground">Trouvez le mentor qui boostera votre startup</p>
+        <div className="mb-6 flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h1 className="text-3xl font-bold">👥 Annuaire des Mentors</h1>
+            <p className="text-muted-foreground">Trouvez le mentor qui boostera votre startup</p>
+          </div>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button><Plus className="w-4 h-4 mr-1" /> Devenir mentor</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Ajouter / mettre à jour mon profil mentor</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-sm font-medium">Nom complet *</label>
+                    <Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} maxLength={120} required />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Pays (code ISO)</label>
+                    <Input value={form.country_code} onChange={(e) => setForm({ ...form, country_code: e.target.value })} maxLength={2} placeholder="TN" />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">LinkedIn</label>
+                    <Input value={form.linkedin_url} onChange={(e) => setForm({ ...form, linkedin_url: e.target.value })} placeholder="https://linkedin.com/in/..." />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Années d'expérience</label>
+                    <Input type="number" min={0} value={form.years_experience} onChange={(e) => setForm({ ...form, years_experience: Number(e.target.value) })} />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Tarif horaire (TND, optionnel)</label>
+                    <Input type="number" min={0} value={form.hourly_rate} onChange={(e) => setForm({ ...form, hourly_rate: e.target.value })} />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Bio</label>
+                  <Textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} maxLength={1000} rows={4} placeholder="Parcours, valeurs ajoutées, types de startups accompagnées..." />
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Expertises</label>
+                  <div className="flex flex-wrap gap-2">
+                    {EXPERTISE.map(e => (
+                      <Badge key={e} variant={form.expertise_tags.includes(e) ? "default" : "outline"} className="cursor-pointer"
+                        onClick={() => setForm({ ...form, expertise_tags: form.expertise_tags.includes(e) ? form.expertise_tags.filter(x => x !== e) : [...form.expertise_tags, e] })}>{e}</Badge>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Langues</label>
+                  <div className="flex flex-wrap gap-2">
+                    {LANGUAGES.map(l => (
+                      <Badge key={l} variant={form.languages.includes(l) ? "default" : "outline"} className="cursor-pointer uppercase"
+                        onClick={() => setForm({ ...form, languages: form.languages.includes(l) ? form.languages.filter(x => x !== l) : [...form.languages, l] })}>{l}</Badge>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Secteurs</label>
+                  <div className="flex flex-wrap gap-2">
+                    {SECTORS.map(s => (
+                      <Badge key={s} variant={form.sectors.includes(s) ? "default" : "outline"} className="cursor-pointer"
+                        onClick={() => setForm({ ...form, sectors: form.sectors.includes(s) ? form.sectors.filter(x => x !== s) : [...form.sectors, s] })}>{s}</Badge>
+                    ))}
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={() => setOpen(false)}>Annuler</Button>
+                  <Button type="submit" disabled={submitting}>{submitting ? "Publication..." : "Publier"}</Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
+
 
         <div className="grid lg:grid-cols-[280px_1fr] gap-6">
           {/* Sidebar filters */}
