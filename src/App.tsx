@@ -35,6 +35,7 @@ import NewIncubationProject from "./pages/NewIncubationProject";
 import IncubationProject from "./pages/IncubationProject";
 import TestDetail from "./pages/TestDetail";
 import KnowledgeBase from "./pages/KnowledgeBase";
+import StrategicAccessGate from "./components/strategic/StrategicAccessGate";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 import DisciplinedEntrepreneurshipPage from "./pages/DisciplinedEntrepreneurshipPage";
@@ -106,10 +107,12 @@ const App = () => (
           <Route path="/c-chief" element={<ProtectedFormation contentSlug="c-chief" contentName="C-CHIEF Leadership"><CChiefPage /></ProtectedFormation>} />
           <Route path="/formation/ai-business" element={<ProtectedFormation contentSlug="ai-business" contentName="AI Business"><AIBusinessPage /></ProtectedFormation>} />
           <Route path="/recherche" element={<SearchPage />} />
-          <Route path="/pole-strategique" element={<IncubationDashboard />} />
-          <Route path="/pole-strategique/new" element={<NewIncubationProject />} />
-          <Route path="/pole-strategique/:id" element={<IncubationProject />} />
-          <Route path="/pole-strategique/:projectId/test/:testId" element={<TestDetail />} />
+          <Route path="/pole-strategique" element={<StrategicAccessGate><IncubationDashboard /></StrategicAccessGate>} />
+          <Route path="/pole-strategique/new" element={<StrategicAccessGate><NewIncubationProject /></StrategicAccessGate>} />
+          <Route path="/pole-strategique/:id" element={<StrategicAccessGate><IncubationProject /></StrategicAccessGate>} />
+          <Route path="/pole-strategique/:projectId/test/:testId" element={<StrategicAccessGate><TestDetail /></StrategicAccessGate>} />
+          <Route path="/strategic-console/:projectId" element={<StrategicAccessGate><StrategicConsolePage /></StrategicAccessGate>} />
+          <Route path="/mvp-validator" element={<Navigate to="/pole-strategique" replace />} />
           <Route path="/communaute" element={<CommunityPage />} />
           <Route path="/communaute/invest" element={<InvestPage />} />
           <Route path="/communaute/forum" element={<ForumPage />} />
@@ -117,10 +120,8 @@ const App = () => (
           <Route path="/marketplace/:slug" element={<StartupDetailPage />} />
           <Route path="/startup-space/:id" element={<StartupPrivateSpace />} />
           <Route path="/knowledge" element={<KnowledgeBase />} />
-          <Route path="/mvp-validator" element={<Navigate to="/pole-strategique" replace />} />
           <Route path="/lean-canvas-lab" element={<LeanCanvasLabPage />} />
           <Route path="/market-intelligence" element={<MarketIntelligencePage />} />
-          <Route path="/strategic-console/:projectId" element={<StrategicConsolePage />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/legal/:slug" element={<LegalPage />} />
