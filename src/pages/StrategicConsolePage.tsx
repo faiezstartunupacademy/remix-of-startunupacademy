@@ -357,6 +357,7 @@ const StrategicConsolePage = () => {
                     <LineChart className="h-4 w-4 text-muted-foreground" /> {projectData.overall_progress}%
                   </div>
                 )}
+                <KnowledgeBaseDownloadButton />
               </div>
             </div>
           </div>
