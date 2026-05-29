@@ -356,18 +356,9 @@ const PlatformStrategyPage = () => {
                         {resource.description}
                       </p>
                       <div className="flex items-center justify-between pt-3 border-t">
-                        <span className="text-xs text-muted-foreground truncate max-w-[120px]">
+                        <span className="text-xs text-muted-foreground truncate max-w-[200px]">
                           {resource.source}
                         </span>
-                        <a
-                          href={resource.file}
-                          download
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-                        >
-                          <Download className="h-3 w-3" />
-                          PDF
-                        </a>
                       </div>
                     </CardContent>
                   </Card>
