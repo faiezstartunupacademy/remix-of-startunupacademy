@@ -638,6 +638,16 @@ const IncubationProject = () => {
                 <Rocket className="h-4 w-4" /> Console Stratégique
               </Link>
             </Button>
+            <ProjectAnalysisCard
+              projectId={project.id}
+              projectName={project.name}
+              sector={project.sector ?? null}
+              description={project.description ?? null}
+              startupStage={project.stage ?? ""}
+              hasIdea={project.has_idea ?? true}
+              messages={[]}
+              userId={project.user_id}
+            />
             {steps.some(s => s.status === "completed") && (
               <Button size="sm" variant="default" className="gap-2" onClick={() => generateFinalPDF()} disabled={generatingFinalPDF}>
                 {generatingFinalPDF ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
