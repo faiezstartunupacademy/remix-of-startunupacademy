@@ -31,13 +31,49 @@ export default function MentorsPage() {
   const [filterLang, setFilterLang] = useState<string[]>([]);
   const [filterSector, setFilterSector] = useState<string[]>([]);
   const [availableOnly, setAvailableOnly] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm] = useState({
+    full_name: "", bio: "", linkedin_url: "", country_code: "TN",
+    years_experience: 0, hourly_rate: "", expertise_tags: [] as string[],
+    languages: ["fr"] as string[], sectors: [] as string[],
+  });
 
-  useEffect(() => {
-    supabase.from("mentors").select("*").eq("is_active", true).then(({ data }) => {
-      setMentors(data || []);
-      setLoading(false);
-    });
-  }, []);
+  async function loadMentors() {
+    const { data } = await supabase.from("mentors").select("*").eq("is_active", true);
+    setMentors(data || []);
+    setLoading(false);
+  }
+
+  useEffect(() => { loadMentors(); }, []);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { toast.error("Connectez-vous pour devenir mentor"); return; }
+    if (!form.full_name.trim() || form.full_name.length > 120) { toast.error("Nom requis (max 120)"); return; }
+    if (form.bio && form.bio.length > 1000) { toast.error("Bio trop longue (max 1000)"); return; }
+    setSubmitting(true);
+    const { error } = await supabase.from("mentors").upsert({
+      user_id: user.id,
+      full_name: form.full_name.trim(),
+      bio: form.bio.trim() || null,
+      linkedin_url: form.linkedin_url.trim() || null,
+      country_code: form.country_code.trim().toUpperCase() || "TN",
+      years_experience: Number(form.years_experience) || 0,
+      hourly_rate: form.hourly_rate ? Number(form.hourly_rate) : null,
+      expertise_tags: form.expertise_tags,
+      languages: form.languages,
+      sectors: form.sectors,
+      is_active: true,
+    }, { onConflict: "user_id" });
+    setSubmitting(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Profil mentor publié 🎉");
+    setOpen(false);
+    loadMentors();
+  }
+
 
   const filtered = useMemo(() => mentors.filter(m => {
     if (search && !m.full_name.toLowerCase().includes(search.toLowerCase())) return false;
