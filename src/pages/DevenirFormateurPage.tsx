@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { GraduationCap, ShieldCheck, AlertTriangle, CalendarDays, Users, Link2, Loader2, Plus, CheckCircle2, Clock, XCircle, FileText, ArrowLeft, MessageSquare, ExternalLink } from "lucide-react";
+import { GraduationCap, ShieldCheck, AlertTriangle, CalendarDays, Users, Link2, Loader2, Plus, CheckCircle2, Clock, XCircle, FileText, ArrowLeft, CalendarRange, Sparkles, Video } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,10 +12,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import TrainerRegistrationForm from "@/components/formation/TrainerRegistrationForm";
+
 
 const THEMES = [
   "Design Thinking", "Lean Startup", "Business Model", "Growth Hacking",
@@ -68,6 +70,35 @@ const DevenirFormateurPage = () => {
   };
 
   useEffect(() => { loadSessions(); }, [user?.id]);
+
+  // Forum formation threads (calendar + upcoming)
+  const [forumFormations, setForumFormations] = useState<any[]>([]);
+  const [calendarDate, setCalendarDate] = useState<Date | undefined>(new Date());
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.rpc("get_safe_forum_threads" as any);
+      const list = ((data as any[]) || []).filter(t => t.category === "formation" && t.scheduled_date);
+      setForumFormations(list);
+    })();
+  }, []);
+
+  const scheduledDates = useMemo(() => forumFormations.map(t => new Date(t.scheduled_date)), [forumFormations]);
+  const selectedDateFormations = useMemo(() =>
+    calendarDate
+      ? forumFormations.filter(t => new Date(t.scheduled_date).toDateString() === calendarDate.toDateString())
+      : [],
+    [forumFormations, calendarDate]
+  );
+  const upcomingFormations = useMemo(() =>
+    forumFormations
+      .filter(t => new Date(t.scheduled_date) >= new Date())
+      .sort((a, b) => new Date(a.scheduled_date).getTime() - new Date(b.scheduled_date).getTime())
+      .slice(0, 8),
+    [forumFormations]
+  );
+  const fmtDateTime = (d: string) => new Date(d).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,7 +169,7 @@ const DevenirFormateurPage = () => {
           <TabsList className="grid w-full md:w-[640px] grid-cols-2 md:grid-cols-4">
             <TabsTrigger value="declare">Déclarer</TabsTrigger>
             <TabsTrigger value="sessions">Mes sessions ({sessions.length})</TabsTrigger>
-            <TabsTrigger value="forum" className="gap-1.5"><MessageSquare className="h-3.5 w-3.5" /> Forum</TabsTrigger>
+            <TabsTrigger value="forum" className="gap-1.5"><CalendarRange className="h-3.5 w-3.5" /> Calendrier</TabsTrigger>
             <TabsTrigger value="profile">Profil</TabsTrigger>
           </TabsList>
 
@@ -272,26 +303,84 @@ const DevenirFormateurPage = () => {
           </TabsContent>
 
           <TabsContent value="forum">
-            <Card>
-              <CardHeader className="flex-row items-center justify-between gap-3 space-y-0">
-                <div>
-                  <CardTitle className="flex items-center gap-2"><MessageSquare className="h-5 w-5 text-primary" /> Forum & Communauté</CardTitle>
-                  <CardDescription>Discussions, formations programmées et collaboration en temps réel avec la communauté STARTUNUP.</CardDescription>
-                </div>
-                <Button size="sm" variant="outline" asChild className="gap-1.5 shrink-0">
-                  <a href="/communaute/forum" target="_blank" rel="noreferrer"><ExternalLink className="h-3.5 w-3.5" /> Ouvrir en plein écran</a>
-                </Button>
-              </CardHeader>
-              <CardContent className="p-0">
-                <iframe
-                  src="/communaute/forum"
-                  title="Forum & Communauté STARTUNUP"
-                  className="w-full rounded-b-lg border-t"
-                  style={{ height: "78vh", minHeight: 600 }}
-                />
-              </CardContent>
-            </Card>
+            <div className="grid lg:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2"><CalendarRange className="h-5 w-5 text-primary" /> Calendrier des formations</CardTitle>
+                  <CardDescription>Sélectionnez une date pour voir les formations programmées par la communauté.</CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-col items-center">
+                  <Calendar
+                    mode="single"
+                    selected={calendarDate}
+                    onSelect={setCalendarDate}
+                    modifiers={{ scheduled: scheduledDates }}
+                    modifiersClassNames={{ scheduled: "bg-primary/15 text-primary font-semibold rounded-md" }}
+                    className="rounded-md border"
+                  />
+                  <div className="w-full mt-4 space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      {calendarDate ? calendarDate.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }) : "Aucune date sélectionnée"}
+                    </p>
+                    {selectedDateFormations.length === 0 ? (
+                      <p className="text-sm text-muted-foreground italic">Aucune formation ce jour.</p>
+                    ) : (
+                      selectedDateFormations.map(t => (
+                        <div key={t.id} className="p-2 rounded-md border bg-muted/30 text-sm">
+                          <p className="font-medium line-clamp-1">{t.title}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(t.scheduled_date).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
+                            {t.trainer_name && <> · {t.trainer_name}</>}
+                          </p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary" /> Prochaines formations</CardTitle>
+                  <CardDescription>Les {upcomingFormations.length} prochaines sessions programmées par la communauté STARTUNUP.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {upcomingFormations.length === 0 ? (
+                    <div className="py-10 text-center text-muted-foreground">
+                      <CalendarDays className="h-10 w-10 mx-auto mb-3 opacity-40" />
+                      Aucune formation à venir pour le moment.
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {upcomingFormations.map(t => (
+                        <div key={t.id} className="p-3 rounded-lg border hover:border-primary/40 hover:bg-muted/30 transition">
+                          <div className="flex items-start justify-between gap-2 flex-wrap mb-1">
+                            <h4 className="font-semibold text-sm line-clamp-1">{t.title}</h4>
+                            {t.is_strategic && (
+                              <Badge className="bg-violet-500/15 text-violet-700 border-violet-300 text-[10px] gap-1">
+                                <Sparkles className="h-3 w-3" /> Stratégique
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground flex items-center gap-1.5 flex-wrap">
+                            <CalendarDays className="h-3 w-3" /> {fmtDateTime(t.scheduled_date)}
+                            {t.duration_text && <><span>·</span><Clock className="h-3 w-3" /> {t.duration_text}</>}
+                            {t.trainer_name && <><span>·</span> {t.trainer_name}</>}
+                          </p>
+                          {t.meet_link && (
+                            <Button size="sm" variant="outline" asChild className="mt-2 gap-1.5 h-7 text-xs">
+                              <a href={t.meet_link} target="_blank" rel="noreferrer"><Video className="h-3 w-3" /> Lien Meet</a>
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
+
 
           <TabsContent value="profile">
             <TrainerRegistrationForm />
