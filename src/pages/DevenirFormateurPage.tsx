@@ -71,6 +71,35 @@ const DevenirFormateurPage = () => {
 
   useEffect(() => { loadSessions(); }, [user?.id]);
 
+  // Forum formation threads (calendar + upcoming)
+  const [forumFormations, setForumFormations] = useState<any[]>([]);
+  const [calendarDate, setCalendarDate] = useState<Date | undefined>(new Date());
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.rpc("get_safe_forum_threads" as any);
+      const list = ((data as any[]) || []).filter(t => t.category === "formation" && t.scheduled_date);
+      setForumFormations(list);
+    })();
+  }, []);
+
+  const scheduledDates = useMemo(() => forumFormations.map(t => new Date(t.scheduled_date)), [forumFormations]);
+  const selectedDateFormations = useMemo(() =>
+    calendarDate
+      ? forumFormations.filter(t => new Date(t.scheduled_date).toDateString() === calendarDate.toDateString())
+      : [],
+    [forumFormations, calendarDate]
+  );
+  const upcomingFormations = useMemo(() =>
+    forumFormations
+      .filter(t => new Date(t.scheduled_date) >= new Date())
+      .sort((a, b) => new Date(a.scheduled_date).getTime() - new Date(b.scheduled_date).getTime())
+      .slice(0, 8),
+    [forumFormations]
+  );
+  const fmtDateTime = (d: string) => new Date(d).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return toast({ title: "Connexion requise", variant: "destructive" });
