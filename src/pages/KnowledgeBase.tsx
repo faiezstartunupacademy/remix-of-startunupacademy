@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { knowledgeBaseTests, seedKnowledgeBase, KnowledgeBaseTest } from "@/data/knowledgeBaseTests";
+import KnowledgeBaseDownloadButton from "@/components/strategic/KnowledgeBaseDownloadButton";
 import { useToast } from "@/hooks/use-toast";
 import { getAdjustedDuration, getDurationContext } from "@/utils/testDurationUtils";
 
