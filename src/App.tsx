@@ -35,6 +35,7 @@ import NewIncubationProject from "./pages/NewIncubationProject";
 import IncubationProject from "./pages/IncubationProject";
 import TestDetail from "./pages/TestDetail";
 import KnowledgeBase from "./pages/KnowledgeBase";
+import StrategicAccessGate from "./components/strategic/StrategicAccessGate";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 import DisciplinedEntrepreneurshipPage from "./pages/DisciplinedEntrepreneurshipPage";
