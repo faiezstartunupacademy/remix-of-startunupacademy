@@ -313,9 +313,9 @@ const DevenirFormateurPage = () => {
                     </Label>
                   </div>
 
-                  <Button type="submit" disabled={submitting} className="w-full gap-2">
+                  <Button type="submit" disabled={submitting || !!themeConflict} className="w-full gap-2">
                     {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                    Déclarer cette formation
+                    {themeConflict ? "Date indisponible (cooldown 15 j)" : "Déclarer cette formation"}
                   </Button>
                 </form>
               </CardContent>
