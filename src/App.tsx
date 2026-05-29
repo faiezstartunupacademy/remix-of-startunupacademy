@@ -143,6 +143,7 @@ const App = () => (
           <Route path="/profil/conformite" element={<LegalCompliancePage />} />
           <Route path="/annuaire" element={<PartnersDirectoryPage />} />
           <Route path="/partenaires" element={<PartnersDirectoryPage />} />
+          <Route path="/communaute/devenir-formateur" element={<DevenirFormateurPage />} />
           <Route path="*" element={<NotFound />} />
 
         </Routes>
