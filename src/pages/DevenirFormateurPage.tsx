@@ -169,7 +169,7 @@ const DevenirFormateurPage = () => {
           <TabsList className="grid w-full md:w-[640px] grid-cols-2 md:grid-cols-4">
             <TabsTrigger value="declare">Déclarer</TabsTrigger>
             <TabsTrigger value="sessions">Mes sessions ({sessions.length})</TabsTrigger>
-            <TabsTrigger value="forum" className="gap-1.5"><MessageSquare className="h-3.5 w-3.5" /> Forum</TabsTrigger>
+            <TabsTrigger value="forum" className="gap-1.5"><CalendarRange className="h-3.5 w-3.5" /> Calendrier</TabsTrigger>
             <TabsTrigger value="profile">Profil</TabsTrigger>
           </TabsList>
 
