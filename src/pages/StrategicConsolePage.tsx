@@ -26,6 +26,7 @@ import MvpMetricsDashboard from "@/components/mvp-validator/MvpMetricsDashboard"
 import MvpTeamEvaluation from "@/components/mvp-validator/MvpTeamEvaluation";
 import MvpReportPDF from "@/components/mvp-validator/MvpReportPDF";
 import BusinessPlanGenerator from "@/components/strategic/BusinessPlanGenerator";
+import KnowledgeBaseDownloadButton from "@/components/strategic/KnowledgeBaseDownloadButton";
 import TechIntegrationLab from "@/components/mvp-validator/TechIntegrationLab";
 import ScrumBoard from "@/components/mvp-validator/ScrumBoard";
 import V1TestSpace from "@/components/mvp-validator/V1TestSpace";
