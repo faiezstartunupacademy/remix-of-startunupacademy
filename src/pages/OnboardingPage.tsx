@@ -269,8 +269,12 @@ const OnboardingPage = () => {
                   })}
                 </div>
                 {errors.role && <p className="text-destructive text-sm mt-3 text-center">{errors.role.message}</p>}
+                <div className="mt-6 p-4 rounded-xl border border-primary/20 bg-primary/5 text-sm text-center text-muted-foreground max-w-2xl mx-auto">
+                  💡 Vous portez plusieurs casquettes ? Choisissez d'abord votre <b>rôle principal</b>. Vous pourrez activer les autres (mentor, investisseur, incubateur) à tout moment depuis <b>Mission Control → Gérer mes rôles</b>.
+                </div>
               </motion.div>
             )}
+
 
             {/* STEP 2 — Conditional details */}
             {step === 2 && (
