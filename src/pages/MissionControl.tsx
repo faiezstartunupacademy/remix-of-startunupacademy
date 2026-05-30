@@ -177,17 +177,18 @@ const MissionControl = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { navigate("/auth"); return; }
       const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
-      // Mission Control is always accessible once authenticated; onboarding becomes an enhancement, not a gate.
-      const safeProf: Profile = (prof as any) || {
-        full_name: user.email?.split("@")[0] ?? "Founder",
-        startup_name: null, startup_stage: null, startup_sector: null,
-        wilaya: null, problem_statement: null, role_type: null, onboarding_completed: false,
-      };
+      // First login (email or Google) without a chosen role → onboarding
+      if (!prof || !(prof as any).role_type) {
+        navigate("/onboarding");
+        return;
+      }
+      const safeProf: Profile = prof as any;
       setProfile(safeProf);
       setUserId(user.id);
       await loadAll(user.id, safeProf);
     })();
   }, [navigate, loadAll]);
+
 
   // Realtime: any change in user data refreshes KPIs
   useEffect(() => {
