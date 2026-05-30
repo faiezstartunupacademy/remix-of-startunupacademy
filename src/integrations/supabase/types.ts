@@ -4175,6 +4175,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_role_types: {
+        Row: {
+          activated_at: string
+          is_primary: boolean
+          role_type: Database["public"]["Enums"]["user_role_type"]
+          user_id: string
+        }
+        Insert: {
+          activated_at?: string
+          is_primary?: boolean
+          role_type: Database["public"]["Enums"]["user_role_type"]
+          user_id: string
+        }
+        Update: {
+          activated_at?: string
+          is_primary?: boolean
+          role_type?: Database["public"]["Enums"]["user_role_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
