@@ -593,4 +593,38 @@ const MissionControl = () => {
   );
 };
 
+const MultiRoleHint = ({ count, children }: { count: number; children: React.ReactNode }) => {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (count !== 1) return;
+    if (typeof window === "undefined") return;
+    if (localStorage.getItem("mc_multirole_hint_seen") === "1") return;
+    const t = setTimeout(() => setOpen(true), 800);
+    return () => clearTimeout(t);
+  }, [count]);
+  const dismiss = () => {
+    setOpen(false);
+    if (typeof window !== "undefined") localStorage.setItem("mc_multirole_hint_seen", "1");
+  };
+  if (count !== 1) return <>{children}</>;
+  return (
+    <Popover open={open} onOpenChange={(v) => { if (!v) dismiss(); else setOpen(true); }}>
+      <PopoverTrigger asChild><span>{children}</span></PopoverTrigger>
+      <PopoverContent align="end" className="w-72">
+        <p className="text-sm font-semibold mb-1">✨ Vous portez plusieurs casquettes ?</p>
+        <p className="text-xs text-muted-foreground mb-3">
+          Activez vos autres rôles (mentor, investisseur, incubateur) pour adapter Mission Control à toutes vos activités.
+        </p>
+        <div className="flex justify-end gap-2">
+          <Button size="sm" variant="ghost" onClick={dismiss}>Plus tard</Button>
+          <Button size="sm" asChild onClick={dismiss}>
+            <Link to="/profil/roles">Gérer mes rôles</Link>
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
 export default MissionControl;
+
