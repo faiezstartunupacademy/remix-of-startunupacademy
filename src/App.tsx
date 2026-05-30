@@ -53,6 +53,7 @@ import CookieConsentBanner from "./components/legal/CookieConsentBanner";
 import DataRightsCenter from "./pages/DataRightsCenter";
 import OnboardingPage from "./pages/OnboardingPage";
 import MissionControl from "./pages/MissionControl";
+import UserRolesPage from "./pages/UserRolesPage";
 import RoadmapPage from "./pages/RoadmapPage";
 import DealRoomPage from "./pages/DealRoomPage";
 import MentorsPage from "./pages/MentorsPage";
@@ -142,6 +143,7 @@ const App = () => (
           <Route path="/evenements" element={<EventsPage />} />
           <Route path="/cofounders" element={<CofounderMatchingPage />} />
           <Route path="/profil/conformite" element={<LegalCompliancePage />} />
+          <Route path="/profil/roles" element={<UserRolesPage />} />
           <Route path="/annuaire" element={<PartnersDirectoryPage />} />
           <Route path="/partenaires" element={<PartnersDirectoryPage />} />
           <Route path="/communaute/devenir-formateur" element={<DevenirFormateurPage />} />
