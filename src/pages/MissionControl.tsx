@@ -593,7 +593,7 @@ const MissionControl = () => {
   );
 };
 
-const MultiRoleHint = ({ count, children }: { count: number; children: React.ReactNode }) => {
+function MultiRoleHint({ count, children }: { count: number; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     if (count !== 1) return;
