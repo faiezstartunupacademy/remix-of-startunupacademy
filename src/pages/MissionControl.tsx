@@ -14,6 +14,8 @@ import RoleSwitcher from "@/components/mission-control/RoleSwitcher";
 import MentorView from "@/components/mission-control/views/MentorView";
 import InvestorView from "@/components/mission-control/views/InvestorView";
 import IncubatorView from "@/components/mission-control/views/IncubatorView";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
 
 const NAV = [
   { title: "Mon Parcours", icon: Map, url: "/roadmap" },
