@@ -72,6 +72,18 @@ const UserRolesPage = () => {
           </p>
         </div>
 
+        <Card className="border-primary/30 bg-primary/5">
+          <CardContent className="p-4 text-sm space-y-1.5">
+            <p className="font-semibold">Comment fonctionnent les rôles ?</p>
+            <ul className="text-muted-foreground space-y-1 list-disc pl-5">
+              <li>Le <b>rôle principal</b> détermine la vue par défaut à l'ouverture de Mission Control.</li>
+              <li>Basculez d'un rôle à l'autre via le <b>sélecteur en haut</b> du cockpit — votre choix est mémorisé.</li>
+              <li>Activer ou désactiver un rôle ne supprime <b>jamais</b> vos données associées.</li>
+            </ul>
+          </CardContent>
+        </Card>
+
+
         {loading ? (
           <p className="text-sm text-muted-foreground">Chargement…</p>
         ) : (
