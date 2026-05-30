@@ -14,6 +14,8 @@ import RoleSwitcher from "@/components/mission-control/RoleSwitcher";
 import MentorView from "@/components/mission-control/views/MentorView";
 import InvestorView from "@/components/mission-control/views/InvestorView";
 import IncubatorView from "@/components/mission-control/views/IncubatorView";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
 
 const NAV = [
   { title: "Mon Parcours", icon: Map, url: "/roadmap" },
@@ -177,17 +179,18 @@ const MissionControl = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { navigate("/auth"); return; }
       const { data: prof } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
-      // Mission Control is always accessible once authenticated; onboarding becomes an enhancement, not a gate.
-      const safeProf: Profile = (prof as any) || {
-        full_name: user.email?.split("@")[0] ?? "Founder",
-        startup_name: null, startup_stage: null, startup_sector: null,
-        wilaya: null, problem_statement: null, role_type: null, onboarding_completed: false,
-      };
+      // First login (email or Google) without a chosen role → onboarding
+      if (!prof || !(prof as any).role_type) {
+        navigate("/onboarding");
+        return;
+      }
+      const safeProf: Profile = prof as any;
       setProfile(safeProf);
       setUserId(user.id);
       await loadAll(user.id, safeProf);
     })();
   }, [navigate, loadAll]);
+
 
   // Realtime: any change in user data refreshes KPIs
   useEffect(() => {
@@ -288,8 +291,11 @@ const MissionControl = () => {
             <Badge variant="outline" className="hidden md:flex gap-1 text-xs">
               <ShieldCheck className="h-3 w-3 text-emerald-600" /> Temps réel
             </Badge>
-            <RoleSwitcher roles={roles} activeRole={activeRole} onChange={setActiveRole} />
+            <MultiRoleHint count={roles.length}>
+              <RoleSwitcher roles={roles} activeRole={activeRole} onChange={setActiveRole} />
+            </MultiRoleHint>
           </header>
+
 
           <main className="flex-1 p-4 md:p-6 space-y-6 max-w-7xl w-full mx-auto">
             {activeRole === "mentor" && userId && <MentorView userId={userId} />}
@@ -587,4 +593,38 @@ const MissionControl = () => {
   );
 };
 
+const MultiRoleHint = ({ count, children }: { count: number; children: React.ReactNode }) => {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (count !== 1) return;
+    if (typeof window === "undefined") return;
+    if (localStorage.getItem("mc_multirole_hint_seen") === "1") return;
+    const t = setTimeout(() => setOpen(true), 800);
+    return () => clearTimeout(t);
+  }, [count]);
+  const dismiss = () => {
+    setOpen(false);
+    if (typeof window !== "undefined") localStorage.setItem("mc_multirole_hint_seen", "1");
+  };
+  if (count !== 1) return <>{children}</>;
+  return (
+    <Popover open={open} onOpenChange={(v) => { if (!v) dismiss(); else setOpen(true); }}>
+      <PopoverTrigger asChild><span>{children}</span></PopoverTrigger>
+      <PopoverContent align="end" className="w-72">
+        <p className="text-sm font-semibold mb-1">✨ Vous portez plusieurs casquettes ?</p>
+        <p className="text-xs text-muted-foreground mb-3">
+          Activez vos autres rôles (mentor, investisseur, incubateur) pour adapter Mission Control à toutes vos activités.
+        </p>
+        <div className="flex justify-end gap-2">
+          <Button size="sm" variant="ghost" onClick={dismiss}>Plus tard</Button>
+          <Button size="sm" asChild onClick={dismiss}>
+            <Link to="/profil/roles">Gérer mes rôles</Link>
+          </Button>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
 export default MissionControl;
+

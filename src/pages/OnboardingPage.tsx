@@ -198,11 +198,25 @@ const OnboardingPage = () => {
       Object.assign(patch, { program_name: v.program_name, wilaya: v.wilaya, bio: v.bio });
     }
     const { error } = await supabase.from("profiles").update(patch).eq("user_id", userId);
+    if (error) { setLoading(false); toast({ title: "Erreur", description: error.message, variant: "destructive" }); return; }
+
+    // Sync user_role_types: ensure the chosen role exists and is marked primary
+    try {
+      await supabase.from("user_role_types" as any).update({ is_primary: false }).eq("user_id", userId);
+      await supabase.from("user_role_types" as any).upsert(
+        { user_id: userId, role_type: v.role, is_primary: true },
+        { onConflict: "user_id,role_type" }
+      );
+      if (typeof window !== "undefined") localStorage.setItem("mc_active_role", v.role);
+    } catch (e) {
+      // Non-blocking — Mission Control fallbacks to profiles.role_type
+    }
+
     setLoading(false);
-    if (error) { toast({ title: "Erreur", description: error.message, variant: "destructive" }); return; }
     toast({ title: "🚀 Mission Control activé", description: "Votre cockpit est prêt." });
     navigate("/mission-control");
   };
+
 
   if (bootLoading) {
     return <div className="min-h-screen flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -269,8 +283,12 @@ const OnboardingPage = () => {
                   })}
                 </div>
                 {errors.role && <p className="text-destructive text-sm mt-3 text-center">{errors.role.message}</p>}
+                <div className="mt-6 p-4 rounded-xl border border-primary/20 bg-primary/5 text-sm text-center text-muted-foreground max-w-2xl mx-auto">
+                  💡 Vous portez plusieurs casquettes ? Choisissez d'abord votre <b>rôle principal</b>. Vous pourrez activer les autres (mentor, investisseur, incubateur) à tout moment depuis <b>Mission Control → Gérer mes rôles</b>.
+                </div>
               </motion.div>
             )}
+
 
             {/* STEP 2 — Conditional details */}
             {step === 2 && (
