@@ -9,6 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { RadialBarChart, RadialBar, ResponsiveContainer, PolarAngleAxis } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarProvider, Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, SidebarHeader } from "@/components/ui/sidebar";
+import { useUserRoles } from "@/hooks/useUserRoles";
+import RoleSwitcher from "@/components/mission-control/RoleSwitcher";
+import MentorView from "@/components/mission-control/views/MentorView";
+import InvestorView from "@/components/mission-control/views/InvestorView";
+import IncubatorView from "@/components/mission-control/views/IncubatorView";
 
 const NAV = [
   { title: "Mon Parcours", icon: Map, url: "/roadmap" },
@@ -83,6 +88,7 @@ const MissionControl = () => {
     date?: string;
   }>({ status: "none" });
   const [loading, setLoading] = useState(true);
+  const { roles, activeRole, setActiveRole } = useUserRoles(userId);
 
   const loadAll = useCallback(async (uid: string, prof: Profile) => {
     const [
@@ -282,9 +288,15 @@ const MissionControl = () => {
             <Badge variant="outline" className="hidden md:flex gap-1 text-xs">
               <ShieldCheck className="h-3 w-3 text-emerald-600" /> Temps réel
             </Badge>
+            <RoleSwitcher roles={roles} activeRole={activeRole} onChange={setActiveRole} />
           </header>
 
           <main className="flex-1 p-4 md:p-6 space-y-6 max-w-7xl w-full mx-auto">
+            {activeRole === "mentor" && userId && <MentorView userId={userId} />}
+            {activeRole === "investor" && <InvestorView />}
+            {activeRole === "incubator" && <IncubatorView />}
+            {(activeRole === null || activeRole === "startuper") && (<>
+
             {/* KPI strip */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {kpis.map((k, i) => (
@@ -567,6 +579,7 @@ const MissionControl = () => {
                 </Card>
               </motion.div>
             </div>
+            </>)}
           </main>
         </div>
       </div>
