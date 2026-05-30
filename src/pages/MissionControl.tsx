@@ -291,8 +291,11 @@ const MissionControl = () => {
             <Badge variant="outline" className="hidden md:flex gap-1 text-xs">
               <ShieldCheck className="h-3 w-3 text-emerald-600" /> Temps réel
             </Badge>
-            <RoleSwitcher roles={roles} activeRole={activeRole} onChange={setActiveRole} />
+            <MultiRoleHint count={roles.length}>
+              <RoleSwitcher roles={roles} activeRole={activeRole} onChange={setActiveRole} />
+            </MultiRoleHint>
           </header>
+
 
           <main className="flex-1 p-4 md:p-6 space-y-6 max-w-7xl w-full mx-auto">
             {activeRole === "mentor" && userId && <MentorView userId={userId} />}
