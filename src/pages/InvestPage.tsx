@@ -489,7 +489,7 @@ const InvestPage = () => {
               {[
                 { label: "Pôle Stratégique", desc: "7 phases d'incubation IA", icon: Zap, href: "/pole-strategique" },
                 { label: "V1 TEST", desc: "TVH, TVF, TVP validés", icon: Rocket, href: "/pole-strategique" },
-                { label: "Lean Canvas Lab", desc: "6 phases + 25 outils", icon: Target, href: "/lean-canvas-lab" },
+                { label: "Lean Canvas Lab", desc: "6 phases + 25 outils", icon: Target, href: "/communaute/lean-canvas-lab" },
                 { label: "Market Intelligence", desc: "TAM/SAM/SOM, concurrence", icon: TrendingUp, href: "/market-intelligence" },
               ].map(item => {
                 const Icon = item.icon;
@@ -543,7 +543,7 @@ const InvestPage = () => {
               {[
                 { title: "Pôle Stratégique", desc: "7 phases d'incubation + Consultant IA", href: "/pole-strategique", icon: Zap, data: "Phases, rapports IA, milestones" },
                 { title: "MVP Validator + V1 TEST", desc: "Tests, métriques, hypothèses, personas", href: "/pole-strategique", icon: Rocket, data: "TVH, TVF, TVP, V1 TEST, KPIs" },
-                { title: "Lean Canvas Lab", desc: "Protocole 6 phases + 25 outils", href: "/lean-canvas-lab", icon: Target, data: "Canvas, pivots, validation" },
+                { title: "Lean Canvas Lab", desc: "Protocole 6 phases + 25 outils", href: "/communaute/lean-canvas-lab", icon: Target, data: "Canvas, pivots, validation" },
                 { title: "Market Intelligence", desc: "Méthodologie YC + Stress-test VC", href: "/market-intelligence", icon: TrendingUp, data: "TAM/SAM/SOM, concurrence, insights" },
               ].map((link, i) => {
                 const Icon = link.icon;

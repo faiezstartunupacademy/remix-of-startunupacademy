@@ -43,7 +43,7 @@ const GOALS = [
 ] as const;
 
 const STRATEGIC_MODULES = [
-  { id: "lean_canvas", label: "Lean Canvas Lab", icon: Lightbulb, url: "/lean-canvas-lab" },
+  { id: "lean_canvas", label: "Lean Canvas Lab", icon: Lightbulb, url: "/communaute/lean-canvas-lab" },
   { id: "business_model", label: "Business Model Patterns", icon: BarChart3, url: "/formation/business-model" },
   { id: "mvp_validator", label: "MVP Validator", icon: Target, url: "/pole-strategique" },
   { id: "design_thinking", label: "Design Thinking", icon: Sparkles, url: "/formation/design-thinking" },

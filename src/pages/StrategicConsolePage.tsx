@@ -749,7 +749,7 @@ const StrategicConsolePage = () => {
                   </CardHeader>
                   <CardContent>
                     <Button asChild size="sm" className="gap-1.5">
-                      <Link to="/lean-canvas-lab"><Target className="h-3.5 w-3.5" /> Accéder</Link>
+                      <Link to="/communaute/lean-canvas-lab"><Target className="h-3.5 w-3.5" /> Accéder</Link>
                     </Button>
                   </CardContent>
                 </Card>

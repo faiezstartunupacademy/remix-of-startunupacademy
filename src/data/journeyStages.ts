@@ -46,7 +46,7 @@ export const JOURNEY_STAGES: JourneyStage[] = [
       { id: "psf-validated", label: "Problem-Solution Fit validé", points: 25 },
     ],
     resources: [
-      { label: "Lean Canvas Lab", to: "/lean-canvas-lab" },
+      { label: "Lean Canvas Lab", to: "/communaute/lean-canvas-lab" },
       { label: "Market Intelligence", to: "/market-intelligence" },
       { label: "BMC vs Lean", to: "/formation/bm-comparison" },
     ],
