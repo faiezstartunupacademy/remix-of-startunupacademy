@@ -44,7 +44,7 @@ const ALL_MODULES = [
 const RESOURCES_BY_STAGE: Record<string, Array<{ title: string; url: string }>> = {
   "Idée": [
     { title: "Design Thinking — Idéation", url: "/formation/design-thinking" },
-    { title: "Lean Canvas Lab", url: "/lean-canvas-lab" },
+    { title: "Lean Canvas Lab", url: "/communaute/lean-canvas-lab" },
     { title: "Effectuation", url: "/fondements/effectuation" },
   ],
   "MVP": [
