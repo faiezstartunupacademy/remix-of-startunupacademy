@@ -83,12 +83,14 @@ const MissionControl = () => {
   const [moduleCounts, setModuleCounts] = useState<ModuleCounts>({ parcours: 0, programs: 0, strategic: 0, mentoring: 0, funding: 0, dealroom: 0, community: 0, market: 0 });
   const [strategicEligibility, setStrategicEligibility] = useState<{
     status: "none" | "pending" | "validated" | "rejected";
+    source?: "trainer" | "request";
     title?: string;
     theme?: string;
     reason?: string | null;
     participants?: number;
     date?: string;
   }>({ status: "none" });
+  const [strategicProjects, setStrategicProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { roles, activeRole, setActiveRole } = useUserRoles(userId);
 
