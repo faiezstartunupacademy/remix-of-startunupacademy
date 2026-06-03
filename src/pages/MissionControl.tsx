@@ -411,6 +411,47 @@ const MissionControl = () => {
                       </Link>
                     </Button>
                   </CardContent>
+                  {strategicProjects.length > 0 && (
+                    <div className="px-4 pb-4 -mt-2">
+                      <div className="rounded-lg border bg-background/60 p-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                            Mes projets stratégiques ({strategicProjects.length})
+                          </p>
+                          <Button asChild size="sm" variant="ghost" className="h-7 text-xs">
+                            <Link to="/pole-strategique/new" className="gap-1">+ Nouveau projet</Link>
+                          </Button>
+                        </div>
+                        <ul className="space-y-1.5">
+                          {strategicProjects.slice(0, 4).map((p: any) => (
+                            <li key={p.id}>
+                              <Link to={`/pole-strategique/${p.id}`} className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/60 transition group">
+                                <div className="h-8 w-8 rounded-md bg-fuchsia-500/15 text-fuchsia-600 flex items-center justify-center shrink-0">
+                                  <Layers className="h-4 w-4" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium truncate">
+                                    {p.name || profile?.startup_name || "Projet sans nom"}
+                                    {p.is_blocked && <Badge variant="destructive" className="ml-2 text-[10px] h-4">Bloqué</Badge>}
+                                  </p>
+                                  <p className="text-[11px] text-muted-foreground truncate">
+                                    {(p.sector || profile?.startup_sector || "—")} · Étape {p.current_step || 1}/7 · {Math.round(p.overall_progress || 0)}%
+                                  </p>
+                                </div>
+                                <Progress value={p.overall_progress || 0} className="w-16 h-1.5 shrink-0" />
+                                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition shrink-0" />
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                        {strategicProjects.length > 4 && (
+                          <Button asChild size="sm" variant="ghost" className="w-full mt-1 h-7 text-xs">
+                            <Link to="/pole-strategique">Voir tous les projets ({strategicProjects.length})</Link>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </Card>
               );
             })()}
