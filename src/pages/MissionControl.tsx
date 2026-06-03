@@ -149,28 +149,37 @@ const MissionControl = () => {
       market: 0,
     });
 
-    // Strategic Pole eligibility based on trainer-animated sessions
-    const { data: trainerSess } = await supabase
-      .from("trainer_animated_sessions" as any)
-      .select("*")
-      .eq("trainer_user_id", uid)
-      .order("scheduled_date", { ascending: false });
-    const list = (trainerSess || []) as any[];
-    if (list.length === 0) {
-      setStrategicEligibility({ status: "none" });
+    // Strategic Pole eligibility: trainer-animated sessions OR admin-approved access request
+    const [{ data: trainerSess }, { data: accessReqs }, { data: projects }] = await Promise.all([
+      supabase.from("trainer_animated_sessions" as any).select("*").eq("trainer_user_id", uid).order("scheduled_date", { ascending: false }),
+      supabase.from("strategic_access_requests" as any).select("*").eq("user_id", uid).order("created_at", { ascending: false }),
+      supabase.from("incubation_projects").select("id, name, sector, stage, status, overall_progress, current_step, updated_at, is_blocked").eq("user_id", uid).order("updated_at", { ascending: false }),
+    ]);
+    setStrategicProjects((projects as any[]) || []);
+
+    const tList = (trainerSess || []) as any[];
+    const rList = (accessReqs || []) as any[];
+    const validatedTrainer = tList.find(s => s.status === "validated");
+    const approvedReq = rList.find(r => r.status === "approved");
+    const pendingTrainer = tList.find(s => s.status === "planned" || s.status === "completed");
+    const pendingReq = rList.find(r => r.status === "pending");
+    const rejectedTrainer = tList.find(s => s.status === "rejected");
+    const rejectedReq = rList.find(r => r.status === "rejected");
+
+    if (validatedTrainer) {
+      setStrategicEligibility({ status: "validated", source: "trainer", title: validatedTrainer.title, theme: validatedTrainer.theme, participants: validatedTrainer.participants_count, date: validatedTrainer.validated_at || validatedTrainer.scheduled_date });
+    } else if (approvedReq) {
+      setStrategicEligibility({ status: "validated", source: "request", title: approvedReq.startup_name || "Accès accordé par l'administrateur", theme: approvedReq.sector, date: approvedReq.reviewed_at || approvedReq.created_at });
+    } else if (pendingTrainer) {
+      setStrategicEligibility({ status: "pending", source: "trainer", title: pendingTrainer.title, theme: pendingTrainer.theme, participants: pendingTrainer.participants_count, date: pendingTrainer.scheduled_date });
+    } else if (pendingReq) {
+      setStrategicEligibility({ status: "pending", source: "request", title: pendingReq.startup_name || "Demande d'accès en cours", theme: pendingReq.sector, date: pendingReq.created_at });
+    } else if (rejectedReq) {
+      setStrategicEligibility({ status: "rejected", source: "request", title: rejectedReq.startup_name || "Demande refusée", theme: rejectedReq.sector, reason: rejectedReq.admin_response, date: rejectedReq.created_at });
+    } else if (rejectedTrainer) {
+      setStrategicEligibility({ status: "rejected", source: "trainer", title: rejectedTrainer.title, theme: rejectedTrainer.theme, reason: rejectedTrainer.admin_notes, participants: rejectedTrainer.participants_count, date: rejectedTrainer.scheduled_date });
     } else {
-      const validated = list.find(s => s.status === "validated");
-      const rejected = list.find(s => s.status === "rejected");
-      const pending = list.find(s => s.status === "planned" || s.status === "completed");
-      if (validated) {
-        setStrategicEligibility({ status: "validated", title: validated.title, theme: validated.theme, participants: validated.participants_count, date: validated.validated_at || validated.scheduled_date });
-      } else if (pending) {
-        setStrategicEligibility({ status: "pending", title: pending.title, theme: pending.theme, participants: pending.participants_count, date: pending.scheduled_date });
-      } else if (rejected) {
-        setStrategicEligibility({ status: "rejected", title: rejected.title, theme: rejected.theme, reason: rejected.admin_notes, participants: rejected.participants_count, date: rejected.scheduled_date });
-      } else {
-        setStrategicEligibility({ status: "none" });
-      }
+      setStrategicEligibility({ status: "none" });
     }
 
     setLoading(false);
