@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, Trash2, BellOff } from "lucide-react";
+import { Check, Trash2, BellOff, ArrowRight } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -92,9 +92,18 @@ export default function NotificationsPage() {
           </CardContent></Card>
         ) : (
           <div className="space-y-2">
-            {filtered.map(n => (
+            {filtered.map(n => {
+              const isApproval = n.type === "strategic_access" && /approuv/i.test(n.title);
+              const ctaLabel = isApproval
+                ? "Accéder au Pôle Stratégique"
+                : n.type === "mentor_booking" || n.type === "mentor_confirmed"
+                ? "Voir la session"
+                : n.type === "funding_status"
+                ? "Voir ma candidature"
+                : "Ouvrir";
+              return (
               <Card key={n.id} className={!n.is_read ? "border-l-4 border-l-primary" : ""}>
-                <CardContent className="p-4 flex gap-3">
+                <CardContent className="p-4 flex gap-3 flex-wrap">
                   <span className="text-2xl">{typeIcon(n.type)}</span>
                   <div className="flex-1 min-w-0">
                     {n.link ? (
@@ -106,13 +115,27 @@ export default function NotificationsPage() {
                     <p className="text-xs text-muted-foreground mt-1">
                       {formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: fr })}
                     </p>
+                    {n.link && (
+                      <Button
+                        asChild
+                        size="sm"
+                        variant={isApproval ? "default" : "outline"}
+                        className={`mt-2 gap-1 ${isApproval ? "bg-gradient-to-r from-primary to-purple-600 text-white shadow-md hover:opacity-90" : ""}`}
+                      >
+                        <Link to={n.link} onClick={() => markRead(n.id)}>
+                          {ctaLabel}
+                          <ArrowRight className="h-3.5 w-3.5" />
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                   <Button size="icon" variant="ghost" onClick={() => remove(n.id)}>
                     <Trash2 className="w-4 h-4 text-muted-foreground" />
                   </Button>
                 </CardContent>
               </Card>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

@@ -83,12 +83,14 @@ const MissionControl = () => {
   const [moduleCounts, setModuleCounts] = useState<ModuleCounts>({ parcours: 0, programs: 0, strategic: 0, mentoring: 0, funding: 0, dealroom: 0, community: 0, market: 0 });
   const [strategicEligibility, setStrategicEligibility] = useState<{
     status: "none" | "pending" | "validated" | "rejected";
+    source?: "trainer" | "request";
     title?: string;
     theme?: string;
     reason?: string | null;
     participants?: number;
     date?: string;
   }>({ status: "none" });
+  const [strategicProjects, setStrategicProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { roles, activeRole, setActiveRole } = useUserRoles(userId);
 
@@ -147,28 +149,37 @@ const MissionControl = () => {
       market: 0,
     });
 
-    // Strategic Pole eligibility based on trainer-animated sessions
-    const { data: trainerSess } = await supabase
-      .from("trainer_animated_sessions" as any)
-      .select("*")
-      .eq("trainer_user_id", uid)
-      .order("scheduled_date", { ascending: false });
-    const list = (trainerSess || []) as any[];
-    if (list.length === 0) {
-      setStrategicEligibility({ status: "none" });
+    // Strategic Pole eligibility: trainer-animated sessions OR admin-approved access request
+    const [{ data: trainerSess }, { data: accessReqs }, { data: projects }] = await Promise.all([
+      supabase.from("trainer_animated_sessions" as any).select("*").eq("trainer_user_id", uid).order("scheduled_date", { ascending: false }),
+      supabase.from("strategic_access_requests" as any).select("*").eq("user_id", uid).order("created_at", { ascending: false }),
+      supabase.from("incubation_projects").select("id, name, sector, stage, status, overall_progress, current_step, updated_at, is_blocked").eq("user_id", uid).order("updated_at", { ascending: false }),
+    ]);
+    setStrategicProjects((projects as any[]) || []);
+
+    const tList = (trainerSess || []) as any[];
+    const rList = (accessReqs || []) as any[];
+    const validatedTrainer = tList.find(s => s.status === "validated");
+    const approvedReq = rList.find(r => r.status === "approved");
+    const pendingTrainer = tList.find(s => s.status === "planned" || s.status === "completed");
+    const pendingReq = rList.find(r => r.status === "pending");
+    const rejectedTrainer = tList.find(s => s.status === "rejected");
+    const rejectedReq = rList.find(r => r.status === "rejected");
+
+    if (validatedTrainer) {
+      setStrategicEligibility({ status: "validated", source: "trainer", title: validatedTrainer.title, theme: validatedTrainer.theme, participants: validatedTrainer.participants_count, date: validatedTrainer.validated_at || validatedTrainer.scheduled_date });
+    } else if (approvedReq) {
+      setStrategicEligibility({ status: "validated", source: "request", title: approvedReq.startup_name || "Accès accordé par l'administrateur", theme: approvedReq.sector, date: approvedReq.reviewed_at || approvedReq.created_at });
+    } else if (pendingTrainer) {
+      setStrategicEligibility({ status: "pending", source: "trainer", title: pendingTrainer.title, theme: pendingTrainer.theme, participants: pendingTrainer.participants_count, date: pendingTrainer.scheduled_date });
+    } else if (pendingReq) {
+      setStrategicEligibility({ status: "pending", source: "request", title: pendingReq.startup_name || "Demande d'accès en cours", theme: pendingReq.sector, date: pendingReq.created_at });
+    } else if (rejectedReq) {
+      setStrategicEligibility({ status: "rejected", source: "request", title: rejectedReq.startup_name || "Demande refusée", theme: rejectedReq.sector, reason: rejectedReq.admin_response, date: rejectedReq.created_at });
+    } else if (rejectedTrainer) {
+      setStrategicEligibility({ status: "rejected", source: "trainer", title: rejectedTrainer.title, theme: rejectedTrainer.theme, reason: rejectedTrainer.admin_notes, participants: rejectedTrainer.participants_count, date: rejectedTrainer.scheduled_date });
     } else {
-      const validated = list.find(s => s.status === "validated");
-      const rejected = list.find(s => s.status === "rejected");
-      const pending = list.find(s => s.status === "planned" || s.status === "completed");
-      if (validated) {
-        setStrategicEligibility({ status: "validated", title: validated.title, theme: validated.theme, participants: validated.participants_count, date: validated.validated_at || validated.scheduled_date });
-      } else if (pending) {
-        setStrategicEligibility({ status: "pending", title: pending.title, theme: pending.theme, participants: pending.participants_count, date: pending.scheduled_date });
-      } else if (rejected) {
-        setStrategicEligibility({ status: "rejected", title: rejected.title, theme: rejected.theme, reason: rejected.admin_notes, participants: rejected.participants_count, date: rejected.scheduled_date });
-      } else {
-        setStrategicEligibility({ status: "none" });
-      }
+      setStrategicEligibility({ status: "none" });
     }
 
     setLoading(false);
@@ -206,6 +217,8 @@ const MissionControl = () => {
       .on("postgres_changes", { event: "*", schema: "public", table: "journey_streaks", filter: `user_id=eq.${userId}` }, reload)
       .on("postgres_changes", { event: "*", schema: "public", table: "journey_badges", filter: `user_id=eq.${userId}` }, reload)
       .on("postgres_changes", { event: "*", schema: "public", table: "trainer_animated_sessions", filter: `trainer_user_id=eq.${userId}` }, reload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "strategic_access_requests", filter: `user_id=eq.${userId}` }, reload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "incubation_projects", filter: `user_id=eq.${userId}` }, reload)
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [userId, profile, loadAll]);
@@ -398,6 +411,47 @@ const MissionControl = () => {
                       </Link>
                     </Button>
                   </CardContent>
+                  {strategicProjects.length > 0 && (
+                    <div className="px-4 pb-4 -mt-2">
+                      <div className="rounded-lg border bg-background/60 p-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                            Mes projets stratégiques ({strategicProjects.length})
+                          </p>
+                          <Button asChild size="sm" variant="ghost" className="h-7 text-xs">
+                            <Link to="/pole-strategique/new" className="gap-1">+ Nouveau projet</Link>
+                          </Button>
+                        </div>
+                        <ul className="space-y-1.5">
+                          {strategicProjects.slice(0, 4).map((p: any) => (
+                            <li key={p.id}>
+                              <Link to={`/pole-strategique/${p.id}`} className="flex items-center gap-3 p-2 rounded-md hover:bg-muted/60 transition group">
+                                <div className="h-8 w-8 rounded-md bg-fuchsia-500/15 text-fuchsia-600 flex items-center justify-center shrink-0">
+                                  <Layers className="h-4 w-4" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium truncate">
+                                    {p.name || profile?.startup_name || "Projet sans nom"}
+                                    {p.is_blocked && <Badge variant="destructive" className="ml-2 text-[10px] h-4">Bloqué</Badge>}
+                                  </p>
+                                  <p className="text-[11px] text-muted-foreground truncate">
+                                    {(p.sector || profile?.startup_sector || "—")} · Étape {p.current_step || 1}/7 · {Math.round(p.overall_progress || 0)}%
+                                  </p>
+                                </div>
+                                <Progress value={p.overall_progress || 0} className="w-16 h-1.5 shrink-0" />
+                                <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition shrink-0" />
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                        {strategicProjects.length > 4 && (
+                          <Button asChild size="sm" variant="ghost" className="w-full mt-1 h-7 text-xs">
+                            <Link to="/pole-strategique">Voir tous les projets ({strategicProjects.length})</Link>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </Card>
               );
             })()}
