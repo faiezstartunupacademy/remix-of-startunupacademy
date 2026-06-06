@@ -17,6 +17,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { productStageToTestPhase, PRODUCT_STAGE_LABEL, type ProductStage } from "@/utils/stageTaxonomy";
+
 
 type ProtocolStep = { step: number; title: string; description: string };
 type FormField = { name: string; label: string; type: string; options?: string[] };
@@ -48,8 +50,9 @@ type IncubationContext = {
 };
 
 type Props = {
-  project: { id: string; sector: string; scenario: string; description?: string | null; name?: string };
+  project: { id: string; sector: string; scenario: string; description?: string | null; name?: string; product_stage?: string | null };
 };
+
 
 const STATUS_CONFIG: Record<string, { label: string; icon: any; color: string }> = {
   not_started: { label: "Non commencé", icon: Play, color: "text-muted-foreground" },
