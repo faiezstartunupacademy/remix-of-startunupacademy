@@ -112,7 +112,6 @@ const Header = () => {
                   <ul className="grid gap-2">
                     {[
                       { to: "/pole-strategique", icon: "🎯", title: "Pôle Stratégique", desc: "Validation MVP, incubation 7 étapes" },
-                      { to: "/communaute/lean-canvas-lab", icon: "📋", title: "Lean Canvas Lab", desc: "Atelier interactif" },
                     ].map(it => (
                       <li key={it.to}>
                         <NavigationMenuLink asChild>
