@@ -4292,6 +4292,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      slugify: { Args: { _txt: string }; Returns: string }
+      unaccent_safe: { Args: { _txt: string }; Returns: string }
       validate_license_key: {
         Args: { _content_slug: string; _key_code: string }
         Returns: Json
