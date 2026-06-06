@@ -26,7 +26,10 @@ import BusinessPlanGenerator from "@/components/strategic/BusinessPlanGenerator"
 import TechIntegrationLab from "@/components/mvp-validator/TechIntegrationLab";
 import ScrumBoard from "@/components/mvp-validator/ScrumBoard";
 
-type MvpProject = { id: string; name: string; description: string | null; sector: string; scenario: string; cofounders_count: number; governorate: string | null; sso: string | null; incubation_program: string | null; status: string; created_at: string; };
+import { productStageToCapitalStage, PRODUCT_STAGE_LABEL, type ProductStage } from "@/utils/stageTaxonomy";
+
+type MvpProject = { id: string; name: string; description: string | null; sector: string; scenario: string; cofounders_count: number; governorate: string | null; sso: string | null; incubation_program: string | null; status: string; created_at: string; product_stage?: string | null; };
+
 
 const MvpValidatorPage = () => {
   const { t } = useTranslation();
@@ -137,7 +140,7 @@ const MvpValidatorPage = () => {
                   </Card>
                 </TabsContent>
                 <TabsContent value="chatbot"><MvpAIChatbot projectId={activeProject.id} projectName={activeProject.name} sector={activeProject.sector} scenario={activeProject.scenario} description={activeProject.description || undefined} /></TabsContent>
-                <TabsContent value="tests"><MvpTestsLibraryV2 project={activeProject} /></TabsContent>
+                <TabsContent value="tests"><MvpTestsLibraryV2 project={{ ...activeProject, product_stage: activeProject.product_stage }} /></TabsContent>
                 <TabsContent value="tech-tests"><TechIntegrationLab projectId={activeProject.id} /></TabsContent>
                 <TabsContent value="metrics"><MvpMetricsDashboard projectId={activeProject.id} /></TabsContent>
                 <TabsContent value="scrum"><ScrumBoard projectId={activeProject.id} projectName={activeProject.name} sector={activeProject.sector} /></TabsContent>
@@ -145,8 +148,9 @@ const MvpValidatorPage = () => {
                 <TabsContent value="docs">
                   <div className="space-y-8">
                     <div><h3 className="text-lg font-bold mb-4 flex items-center gap-2"><FileCheck2 className="h-5 w-5 text-primary" /> {t("mvp.reports")}</h3><MvpReportPDF project={activeProject} /></div>
-                    <div><h3 className="text-lg font-bold mb-4 flex items-center gap-2"><BookOpen className="h-5 w-5 text-primary" /> {t("mvp.businessPlan")}</h3><BusinessPlanGenerator projectName={activeProject.name} sector={activeProject.sector} messages={[{ role: "user", content: `Projet: ${activeProject.name}\nSecteur: ${activeProject.sector}\nScénario: ${activeProject.scenario === "A" ? "Idée seule" : "Idée + BM validé"}\nDescription: ${activeProject.description || "Non renseigné"}\nGouvernorat: ${activeProject.governorate || "Non renseigné"}\nSSO: ${activeProject.sso || "Aucun"}\nProgramme: ${activeProject.incubation_program || "Aucun"}`, phase: 1 }]} startupStage={activeProject.scenario === "A" ? "pre-seed" : "seed"} /></div>
-                    <div><h3 className="text-lg font-bold mb-4 flex items-center gap-2"><DollarSign className="h-5 w-5 text-primary" /> {t("mvp.pitchInvest")}</h3><InvestSpace projectId={activeProject.id} projectName={activeProject.name} sector={activeProject.sector} startupStage={activeProject.scenario === "A" ? "pre-seed" : "seed"} messages={[{ role: "user", content: `Projet: ${activeProject.name}\nSecteur: ${activeProject.sector}\nDescription: ${activeProject.description || "Non renseigné"}`, phase: 1 }]} /></div>
+                    <div><h3 className="text-lg font-bold mb-4 flex items-center gap-2"><BookOpen className="h-5 w-5 text-primary" /> {t("mvp.businessPlan")}</h3><BusinessPlanGenerator projectName={activeProject.name} sector={activeProject.sector} messages={[{ role: "user", content: `Projet: ${activeProject.name}\nSecteur: ${activeProject.sector}\nScénario: ${activeProject.scenario === "A" ? "Idée seule" : "Idée + BM validé"}\nStade produit: ${activeProject.product_stage ? PRODUCT_STAGE_LABEL[activeProject.product_stage as ProductStage] : "Non renseigné"}\nDescription: ${activeProject.description || "Non renseigné"}\nGouvernorat: ${activeProject.governorate || "Non renseigné"}\nSSO: ${activeProject.sso || "Aucun"}\nProgramme: ${activeProject.incubation_program || "Aucun"}`, phase: 1 }]} startupStage={productStageToCapitalStage(activeProject.product_stage)} /></div>
+                    <div><h3 className="text-lg font-bold mb-4 flex items-center gap-2"><DollarSign className="h-5 w-5 text-primary" /> {t("mvp.pitchInvest")}</h3><InvestSpace projectId={activeProject.id} projectName={activeProject.name} sector={activeProject.sector} startupStage={productStageToCapitalStage(activeProject.product_stage)} messages={[{ role: "user", content: `Projet: ${activeProject.name}\nSecteur: ${activeProject.sector}\nDescription: ${activeProject.description || "Non renseigné"}`, phase: 1 }]} /></div>
+
                   </div>
                 </TabsContent>
                 <TabsContent value="dashboard">
