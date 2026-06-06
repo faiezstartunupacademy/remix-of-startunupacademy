@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { X, Loader2, Rocket } from "lucide-react";
+import { X, Loader2, Rocket, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { useProjectContext } from "@/hooks/useProjectContext";
 
 interface StartupSubmitFormProps {
   onClose: () => void;
@@ -19,6 +20,7 @@ const StartupSubmitForm = ({ onClose }: StartupSubmitFormProps) => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { active: activeProject } = useProjectContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [programs, setPrograms] = useState<string[]>([]);
   const [form, setForm] = useState({
@@ -84,6 +86,23 @@ const StartupSubmitForm = ({ onClose }: StartupSubmitFormProps) => {
 
   const u = (key: string, value: string) => setForm({ ...form, [key]: value });
 
+  function prefillFromProject() {
+    if (!activeProject) return;
+    const stageMap: Record<string, string> = {
+      idee: "early", ideation: "early", prototype: "early",
+      mvp: "early", traction: "growth", growth: "growth",
+    };
+    setForm((f) => ({
+      ...f,
+      name: f.name || activeProject.name,
+      sector: activeProject.sector || f.sector,
+      stage: stageMap[activeProject.productStage || ""] || f.stage,
+      governorate: activeProject.governorate || f.governorate,
+      location: f.location || (activeProject.governorate ? `${activeProject.governorate}, Tunisie` : f.location),
+    }));
+    toast({ title: "Pré-rempli", description: `Données du projet "${activeProject.name}" injectées.` });
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-background rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-border">
@@ -92,6 +111,17 @@ const StartupSubmitForm = ({ onClose }: StartupSubmitFormProps) => {
           <Button variant="ghost" size="icon" onClick={onClose}><X className="h-5 w-5" /></Button>
         </div>
         <div className="p-6 space-y-4">
+          {activeProject && (
+            <div className="flex items-center justify-between gap-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
+              <p className="text-xs">
+                Projet actif détecté&nbsp;: <strong>{activeProject.name}</strong>
+                {activeProject.sector && <> · {activeProject.sector}</>}
+              </p>
+              <Button size="sm" variant="outline" onClick={prefillFromProject} className="gap-1.5">
+                <Sparkles className="h-3.5 w-3.5" /> Pré-remplir
+              </Button>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2"><Label>{t("common.name")} *</Label><Input value={form.name} onChange={e => u("name", e.target.value)} placeholder={t("submitForm.namePlaceholder")} /></div>
             <div className="space-y-2"><Label>Tagline *</Label><Input value={form.tagline} onChange={e => u("tagline", e.target.value)} placeholder={t("submitForm.taglinePlaceholder")} /></div>
