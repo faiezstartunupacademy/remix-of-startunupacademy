@@ -24,23 +24,15 @@ export default function SuggestedDocuments({ userId }: { userId: string }) {
 
   useEffect(() => {
     (async () => {
-      const [mi, inc] = await Promise.all([
-        supabase
-          .from("market_intelligence_reports")
-          .select("id,title,report_type,result_markdown,created_at")
-          .eq("user_id", userId)
-          .order("created_at", { ascending: false })
-          .limit(20),
-        supabase
-          .from("incubation_reports")
-          .select("id,title,file_path,created_at")
-          .eq("user_id", userId)
-          .order("created_at", { ascending: false })
-          .limit(20),
-      ]);
+      const mi: any = await supabase
+        .from("market_intelligence_reports")
+        .select("id,title,report_type,result_markdown,created_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(30);
 
       const list: Suggested[] = [];
-      (mi.data || []).forEach((r: any) =>
+      ((mi.data as any[]) || []).forEach((r: any) =>
         list.push({
           id: "mi-" + r.id,
           title: r.title,
@@ -48,17 +40,6 @@ export default function SuggestedDocuments({ userId }: { userId: string }) {
           origin: `Market Intel · ${r.report_type}`,
           createdAt: r.created_at,
           markdown: r.result_markdown,
-        })
-      );
-      (inc.data || []).forEach((r: any) =>
-        list.push({
-          id: "inc-" + r.id,
-          title: r.title || "Rapport d'incubation",
-          type: "incubation",
-          origin: "Incubation · Rapport PDF",
-          createdAt: r.created_at,
-          bucket: "incubation-reports",
-          path: r.file_path,
         })
       );
       list.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
