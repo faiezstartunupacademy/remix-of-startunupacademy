@@ -156,9 +156,9 @@ const Header = () => {
               <NavigationMenuContent>
                 <ul className="grid w-[420px] gap-2 p-4">
                   {[
-                    { to: "/communaute/lean-canvas-lab", icon: "📋", title: "Lean Canvas Lab", desc: "Atelier interactif" },
                     { to: "/communaute/devenir-formateur", icon: "🎓", title: "Devenir Formateur STARTUNUP", desc: "Animez une formation (15+) → accès Pôle Stratégique" },
                     { to: "/mentors", icon: "🎓", title: "Mentor", desc: "Annuaire mentors, booking & dashboard" },
+                    { to: "/communaute/lean-canvas-lab", icon: "📋", title: "Lean Canvas Lab", desc: "Atelier interactif" },
                     { to: "/feed", icon: "✨", title: "Feed", desc: "Wins, questions, ressources" },
                     { to: "/evenements", icon: "📅", title: "Événements", desc: "Pitch days, meetups" },
                     { to: "/cofounders", icon: "🤝", title: "Co-founders", desc: "Matching binôme" },
