@@ -261,7 +261,11 @@ const MvpTestsLibraryV2 = ({ project }: Props) => {
   const [analyzingVerdict, setAnalyzingVerdict] = useState(false);
   const [aiVerdict, setAiVerdict] = useState<any>(null);
   const [filterPriority, setFilterPriority] = useState<string>("all");
+  const [showAllPhases, setShowAllPhases] = useState<boolean>(false);
   const { toast } = useToast();
+
+  const targetPhase = useMemo(() => productStageToTestPhase(project.product_stage), [project.product_stage]);
+
 
   useEffect(() => { loadData(); }, [project.id]);
 
@@ -372,9 +376,18 @@ const MvpTestsLibraryV2 = ({ project }: Props) => {
   }, [tests, avgTeamSkills, project.sector, project.scenario, project.description, incubationCtx]);
 
   const filteredTests = useMemo(() => {
-    if (filterPriority === "all") return testsWithRationale;
-    return testsWithRationale.filter(t => t.priority === filterPriority);
-  }, [testsWithRationale, filterPriority]);
+    let list = testsWithRationale;
+    // 1. Filter by product stage -> test phase (auto, with toggle to reveal all)
+    if (targetPhase && !showAllPhases) {
+      list = list.filter(t => t.phase === targetPhase);
+    }
+    // 2. Filter by priority
+    if (filterPriority !== "all") {
+      list = list.filter(t => t.priority === filterPriority);
+    }
+    return list;
+  }, [testsWithRationale, filterPriority, targetPhase, showAllPhases]);
+
 
   const openTest = (test: Test) => {
     const existing = results.find(r => r.test_id === test.id);
