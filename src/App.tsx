@@ -72,6 +72,7 @@ import LanguageSync from "./components/LanguageSync";
 import InstallPwaPrompt from "./components/InstallPwaPrompt";
 import PartnersDirectoryPage from "./pages/PartnersDirectoryPage";
 import DevenirFormateurPage from "./pages/DevenirFormateurPage";
+import ProjectContextHubPage from "./pages/ProjectContextHubPage";
 
 const queryClient = new QueryClient();
 
@@ -131,6 +132,7 @@ const App = () => (
           <Route path="/profil/donnees" element={<DataRightsCenter />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/mission-control" element={<MissionControl />} />
+          <Route path="/contexte-projet" element={<ProjectContextHubPage />} />
           <Route path="/roadmap" element={<RoadmapPage />} />
           <Route path="/deal-room" element={<DealRoomPage />} />
           <Route path="/mentors" element={<MentorsPage />} />

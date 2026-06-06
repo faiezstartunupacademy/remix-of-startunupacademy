@@ -19,6 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 
 const NAV = [
   { title: "Mon Parcours", icon: Map, url: "/roadmap" },
+  { title: "Contexte Projet", icon: Target, url: "/contexte-projet" },
   { title: "Mon Dossier", icon: FileText, url: "/profil/donnees" },
   { title: "Mes Programmes", icon: GraduationCap, url: "/formations" },
   { title: "Mon Équipe", icon: Users, url: "/pole-strategique" },
