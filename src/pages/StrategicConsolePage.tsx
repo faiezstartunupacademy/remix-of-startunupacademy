@@ -34,6 +34,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { generatePersonas } from "@/utils/personaGenerator";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  productStageToScenario,
+  productStageToCapitalStage,
+  PRODUCT_STAGE_LABEL,
+  CAPITAL_STAGE_LABEL,
+  type ProductStage,
+} from "@/utils/stageTaxonomy";
+
 
 const StrategicConsolePage = () => {
   const { projectId } = useParams();
