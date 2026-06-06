@@ -479,6 +479,27 @@ const MvpTestsLibraryV2 = ({ project }: Props) => {
         </CardContent>
       </Card>
 
+      {/* Stage filter banner */}
+      {targetPhase && (
+        <Card className="border-blue-500/30 bg-blue-500/5">
+          <CardContent className="py-3 flex flex-wrap items-center justify-between gap-3">
+            <div className="text-sm flex items-center gap-2 flex-wrap">
+              <Badge className="bg-blue-600 text-white">
+                Stade produit : {PRODUCT_STAGE_LABEL[project.product_stage as ProductStage]}
+              </Badge>
+              <span className="text-muted-foreground">
+                {showAllPhases
+                  ? "Affichage : tous les tests (toutes phases)"
+                  : <>Affichage : phase <strong>{targetPhase}</strong> uniquement</>}
+              </span>
+            </div>
+            <Button size="sm" variant="outline" onClick={() => setShowAllPhases(v => !v)} className="text-xs">
+              {showAllPhases ? "Filtrer sur ma phase" : "Voir tous les tests"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Filter bar */}
       <div className="flex items-center gap-3 flex-wrap">
         <BookOpen className="h-5 w-5 text-primary" />
@@ -498,6 +519,7 @@ const MvpTestsLibraryV2 = ({ project }: Props) => {
           </Button>
         </div>
       </div>
+
 
       {filteredTests.length === 0 ? (
         <Card className="text-center py-8"><CardContent><p className="text-muted-foreground">Aucun test pour ce filtre.</p></CardContent></Card>
