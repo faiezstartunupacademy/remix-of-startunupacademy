@@ -185,13 +185,7 @@ const StrategicConsolePage = () => {
     if (!user || !projectData) return;
     setImportingFromIncubation(true);
 
-    const stageMap: Record<string, string> = {
-      ideation: "A",
-      mvp: "B",
-      "product-market-fit": "B",
-      growth: "B",
-      scale: "B",
-    };
+    const scenario = productStageToScenario(projectData.stage);
 
     const { data, error } = await supabase
       .from("mvp_validator_projects" as any)
@@ -206,7 +200,8 @@ const StrategicConsolePage = () => {
           projectData.differentiator ? `Différenciation: ${projectData.differentiator}` : null,
         ].filter(Boolean).join("\n"),
         sector: projectData.sector || "Autre",
-        scenario: stageMap[projectData.stage] || "A",
+        scenario,
+        product_stage: projectData.stage || null,
         cofounders_count: 1,
         governorate: null,
         sso: null,
@@ -217,6 +212,7 @@ const StrategicConsolePage = () => {
       .single();
 
     setImportingFromIncubation(false);
+
 
     if (!error && data) {
       const newProjectId = (data as any).id;
