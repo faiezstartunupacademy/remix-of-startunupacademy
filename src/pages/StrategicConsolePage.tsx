@@ -341,11 +341,21 @@ const StrategicConsolePage = () => {
                   </Badge>
                   {projectData.stage && (
                     <Badge variant="outline" className={stageColors[projectData.stage] || ""}>
-                      {projectData.stage}
+                      {PRODUCT_STAGE_LABEL[projectData.stage as ProductStage] || projectData.stage}
                     </Badge>
                   )}
                 </div>
                 <h1 className="text-3xl md:text-4xl font-bold">{projectData.name}</h1>
+                {projectData.stage && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Maturité capital suggérée pour BP & Invest :{" "}
+                    <span className="font-medium text-foreground">
+                      {CAPITAL_STAGE_LABEL[productStageToCapitalStage(projectData.stage)]}
+                    </span>
+                    {" "}<span className="opacity-60">(modifiable lors de la génération)</span>
+                  </p>
+                )}
+
                 {projectData.description && (
                   <p className="text-muted-foreground mt-2 max-w-2xl text-sm">{projectData.description}</p>
                 )}
