@@ -34,6 +34,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { generatePersonas } from "@/utils/personaGenerator";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  productStageToScenario,
+  productStageToCapitalStage,
+  PRODUCT_STAGE_LABEL,
+  CAPITAL_STAGE_LABEL,
+  type ProductStage,
+} from "@/utils/stageTaxonomy";
+
 
 const StrategicConsolePage = () => {
   const { projectId } = useParams();
@@ -185,13 +193,7 @@ const StrategicConsolePage = () => {
     if (!user || !projectData) return;
     setImportingFromIncubation(true);
 
-    const stageMap: Record<string, string> = {
-      ideation: "A",
-      mvp: "B",
-      "product-market-fit": "B",
-      growth: "B",
-      scale: "B",
-    };
+    const scenario = productStageToScenario(projectData.stage);
 
     const { data, error } = await supabase
       .from("mvp_validator_projects" as any)
@@ -206,7 +208,8 @@ const StrategicConsolePage = () => {
           projectData.differentiator ? `Différenciation: ${projectData.differentiator}` : null,
         ].filter(Boolean).join("\n"),
         sector: projectData.sector || "Autre",
-        scenario: stageMap[projectData.stage] || "A",
+        scenario,
+        product_stage: projectData.stage || null,
         cofounders_count: 1,
         governorate: null,
         sso: null,
@@ -217,6 +220,7 @@ const StrategicConsolePage = () => {
       .single();
 
     setImportingFromIncubation(false);
+
 
     if (!error && data) {
       const newProjectId = (data as any).id;
@@ -337,11 +341,21 @@ const StrategicConsolePage = () => {
                   </Badge>
                   {projectData.stage && (
                     <Badge variant="outline" className={stageColors[projectData.stage] || ""}>
-                      {projectData.stage}
+                      {PRODUCT_STAGE_LABEL[projectData.stage as ProductStage] || projectData.stage}
                     </Badge>
                   )}
                 </div>
                 <h1 className="text-3xl md:text-4xl font-bold">{projectData.name}</h1>
+                {projectData.stage && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Maturité capital suggérée pour BP & Invest :{" "}
+                    <span className="font-medium text-foreground">
+                      {CAPITAL_STAGE_LABEL[productStageToCapitalStage(projectData.stage)]}
+                    </span>
+                    {" "}<span className="opacity-60">(modifiable lors de la génération)</span>
+                  </p>
+                )}
+
                 {projectData.description && (
                   <p className="text-muted-foreground mt-2 max-w-2xl text-sm">{projectData.description}</p>
                 )}
@@ -637,8 +651,9 @@ const StrategicConsolePage = () => {
                       </div>
                     </TabsContent>
                     <TabsContent value="tests">
-                      <MvpTestsLibraryV2 project={{ id: mvpProject.id, sector: mvpProject.sector, scenario: mvpProject.scenario, description: mvpProject.description, name: mvpProject.name }} />
+                      <MvpTestsLibraryV2 project={{ id: mvpProject.id, sector: mvpProject.sector, scenario: mvpProject.scenario, description: mvpProject.description, name: mvpProject.name, product_stage: mvpProject.product_stage ?? projectData.stage }} />
                     </TabsContent>
+
                     <TabsContent value="tech-tests">
                       <TechIntegrationLab projectId={mvpProject.id} />
                     </TabsContent>
@@ -657,8 +672,9 @@ const StrategicConsolePage = () => {
                     <TabsContent value="docs">
                       <div className="space-y-8">
                         <div><h3 className="text-lg font-bold mb-4 flex items-center gap-2"><FileCheck2 className="h-5 w-5 text-primary" /> Rapports</h3><MvpReportPDF project={mvpProject} /></div>
-                        <div><h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Target className="h-5 w-5 text-primary" /> Business Plan</h3><BusinessPlanGenerator projectName={mvpProject.name} sector={mvpProject.sector} messages={phaseMessages} startupStage={projectData.stage || "early-stage"} /></div>
-                        <div><h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Wallet className="h-5 w-5 text-primary" /> Pitch & Invest</h3><InvestSpace projectId={mvpProject.id} projectName={mvpProject.name} sector={mvpProject.sector} startupStage={projectData.stage || "early-stage"} messages={phaseMessages} /></div>
+                        <div><h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Target className="h-5 w-5 text-primary" /> Business Plan</h3><BusinessPlanGenerator projectName={mvpProject.name} sector={mvpProject.sector} messages={phaseMessages} startupStage={productStageToCapitalStage(projectData.stage)} /></div>
+                        <div><h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Wallet className="h-5 w-5 text-primary" /> Pitch & Invest</h3><InvestSpace projectId={mvpProject.id} projectName={mvpProject.name} sector={mvpProject.sector} startupStage={productStageToCapitalStage(projectData.stage)} messages={phaseMessages} /></div>
+
                       </div>
                     </TabsContent>
                     <TabsContent value="dashboard">

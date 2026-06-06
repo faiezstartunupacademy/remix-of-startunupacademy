@@ -17,6 +17,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { productStageToTestPhase, PRODUCT_STAGE_LABEL, type ProductStage } from "@/utils/stageTaxonomy";
+
 
 type ProtocolStep = { step: number; title: string; description: string };
 type FormField = { name: string; label: string; type: string; options?: string[] };
@@ -48,8 +50,9 @@ type IncubationContext = {
 };
 
 type Props = {
-  project: { id: string; sector: string; scenario: string; description?: string | null; name?: string };
+  project: { id: string; sector: string; scenario: string; description?: string | null; name?: string; product_stage?: string | null };
 };
+
 
 const STATUS_CONFIG: Record<string, { label: string; icon: any; color: string }> = {
   not_started: { label: "Non commencé", icon: Play, color: "text-muted-foreground" },
@@ -258,7 +261,11 @@ const MvpTestsLibraryV2 = ({ project }: Props) => {
   const [analyzingVerdict, setAnalyzingVerdict] = useState(false);
   const [aiVerdict, setAiVerdict] = useState<any>(null);
   const [filterPriority, setFilterPriority] = useState<string>("all");
+  const [showAllPhases, setShowAllPhases] = useState<boolean>(false);
   const { toast } = useToast();
+
+  const targetPhase = useMemo(() => productStageToTestPhase(project.product_stage), [project.product_stage]);
+
 
   useEffect(() => { loadData(); }, [project.id]);
 
@@ -369,9 +376,18 @@ const MvpTestsLibraryV2 = ({ project }: Props) => {
   }, [tests, avgTeamSkills, project.sector, project.scenario, project.description, incubationCtx]);
 
   const filteredTests = useMemo(() => {
-    if (filterPriority === "all") return testsWithRationale;
-    return testsWithRationale.filter(t => t.priority === filterPriority);
-  }, [testsWithRationale, filterPriority]);
+    let list = testsWithRationale;
+    // 1. Filter by product stage -> test phase (auto, with toggle to reveal all)
+    if (targetPhase && !showAllPhases) {
+      list = list.filter(t => t.phase === targetPhase);
+    }
+    // 2. Filter by priority
+    if (filterPriority !== "all") {
+      list = list.filter(t => t.priority === filterPriority);
+    }
+    return list;
+  }, [testsWithRationale, filterPriority, targetPhase, showAllPhases]);
+
 
   const openTest = (test: Test) => {
     const existing = results.find(r => r.test_id === test.id);
@@ -463,6 +479,27 @@ const MvpTestsLibraryV2 = ({ project }: Props) => {
         </CardContent>
       </Card>
 
+      {/* Stage filter banner */}
+      {targetPhase && (
+        <Card className="border-blue-500/30 bg-blue-500/5">
+          <CardContent className="py-3 flex flex-wrap items-center justify-between gap-3">
+            <div className="text-sm flex items-center gap-2 flex-wrap">
+              <Badge className="bg-blue-600 text-white">
+                Stade produit : {PRODUCT_STAGE_LABEL[project.product_stage as ProductStage]}
+              </Badge>
+              <span className="text-muted-foreground">
+                {showAllPhases
+                  ? "Affichage : tous les tests (toutes phases)"
+                  : <>Affichage : phase <strong>{targetPhase}</strong> uniquement</>}
+              </span>
+            </div>
+            <Button size="sm" variant="outline" onClick={() => setShowAllPhases(v => !v)} className="text-xs">
+              {showAllPhases ? "Filtrer sur ma phase" : "Voir tous les tests"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Filter bar */}
       <div className="flex items-center gap-3 flex-wrap">
         <BookOpen className="h-5 w-5 text-primary" />
@@ -482,6 +519,7 @@ const MvpTestsLibraryV2 = ({ project }: Props) => {
           </Button>
         </div>
       </div>
+
 
       {filteredTests.length === 0 ? (
         <Card className="text-center py-8"><CardContent><p className="text-muted-foreground">Aucun test pour ce filtre.</p></CardContent></Card>

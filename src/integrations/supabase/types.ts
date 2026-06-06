@@ -3364,6 +3364,7 @@ export type Database = {
           id: string
           incubation_program: string | null
           name: string
+          product_stage: string | null
           scenario: string
           sector: string
           sso: string | null
@@ -3379,6 +3380,7 @@ export type Database = {
           id?: string
           incubation_program?: string | null
           name: string
+          product_stage?: string | null
           scenario?: string
           sector?: string
           sso?: string | null
@@ -3394,6 +3396,7 @@ export type Database = {
           id?: string
           incubation_program?: string | null
           name?: string
+          product_stage?: string | null
           scenario?: string
           sector?: string
           sso?: string | null
