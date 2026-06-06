@@ -161,6 +161,15 @@ export default function FundingApplicationsPage() {
           <Card className="p-4"><div className="text-xs text-muted-foreground flex items-center gap-1"><Banknote className="h-3 w-3" /> Obtenu</div><div className="text-2xl font-bold">{stats.awarded > 0 ? `${(stats.awarded / 1000).toFixed(0)}K TND` : "—"}</div></Card>
         </div>
 
+        {activeProject && (
+          <div className="flex items-center gap-2 text-sm">
+            <Checkbox id="only-my-stage" checked={onlyMyStage} onCheckedChange={(c) => setOnlyMyStage(!!c)} />
+            <label htmlFor="only-my-stage" className="cursor-pointer">
+              Afficher uniquement les programmes éligibles à mon stade actuel ({activeProject.capitalStage})
+            </label>
+          </div>
+        )}
+
         {loading ? (
           <div className="flex justify-center py-20"><Loader2 className="animate-spin" /></div>
         ) : (
@@ -202,9 +211,14 @@ export default function FundingApplicationsPage() {
                           <Calendar className="h-3 w-3" /> {a.next_action}
                         </div>
                       )}
-                      {a.match_score && (
-                        <Badge variant="outline" className="mt-2 text-[10px]">⚡ {a.match_score}% match</Badge>
-                      )}
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {a.match_score && (
+                          <Badge variant="outline" className="text-[10px]">⚡ {a.match_score}% match</Badge>
+                        )}
+                        {a.stage_at_submission && (
+                          <Badge variant="outline" className="text-[10px]">Stade dépôt : {a.stage_at_submission}</Badge>
+                        )}
+                      </div>
                     </Card>
                   </motion.div>
                 ))}
