@@ -641,8 +641,9 @@ const StrategicConsolePage = () => {
                       </div>
                     </TabsContent>
                     <TabsContent value="tests">
-                      <MvpTestsLibraryV2 project={{ id: mvpProject.id, sector: mvpProject.sector, scenario: mvpProject.scenario, description: mvpProject.description, name: mvpProject.name }} />
+                      <MvpTestsLibraryV2 project={{ id: mvpProject.id, sector: mvpProject.sector, scenario: mvpProject.scenario, description: mvpProject.description, name: mvpProject.name, product_stage: mvpProject.product_stage ?? projectData.stage }} />
                     </TabsContent>
+
                     <TabsContent value="tech-tests">
                       <TechIntegrationLab projectId={mvpProject.id} />
                     </TabsContent>
@@ -661,8 +662,9 @@ const StrategicConsolePage = () => {
                     <TabsContent value="docs">
                       <div className="space-y-8">
                         <div><h3 className="text-lg font-bold mb-4 flex items-center gap-2"><FileCheck2 className="h-5 w-5 text-primary" /> Rapports</h3><MvpReportPDF project={mvpProject} /></div>
-                        <div><h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Target className="h-5 w-5 text-primary" /> Business Plan</h3><BusinessPlanGenerator projectName={mvpProject.name} sector={mvpProject.sector} messages={phaseMessages} startupStage={projectData.stage || "early-stage"} /></div>
-                        <div><h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Wallet className="h-5 w-5 text-primary" /> Pitch & Invest</h3><InvestSpace projectId={mvpProject.id} projectName={mvpProject.name} sector={mvpProject.sector} startupStage={projectData.stage || "early-stage"} messages={phaseMessages} /></div>
+                        <div><h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Target className="h-5 w-5 text-primary" /> Business Plan</h3><BusinessPlanGenerator projectName={mvpProject.name} sector={mvpProject.sector} messages={phaseMessages} startupStage={productStageToCapitalStage(projectData.stage)} /></div>
+                        <div><h3 className="text-lg font-bold mb-4 flex items-center gap-2"><Wallet className="h-5 w-5 text-primary" /> Pitch & Invest</h3><InvestSpace projectId={mvpProject.id} projectName={mvpProject.name} sector={mvpProject.sector} startupStage={productStageToCapitalStage(projectData.stage)} messages={phaseMessages} /></div>
+
                       </div>
                     </TabsContent>
                     <TabsContent value="dashboard">
