@@ -8,11 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Plus, Calendar, MoreVertical, Loader2, Banknote, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import ProjectContextBadge from "@/components/shared/ProjectContextBadge";
+import { useProjectContext } from "@/hooks/useProjectContext";
 
 const COLUMNS = [
   { id: "shortlist", label: "🎯 Shortlist", color: "from-slate-500/10" },
@@ -25,6 +28,7 @@ const COLUMNS = [
 
 export default function FundingApplicationsPage() {
   const navigate = useNavigate();
+  const { active: activeProject } = useProjectContext();
   const [apps, setApps] = useState<any[]>([]);
   const [programs, setPrograms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,13 +37,14 @@ export default function FundingApplicationsPage() {
   const [newOpen, setNewOpen] = useState(false);
   const [newProgramId, setNewProgramId] = useState<string>("");
   const [newCustom, setNewCustom] = useState("");
+  const [onlyMyStage, setOnlyMyStage] = useState(false);
 
   async function load() {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) { navigate("/auth"); return; }
     setUserId(u.user.id);
     const [a, p] = await Promise.all([
-      supabase.from("funding_applications").select("*, funding_programs(name,organization,type,max_amount_tnd)").eq("user_id", u.user.id).order("updated_at", { ascending: false }),
+      supabase.from("funding_applications").select("*, funding_programs(name,organization,type,max_amount_tnd,stages)").eq("user_id", u.user.id).order("updated_at", { ascending: false }),
       supabase.from("funding_programs").select("id,name,organization").eq("is_active", true).order("name"),
     ]);
     setApps(a.data || []);
@@ -48,12 +53,22 @@ export default function FundingApplicationsPage() {
   }
   useEffect(() => { load(); }, []);
 
+  const visibleApps = useMemo(() => {
+    if (!onlyMyStage || !activeProject) return apps;
+    const stageTokens = [activeProject.productStage, activeProject.capitalStage].filter(Boolean) as string[];
+    return apps.filter(a => {
+      const stages: string[] = a.funding_programs?.stages || [];
+      if (stages.length === 0) return true;
+      return stages.some(s => stageTokens.includes(s));
+    });
+  }, [apps, onlyMyStage, activeProject]);
+
   const byStatus = useMemo(() => {
     const m: Record<string, any[]> = {};
     COLUMNS.forEach(c => m[c.id] = []);
-    apps.forEach(a => { (m[a.status] ||= []).push(a); });
+    visibleApps.forEach(a => { (m[a.status] ||= []).push(a); });
     return m;
-  }, [apps]);
+  }, [visibleApps]);
 
   const stats = useMemo(() => ({
     total: apps.length,
@@ -92,7 +107,8 @@ export default function FundingApplicationsPage() {
       program_id: newProgramId || null,
       custom_program_name: newProgramId ? null : newCustom.trim(),
       status: "shortlist",
-    });
+      stage_at_submission: activeProject?.capitalStage || activeProject?.productStage || null,
+    } as any);
     if (error) { toast.error(error.message); return; }
     setNewOpen(false); setNewProgramId(""); setNewCustom("");
     toast.success("Candidature créée");
@@ -103,6 +119,7 @@ export default function FundingApplicationsPage() {
     <>
       <Header />
       <div className="container py-10 space-y-6">
+        <ProjectContextBadge />
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
             <Link to="/financement" className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
@@ -145,6 +162,15 @@ export default function FundingApplicationsPage() {
           <Card className="p-4"><div className="text-xs text-muted-foreground flex items-center gap-1"><Banknote className="h-3 w-3" /> Obtenu</div><div className="text-2xl font-bold">{stats.awarded > 0 ? `${(stats.awarded / 1000).toFixed(0)}K TND` : "—"}</div></Card>
         </div>
 
+        {activeProject && (
+          <div className="flex items-center gap-2 text-sm">
+            <Checkbox id="only-my-stage" checked={onlyMyStage} onCheckedChange={(c) => setOnlyMyStage(!!c)} />
+            <label htmlFor="only-my-stage" className="cursor-pointer">
+              Afficher uniquement les programmes éligibles à mon stade actuel ({activeProject.capitalStage})
+            </label>
+          </div>
+        )}
+
         {loading ? (
           <div className="flex justify-center py-20"><Loader2 className="animate-spin" /></div>
         ) : (
@@ -186,9 +212,14 @@ export default function FundingApplicationsPage() {
                           <Calendar className="h-3 w-3" /> {a.next_action}
                         </div>
                       )}
-                      {a.match_score && (
-                        <Badge variant="outline" className="mt-2 text-[10px]">⚡ {a.match_score}% match</Badge>
-                      )}
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {a.match_score && (
+                          <Badge variant="outline" className="text-[10px]">⚡ {a.match_score}% match</Badge>
+                        )}
+                        {a.stage_at_submission && (
+                          <Badge variant="outline" className="text-[10px]">Stade dépôt : {a.stage_at_submission}</Badge>
+                        )}
+                      </div>
                     </Card>
                   </motion.div>
                 ))}

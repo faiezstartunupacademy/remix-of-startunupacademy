@@ -11,6 +11,8 @@ import { Link } from "react-router-dom";
 import { ExternalLink, Plus, Sparkles, Calendar as CalIcon, Banknote, Loader2, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { useProjectContext } from "@/hooks/useProjectContext";
+import ProjectContextBadge from "@/components/shared/ProjectContextBadge";
 
 const TYPES = [
   { v: "grant", label: "Subvention", emoji: "🎁" },
@@ -31,11 +33,19 @@ function fmtTND(n: number | null | undefined) {
   return `${n} TND`;
 }
 
-function computeMatchScore(program: any, profile: { stage?: string; sector?: string; wilaya?: string }) {
-  if (!profile?.stage && !profile?.sector && !profile?.wilaya) return null;
+function computeMatchScore(program: any, profile: {
+  stage?: string; sector?: string; wilaya?: string;
+  bmValidated?: boolean; mvpScore?: number | null; capitalStage?: string;
+}) {
+  if (!profile?.stage && !profile?.sector && !profile?.wilaya && !profile?.capitalStage) return null;
   let score = 50;
-  if (profile.stage && program.stages?.includes(profile.stage)) score += 25;
+  const stageMatchers = [profile.stage, profile.capitalStage].filter(Boolean) as string[];
+  if (stageMatchers.length && program.stages?.some((s: string) => stageMatchers.includes(s))) score += 25;
   if (profile.sector && (program.sectors?.length === 0 || program.sectors?.includes(profile.sector))) score += 15;
+  // BM validated bonus on early stages
+  if (profile.bmValidated && program.stages?.some((s: string) => ["ideation","prototype","mvp"].includes(s))) score += 10;
+  // MVP validated bonus on later stages
+  if ((profile.mvpScore ?? 0) >= 60 && program.stages?.some((s: string) => ["mvp","traction","growth"].includes(s))) score += 10;
   // Regional targeting bonus
   if (profile.wilaya) {
     const targets: string[] | null = program.target_governorates || null;
@@ -52,6 +62,7 @@ function computeMatchScore(program: any, profile: { stage?: string; sector?: str
 }
 
 export default function FundingPage() {
+  const { active: activeProject } = useProjectContext();
   const [programs, setPrograms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -59,7 +70,7 @@ export default function FundingPage() {
   const [filterStage, setFilterStage] = useState<string[]>([]);
   const [tab, setTab] = useState("all");
   const [userId, setUserId] = useState<string | null>(null);
-  const [profile, setProfile] = useState<{ stage?: string; sector?: string; wilaya?: string }>({});
+  const [profile, setProfile] = useState<{ stage?: string; sector?: string; wilaya?: string; bmValidated?: boolean; mvpScore?: number | null; capitalStage?: string }>({});
   const [savingId, setSavingId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -70,19 +81,26 @@ export default function FundingPage() {
       setPrograms(data || []);
 
       if (u.user?.id) {
-        const [{ data: proj }, { data: prof }] = await Promise.all([
-          supabase.from("incubation_projects").select("stage,sector,governorate").eq("user_id", u.user.id).limit(1).maybeSingle(),
-          supabase.from("profiles").select("wilaya").eq("user_id", u.user.id).maybeSingle(),
-        ]);
-        setProfile({
-          stage: proj?.stage || undefined,
-          sector: proj?.sector || undefined,
-          wilaya: (proj as any)?.governorate || prof?.wilaya || undefined,
-        });
+        const { data: prof } = await supabase.from("profiles").select("wilaya").eq("user_id", u.user.id).maybeSingle();
+        setProfile((prev) => ({ ...prev, wilaya: prev.wilaya || prof?.wilaya || undefined }));
       }
       setLoading(false);
     })();
   }, []);
+
+  // Sync with active project context
+  useEffect(() => {
+    if (!activeProject) return;
+    setProfile((prev) => ({
+      ...prev,
+      stage: activeProject.productStage || prev.stage,
+      sector: activeProject.sector || prev.sector,
+      wilaya: activeProject.governorate || prev.wilaya,
+      bmValidated: activeProject.bmValidated,
+      mvpScore: activeProject.mvpScore,
+      capitalStage: activeProject.capitalStage,
+    }));
+  }, [activeProject]);
 
   const scored = useMemo(() => programs.map(p => ({ ...p, _score: computeMatchScore(p, profile) })), [programs, profile]);
 
@@ -104,7 +122,8 @@ export default function FundingPage() {
     setSavingId(p.id);
     const { error } = await supabase.from("funding_applications").insert({
       user_id: userId, program_id: p.id, status: "shortlist", match_score: p._score || null,
-    });
+      stage_at_submission: activeProject?.capitalStage || activeProject?.productStage || null,
+    } as any);
     setSavingId(null);
     if (error) toast.error(error.message);
     else toast.success(`${p.name} ajouté à vos candidatures`);
@@ -130,6 +149,8 @@ export default function FundingPage() {
           </div>
         </motion.div>
 
+        <ProjectContextBadge />
+
         {(profile.stage || profile.wilaya) && (
           <Card className="p-4 bg-primary/5 border-primary/20 flex items-center gap-3 flex-wrap">
             <Sparkles className="h-5 w-5 text-primary" />
@@ -138,6 +159,7 @@ export default function FundingPage() {
               {profile.stage && <> — Stage: <Badge variant="outline">{profile.stage}</Badge></>}
               {profile.sector && <> · Secteur: <Badge variant="outline">{profile.sector}</Badge></>}
               {profile.wilaya && <> · Région: <Badge variant="outline">{profile.wilaya}</Badge></>}
+              {profile.bmValidated && <> · <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30">BM ✓</Badge></>}
             </p>
           </Card>
         )}

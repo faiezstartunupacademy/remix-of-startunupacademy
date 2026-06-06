@@ -15,6 +15,8 @@ import { Upload, FileText, Trash2, Link2, Eye, Shield, Download, Lock, Copy } fr
 import { format } from "date-fns";
 import DealsPipeline from "@/components/deal-room/DealsPipeline";
 import InvestorInterests from "@/components/deal-room/InvestorInterests";
+import SuggestedDocuments from "@/components/deal-room/SuggestedDocuments";
+import ProjectContextBadge from "@/components/shared/ProjectContextBadge";
 
 const CATEGORIES = [
   { id: "financials", label: "📊 Financials", desc: "Business plan, projections, cap table" },
@@ -203,10 +205,13 @@ export default function DealRoomPage() {
           })}
         </aside>
 
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 space-y-6">
+          <ProjectContextBadge compact />
+          {userId && <SuggestedDocuments userId={userId} />}
+
           {/* Upload zone */}
           <Card
-            className="border-2 border-dashed p-8 mb-6 text-center cursor-pointer hover:border-primary transition"
+            className="border-2 border-dashed p-8 text-center cursor-pointer hover:border-primary transition"
             onClick={() => fileRef.current?.click()}
             onDragOver={(e) => e.preventDefault()}
             onDrop={(e) => { e.preventDefault(); handleFiles(e.dataTransfer.files); }}

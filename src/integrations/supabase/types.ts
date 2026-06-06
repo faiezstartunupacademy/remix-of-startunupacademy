@@ -1277,6 +1277,7 @@ export type Database = {
           notes: string | null
           priority: string | null
           program_id: string | null
+          stage_at_submission: string | null
           startup_id: string | null
           status: string
           submission_date: string | null
@@ -1297,6 +1298,7 @@ export type Database = {
           notes?: string | null
           priority?: string | null
           program_id?: string | null
+          stage_at_submission?: string | null
           startup_id?: string | null
           status?: string
           submission_date?: string | null
@@ -1317,6 +1319,7 @@ export type Database = {
           notes?: string | null
           priority?: string | null
           program_id?: string | null
+          stage_at_submission?: string | null
           startup_id?: string | null
           status?: string
           submission_date?: string | null

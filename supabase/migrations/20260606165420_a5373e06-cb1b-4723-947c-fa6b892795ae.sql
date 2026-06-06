@@ -1,0 +1,1 @@
+ALTER TABLE public.funding_applications ADD COLUMN IF NOT EXISTS stage_at_submission TEXT;

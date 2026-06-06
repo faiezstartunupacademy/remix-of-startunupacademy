@@ -15,6 +15,8 @@ import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 import { BusinessIntelligenceDashboard } from "@/components/strategic/BusinessIntelligenceDashboard";
 import MarketToolsPanel from "@/components/market-intel/MarketToolsPanel";
+import ProjectContextBadge from "@/components/shared/ProjectContextBadge";
+import { useProjectContext } from "@/hooks/useProjectContext";
 import { Wrench } from "lucide-react";
 
 type DataSource = {
@@ -28,6 +30,7 @@ type MvpProject = { id: string; name: string };
 
 const MarketIntelligencePage = () => {
   const { toast } = useToast();
+  const { active: activeProject } = useProjectContext();
   const [currentPhase, setCurrentPhase] = useState<"collect" | "insights" | "assumptions" | "stress-test">("collect");
   const [dataSources, setDataSources] = useState<DataSource[]>([]);
   const [newSource, setNewSource] = useState({ type: "competitor" as const, url: "", content: "" });
@@ -196,6 +199,10 @@ const MarketIntelligencePage = () => {
             </p>
           </div>
 
+          <div className="mb-6">
+            <ProjectContextBadge />
+          </div>
+
           {/* Main Tab Switch: Market Intelligence vs BI */}
           <Tabs value={mainTab} onValueChange={(v) => setMainTab(v as any)} className="mb-8">
             <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3">
@@ -211,7 +218,7 @@ const MarketIntelligencePage = () => {
             </TabsList>
 
             <TabsContent value="tools" className="mt-6">
-              <MarketToolsPanel />
+              <MarketToolsPanel sector={activeProject?.sector || undefined} />
             </TabsContent>
 
             <TabsContent value="market" className="mt-6">
