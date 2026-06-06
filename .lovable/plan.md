@@ -1,70 +1,102 @@
+
 ## Objectif
 
-Clarifier et renforcer le flux d'inscription / 1ère connexion Google pour qu'un utilisateur :
-1. Choisisse **un seul rôle principal** lors de l'onboarding (mono-rôle obligatoire).
-2. Découvre **après** comment cumuler d'autres casquettes via `/profil/roles` et le switcher Mission Control.
+Corriger l'incohérence des stades entre le Pôle Stratégique et le MVP Validator, et propager le **stade produit** comme filtre de pertinence — tout en gardant les **6 stades capital** distincts pour les générateurs financiers (auto-suggérés, modifiables).
 
-L'architecture multi-rôles (`user_role_types`, `useUserRoles`, RoleSwitcher, page `/profil/roles`) existe déjà. Ce plan ne crée **aucune nouvelle table** — il renforce l'UX d'onboarding et la pédagogie autour du cumul.
+## Principe directeur
 
----
+Deux dimensions complémentaires, jamais fusionnées :
+- **Stade produit** (4) : `idee` → `prototype` → `mvp` → `traction` — maturité R&D
+- **Stade capital** (6) : `student` → … → `accelerated` — maturité financière
 
-## 1. Onboarding mono-rôle (email + Google identiques)
+Le stade produit est la source de vérité ; le stade capital est dérivé puis ajustable.
 
-`src/pages/OnboardingPage.tsx` (existant) :
-- Vérifier que la page est bien déclenchée pour les comptes Google sans `profiles.role_type` (sinon, ajouter redirection depuis `useAuth` ou un guard dans `App.tsx`).
-- Garder l'écran actuel de sélection unique de rôle (radios : Startuper / Mentor / Investisseur / Incubateur).
-- Au submit :
-  - `profiles.role_type` ← rôle choisi.
-  - `user_role_types` ← INSERT avec `is_primary = true` (s'il n'existe pas déjà — la migration le crée pour les comptes pré-existants, mais pas pour les nouveaux signups).
-  - `localStorage['mc_active_role']` ← rôle choisi.
-- Ajouter en bas de l'écran une **note pédagogique** : « Vous pourrez activer d'autres casquettes (mentor, investisseur, incubateur) à tout moment depuis votre profil. »
+## Changements
 
-## 2. Hook côté création de compte
+### 1. Fix du `stageMap` cassé (Pôle Stratégique → MVP Validator)
 
-`src/hooks/handle_new_user` côté DB : le trigger existant ne crée que `profiles` + `user_roles`. Ajouter dans la même fonction (ou dans le submit de l'OnboardingPage) la création de la ligne `user_role_types` correspondante quand `role_type` est défini, avec `is_primary = true`.
+`src/pages/StrategicConsolePage.tsx` (lignes ~188-194) référence des clés inexistantes (`ideation`, `product-market-fit`, `growth`, `scale`). Remplacer par les 4 vraies clés :
 
-→ Décision : faire ça **dans OnboardingPage** (pas dans le trigger), car le rôle n'est pas connu au moment du signup auth — il est choisi après. Donc OnboardingPage devient l'endroit unique qui synchronise `profiles.role_type` + `user_role_types`.
+```text
+idee       → scenario A (idée seule)
+prototype  → scenario A
+mvp        → scenario B (idée + BM validé)
+traction   → scenario B
+```
 
-## 3. Google 1ère connexion = même onboarding
+### 2. Propager le `stage` produit dans MVP Validator
 
-- Après `lovable.auth.signInWithOAuth("google", …)`, le callback ramène sur `/` ou `/mission-control`.
-- Ajouter un guard dans `App.tsx` (ou dans `MissionControl.tsx`) : si l'utilisateur est authentifié et que `profiles.role_type IS NULL`, rediriger vers `/onboarding`.
-- Ainsi l'expérience email vs Google est identique : compte créé → onboarding → choix mono-rôle → Mission Control.
+- Ajouter colonne `product_stage` (text, nullable, check sur les 4 valeurs) à `mvp_validator_projects`.
+- À l'import depuis le Pôle Stratégique, copier `incubation_projects.stage` → `mvp_validator_projects.product_stage`.
+- Exposer le stade dans le contexte projet partagé aux composants enfants.
 
-## 4. Pédagogie post-onboarding pour le cumul de rôles
+### 3. Filtrage automatique des tests MVP par stade produit
 
-Ajouter 2 nudges discrets pour que l'utilisateur découvre la fonctionnalité multi-rôles :
+Dans `MvpTestsLibrary.tsx` + `utils/mvpTestFilter.ts` :
 
-**a. Tooltip "Did you know" dans le RoleSwitcher (1ère visite)**
-- À l'ouverture de Mission Control si `user_role_types.count = 1`, afficher une bulle d'info (Popover shadcn) à côté du RoleSwitcher : « Vous portez plusieurs casquettes ? Ajoutez-les depuis Gérer mes rôles. »
-- Dismissible, mémorisé via `localStorage['mc_multirole_hint_seen']`.
+| Stade produit | Phase tests prioritaire |
+|---|---|
+| `idee` | Problem-Solution Fit |
+| `prototype` | Problem-Solution Fit + début Product-Market Fit |
+| `mvp` | Product-Market Fit |
+| `traction` | Scale |
 
-**b. Carte "Vos autres casquettes" dans le profil**
-- Sur la page Profil (ou en bas de Mission Control si pas de page profil dédiée), petite carte listant les 3 rôles non activés avec un CTA « Activer » → redirige vers `/profil/roles`.
+- Filtrer la bibliothèque pour ne montrer que les tests de la phase courante par défaut.
+- Ajouter un toggle **"Voir tous les tests"** pour révéler les autres phases (pas de blocage dur).
+- Conserver le filtrage existant par `scenario` (A/B) et `sector` ; le `stage` agit comme 3e filtre additionnel.
 
-## 5. Page `/profil/roles` (existante) — renforcement copy
+### 4. Auto-suggestion du stade capital pour BP/Invest
 
-- Ajouter un bandeau en haut : « Comment fonctionnent les rôles ? » expliquant en 3 lignes que :
-  - Le rôle principal détermine la vue par défaut de Mission Control.
-  - Vous pouvez basculer entre vos rôles à tout moment via le sélecteur en haut.
-  - Activer/désactiver un rôle ne supprime jamais vos données.
+Dans `MvpValidatorPage.tsx` (et tout endroit qui passe `startupStage` aux générateurs BP/Invest) :
 
----
+```text
+idee/prototype  → pre-seed   (suggéré)
+mvp             → seed        (suggéré)
+traction        → serie-a    (suggéré)
+```
 
-## Fichiers impactés
+- Le `StartupStageSelector` reste affiché, pré-rempli avec la suggestion, mais **modifiable** par l'utilisateur.
+- Supprimer la conversion actuelle `scenario === "A" ? "pre-seed" : "seed"` qui ignore le stade produit réel.
 
-**Modifiés**
-- `src/pages/OnboardingPage.tsx` — synchroniser `user_role_types` au submit + note pédagogique.
-- `src/App.tsx` ou `src/hooks/useAuth.ts` — guard `role_type IS NULL` → `/onboarding` (couvre Google).
-- `src/pages/MissionControl.tsx` — Popover de découverte multi-rôles si 1 seul rôle actif.
-- `src/pages/UserRolesPage.tsx` — bandeau pédagogique en tête de page.
+### 5. Affichage du double badge dans le Pôle Stratégique
 
-**Aucune migration SQL** — la table `user_role_types` et ses triggers existent déjà.
+Sur la fiche projet (`StrategicConsolePage.tsx`) :
+- Badge stade produit (existant) à conserver.
+- Ajouter un sous-libellé discret : "Maturité capital suggérée : pre-seed" (lien vers le BP/Invest).
 
----
+### 6. Documentation mémoire
 
-## Réponse à votre question (pour mémoire)
+Créer `mem://logic/stage-taxonomy-bridge` :
+- Définit les 2 taxonomies et leur rôle respectif.
+- Documente le mapping produit → capital (auto-suggéré, non strict).
+- Documente le filtrage tests MVP par stade.
 
-- **Inscription / 1ère connexion Google** : 1 seul rôle est choisi pendant l'onboarding → devient le rôle **principal**.
-- **Cumul** : se fait **après**, librement, depuis le switcher Mission Control → « Gérer mes rôles » → `/profil/roles`. Activer le rôle Mentor crée automatiquement la fiche annuaire (trigger DB existant).
-- **Pas de validation admin** requise pour ajouter un rôle (libre).
+Mettre à jour `mem://logic/mvp-test-filtering` pour ajouter `product_stage` comme 3e critère.
+
+## Détails techniques
+
+**Migration SQL** (1 seule) :
+```sql
+ALTER TABLE public.mvp_validator_projects
+  ADD COLUMN IF NOT EXISTS product_stage text
+  CHECK (product_stage IN ('idee','prototype','mvp','traction'));
+```
+
+**Fichiers touchés** :
+- `src/pages/StrategicConsolePage.tsx` — fix `stageMap`, badge capital suggéré, passage `product_stage` à l'import
+- `src/pages/MvpValidatorPage.tsx` — auto-suggestion `startupStage` depuis `product_stage`
+- `src/components/mvp-validator/MvpTestsLibrary.tsx` — filtre stage + toggle "Voir tous"
+- `src/utils/mvpTestFilter.ts` — ajouter paramètre `productStage` et map phase→stage
+- `src/components/strategic/StartupStageSelector.tsx` — accepter prop `suggestedFrom` pour afficher d'où vient la suggestion
+- Migration DB + maj mémoires
+
+**Hors scope** :
+- Pas de refonte du `StartupStageSelector` 6-stades.
+- Pas de migration de données rétroactive (les projets existants gardent `null` en `product_stage`, le filtre montre tous les tests par défaut).
+- Pas de changement UX sur la fiche projet startupeur (Mission Control) — seulement consommation lecture.
+
+## Validation
+
+- Importer un projet `idee` → MVP Validator doit créer un scénario A et ne montrer que les tests Problem-Solution Fit.
+- Importer un projet `traction` → scénario B, tests Scale, `startupStage` BP pré-rempli à `serie-a` (modifiable).
+- Le badge "Maturité capital suggérée" doit apparaître dans le Pôle Stratégique.
