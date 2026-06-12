@@ -74,11 +74,7 @@ const BusinessModelPage = () => {
       return null;
     };
 
-    return (
-      <InlineLicenseGate contentSlug={gateSlug} contentName={gateName}>
-        {renderContent()}
-      </InlineLicenseGate>
-    );
+    return renderContent();
   }
 
   return (
@@ -389,9 +385,7 @@ const BusinessModelPage = () => {
               className="py-12"
             >
               <div className="container">
-                <InlineLicenseGate contentSlug="bm-green-bm" contentName="Green Business Model">
-                  <GreenBMPresentation />
-                </InlineLicenseGate>
+                <GreenBMPresentation />
               </div>
             </motion.div>
           )}
