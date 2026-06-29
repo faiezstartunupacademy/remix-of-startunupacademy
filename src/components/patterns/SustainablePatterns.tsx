@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Leaf, Target, X, Recycle, HandHeart, Users, Factory, Coins, Heart, Globe, Building2, Lightbulb, Sparkles } from "lucide-react";
+import { Search, Leaf, Target, X, Recycle, HandHeart, Users, Factory, Coins, Heart, Globe, Building2, Lightbulb, Sparkles, Download } from "lucide-react";
 import { SUSTAINABLE_PATTERNS_DATA, SUSTAINABLE_CATEGORIES, getSustainableGroupColor } from "@/data/sustainablePatterns";
 import { Input } from "@/components/ui/input";
 
@@ -72,6 +72,16 @@ export const SustainablePatterns = () => {
           <p className="text-muted-foreground max-w-2xl mx-auto mt-4">
             Taxonomie de Lüdeke-Freund et al. — Performance économique conciliée avec un impact environnemental et social positif
           </p>
+          <motion.a
+            href="/sustainable-growth-patterns.pdf"
+            download
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="inline-flex items-center gap-2 mt-6 px-6 py-3 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold shadow-lg hover:shadow-xl transition-all"
+          >
+            <Download className="h-5 w-5" />
+            Télécharger le PDF (45 patterns + métriques)
+          </motion.a>
         </div>
       </motion.div>
 
