@@ -360,17 +360,15 @@ const BusinessModelPage = () => {
               className="py-12"
             >
               <div className="container">
-                <InlineLicenseGate contentSlug="bm-patterns" contentName="Business Model Patterns">
-                  <div className="text-center mb-10">
-                    <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                      Business Model <span className="text-gradient">Patterns</span>
-                    </h2>
-                    <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-                      Explorez les 60 patterns de business model, les modèles durables et les métriques de validation.
-                    </p>
-                  </div>
-                  <PatternsSpace />
-                </InlineLicenseGate>
+                <div className="text-center mb-10">
+                  <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                    Business Model <span className="text-gradient">Patterns</span>
+                  </h2>
+                  <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+                    Explorez les 60 patterns de business model, les modèles durables et les métriques de validation.
+                  </p>
+                </div>
+                <PatternsSpace />
               </div>
             </motion.div>
           )}
