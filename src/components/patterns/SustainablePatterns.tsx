@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Leaf, Target, X, Recycle, HandHeart, Users, Factory, Coins, Heart, Globe, Building2, Lightbulb, Sparkles } from "lucide-react";
+import { Search, Leaf, Target, X, Recycle, HandHeart, Users, Factory, Coins, Heart, Globe, Building2, Lightbulb, Sparkles, Download } from "lucide-react";
 import { SUSTAINABLE_PATTERNS_DATA, SUSTAINABLE_CATEGORIES, getSustainableGroupColor } from "@/data/sustainablePatterns";
 import { Input } from "@/components/ui/input";
 
