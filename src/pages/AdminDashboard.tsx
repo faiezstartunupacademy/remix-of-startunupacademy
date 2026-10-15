@@ -270,7 +270,7 @@ const AdminDashboard = () => {
 
           {/* Dashboard Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-             <TabsList className="grid w-full grid-cols-3 md:grid-cols-9 h-auto">
+             <TabsList className="grid w-full grid-cols-4 md:grid-cols-8 h-auto">
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <LayoutDashboard className="h-4 w-4" />
                 <span className="hidden lg:inline">Aperçu</span>
