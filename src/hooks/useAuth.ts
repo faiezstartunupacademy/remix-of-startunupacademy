@@ -49,6 +49,9 @@ export const useAuth = () => {
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      const uid = session?.user?.id ?? null;
+      if (lastUserId !== undefined && uid === lastUserId) return;
+      lastUserId = uid;
       setAuthState(prev => ({
         ...prev,
         session,
