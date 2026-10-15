@@ -1,4 +1,4 @@
-import { useEffect, useState, ReactNode } from "react";
+import { useEffect, useRef, useState, ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Lock, Loader2, GraduationCap, Send, CheckCircle2, Clock, XCircle, ShieldCheck } from "lucide-react";
@@ -28,9 +28,11 @@ const StrategicAccessGate = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => { if (!authLoading && !user) navigate("/auth"); }, [user, authLoading, navigate]);
 
+  const checkedOnce = useRef(false);
   const checkAccess = async () => {
     if (!user) return;
-    setChecking(true);
+    // Only block the UI on the very first check — silent re-checks keep pages mounted
+    if (!checkedOnce.current) setChecking(true);
     try {
       // 1) Approved trainer profile (granted by trigger when a session is validated)
       const { data: trainer } = await supabase
@@ -62,11 +64,13 @@ const StrategicAccessGate = ({ children }: { children: ReactNode }) => {
       if (reqData && (reqData as any[]).length > 0) setRequest((reqData as any)[0]);
       else setRequest(null);
     } finally {
+      checkedOnce.current = true;
       setChecking(false);
     }
   };
 
-  useEffect(() => { if (user && !authLoading) checkAccess(); }, [user, authLoading]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (user?.id && !authLoading) checkAccess(); }, [user?.id, authLoading]);
 
   // Realtime: detect approval
   useEffect(() => {

@@ -22,15 +22,15 @@ export const useAuth = () => {
   });
 
   useEffect(() => {
+    let lastUserId: string | null | undefined = undefined;
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        setAuthState(prev => ({
-          ...prev,
-          session,
-          user: session?.user ?? null,
-          loading: false,
-        }));
+        // Token refresh / tab refocus with the same user: don't re-render consumers
+        const uid = session?.user?.id ?? null;
+        if (lastUserId !== undefined && uid === lastUserId) return;
+        lastUserId = uid;
+        setAuthState(prev => ({ ...prev, session, user: session?.user ?? null, loading: false }));
 
         // Defer role check with setTimeout to avoid deadlock
         if (session?.user) {
@@ -49,6 +49,9 @@ export const useAuth = () => {
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      const uid = session?.user?.id ?? null;
+      if (lastUserId !== undefined && uid === lastUserId) return;
+      lastUserId = uid;
       setAuthState(prev => ({
         ...prev,
         session,
