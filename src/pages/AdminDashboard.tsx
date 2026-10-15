@@ -38,6 +38,17 @@ import AccountsManager from "@/components/admin/AccountsManager";
 import FundingProgramsManager from "@/components/admin/FundingProgramsManager";
 import ApplicationsPipeline from "@/components/admin/ApplicationsPipeline";
 import CohortAnalytics from "@/components/admin/CohortAnalytics";
+import MarketplaceAdmin from "@/components/marketplace/MarketplaceAdmin";
+import DealsPipeline from "@/components/deal-room/DealsPipeline";
+
+function AdminDealRoomTab() {
+  const [uid, setUid] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUid(data.user?.id ?? null));
+  }, []);
+  if (!uid) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>;
+  return <DealsPipeline userId={uid} />;
+}
 import LegalVerificationPanel from "@/components/admin/LegalVerificationPanel";
 import RegionalEquityDashboard from "@/components/admin/RegionalEquityDashboard";
 import PartnersAdminManager from "@/components/admin/PartnersAdminManager";
@@ -288,13 +299,21 @@ const AdminDashboard = () => {
                 <BarChart3 className="h-4 w-4" />
                 <span className="hidden lg:inline">Projets</span>
               </TabsTrigger>
+              <TabsTrigger value="marketplace" className="flex items-center gap-2">
+                <Home className="h-4 w-4" />
+                <span className="hidden lg:inline">Marketplace</span>
+              </TabsTrigger>
               <TabsTrigger value="programs" className="flex items-center gap-2">
                 <Briefcase className="h-4 w-4" />
-                <span className="hidden lg:inline">Programmes</span>
+                <span className="hidden lg:inline">Financement</span>
               </TabsTrigger>
               <TabsTrigger value="pipeline" className="flex items-center gap-2">
                 <Kanban className="h-4 w-4" />
-                <span className="hidden lg:inline">Pipeline</span>
+                <span className="hidden lg:inline">Candidatures</span>
+              </TabsTrigger>
+              <TabsTrigger value="dealroom" className="flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                <span className="hidden lg:inline">Deal Room</span>
               </TabsTrigger>
               <TabsTrigger value="legal" className="flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4" />
@@ -316,6 +335,14 @@ const AdminDashboard = () => {
 
             <TabsContent value="bi">
               <PlatformBIDashboard />
+            </TabsContent>
+
+            <TabsContent value="marketplace">
+              <MarketplaceAdmin />
+            </TabsContent>
+
+            <TabsContent value="dealroom">
+              <AdminDealRoomTab />
             </TabsContent>
 
 
